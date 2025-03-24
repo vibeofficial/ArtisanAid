@@ -5,6 +5,7 @@ exports.registerValidation = async (req, res, next) => {
   const schema = joi.object({
     fullname: joi.string().min(3).trim().required().pattern(/^[A-Za-z]/),
     email: joi.string().email().trim().required(),
+    confirmEmail: joi.string().email().trim().required(),
     username: joi.string().min(3).trim().required(),
     phoneNumber: joi.string().min(11).max(11).required().pattern(/^[0-9]+$/),
     gender: joi.string().trim().min(4).max(6).required().pattern(/^(Male|Female)$/),

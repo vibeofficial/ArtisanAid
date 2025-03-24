@@ -10,7 +10,7 @@ const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerUser = async (req, res) => {
     try {
-        const { fullname, email, username, phoneNumber, gender, age, password, confirmPassword } = req.body;
+        const { fullname, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword } = req.body;
         const file = req.file;
 
         if (password !== confirmPassword) {
@@ -18,7 +18,14 @@ exports.registerUser = async (req, res) => {
             return res.status(400).json({
                 message: 'Password does not match'
             })
-        }
+        };
+
+        if (email !== confirmEmail) {
+            fs.unlinkSync(file.path);
+            return res.status(400).json({
+                message: 'Email does not match'
+            })
+        };
 
         const checkEmail = await userModel.find({ email: email.toLowerCase() });
 
@@ -52,20 +59,42 @@ exports.registerUser = async (req, res) => {
 
         const profilePicResult = await cloudinary.uploader.upload(file.path)
         fs.unlinkSync(file.path);
+        let user;
 
-        const user = new userModel({
-            fullname,
-            email,
-            username,
-            phoneNumber,
-            gender,
-            age: `${age} years`,
-            password: hashedPassword,
-            profilePic: {
-                public_id: profilePicResult.public_id,
-                image_url: profilePicResult.secure_url
-            }
-        });
+        if (email === '') {
+            user = new userModel({
+                fullname,
+                email,
+                username,
+                phoneNumber,
+                gender,
+                age: `${age} years`,
+                password: hashedPassword,
+                profilePic: {
+                    public_id: profilePicResult.public_id,
+                    image_url: profilePicResult.secure_url
+                },
+                role: 'Admin',
+                subscription: 'Unlimited',
+            })
+        } else {
+            user = new userModel({
+                fullname,
+                email,
+                username,
+                phoneNumber,
+                gender,
+                age: `${age} years`,
+                password: hashedPassword,
+                profilePic: {
+                    public_id: profilePicResult.public_id,
+                    image_url: profilePicResult.secure_url
+                },
+                role: 'User',
+                subscription: 'Demo',
+                expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3)
+            });
+        };
 
         const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
         const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${token}`;
