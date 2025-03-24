@@ -41,6 +41,9 @@ const userSchema = new mongoose.Schema({
     enum: ['Admin', 'User'],
     default: 'User'
   },
+  category: {
+    type: String,
+  },
   isLoggedIn: {
     type: Boolean,
     default: false
@@ -57,11 +60,23 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isSubscribed: {
+    type: Boolean,
+    default: false
+  },
+  expires: {
+    type: Number,
+    default: 0
+  },
+  subscription: {
+    type: String,
+    enum: ['Unlimited', 'Demo', 'Active', 'Expired'],
+  },
   subscriptionId: [{
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'subscriptions'
   }]
-});
+}, { timestamps: true });
 
 const userModel = mongoose.model('users', userSchema);
 
