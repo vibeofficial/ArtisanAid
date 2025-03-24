@@ -313,7 +313,7 @@ exports.login = async (req, res) => {
 
         if (user.isRestricted === true) {
             return res.status(400).json({
-                message: 'Your account is restricted'
+                message: 'Your account is restricted, contact: jueffizzy@gmail.com for complaints'
             })
         };
 
@@ -424,6 +424,70 @@ exports.removeAdmin = async (req, res) => {
 };
 
 
+exports.restrictAccount = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await userModel.findOne({ _id: userId });
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'Account not found'
+            })
+        };
+
+        if (user.isRestricted === true) {
+            return res.status(404).json({
+                message: 'This account is already restricted'
+            })
+        };
+
+        user.isRestricted = true;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Account is restricted successfully'
+        })
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            message: 'Error restricting account'
+        })
+    }
+};
+
+
+exports.unrestrictAccount = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await userModel.findOne({ _id: userId });
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'Account not found'
+            })
+        };
+
+        if (user.isRestricted === false) {
+            return res.status(404).json({
+                message: 'This account is not restricted'
+            })
+        };
+
+        user.isRestricted = false;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Account is no longer restricted'
+        })
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            message: 'Error unrestricting account'
+        })
+    }
+};
+
+
 exports.getAdmins = async (req, res) => {
     try {
         const users = await userModel.find({ role: 'Admin' });
@@ -520,7 +584,7 @@ exports.getUsers = async (req, res) => {
 
 exports.getUser = async (req, res) => {
     try {
-        const { userId } = req.user;
+        const { userId } = req.params;
         const user = await userModel.findById(userId);
 
         if (!user) {
@@ -695,8 +759,8 @@ exports.updateAddress = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const user = await userModel.findById(id);
+        const { userId } = req.params;
+        const user = await userModel.findById(userId);
 
         if (!user) {
             return res.status(404).json({
