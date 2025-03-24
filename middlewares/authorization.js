@@ -83,7 +83,7 @@ exports.authorize = async (req, res, next) => {
       })
     };
 
-    if (user.isAdmin !== true) {
+    if (user.role !== 'Admin') {
       return res.status(401).json({
         message: 'Authorization failed: Contact admin'
       })
