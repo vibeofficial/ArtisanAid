@@ -20,6 +20,12 @@ exports.registerUser = async (req, res) => {
             })
         };
 
+        if (age < 18) {
+            return res.status(400).json({
+                message: 'Age must be above 18'
+            })
+        };
+
         if (email !== confirmEmail) {
             fs.unlinkSync(file.path);
             return res.status(400).json({
