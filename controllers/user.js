@@ -12,7 +12,9 @@ exports.registerUser = async (req, res) => {
     try {
         const { fullname, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword } = req.body;
         const file = req.file;
-
+        const name = fullname.split(' ');
+        const nameFormat = name.map((e) => { return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase() }).join(' ');
+        
         if (password !== confirmPassword) {
             fs.unlinkSync(file.path);
             return res.status(400).json({
@@ -62,14 +64,13 @@ exports.registerUser = async (req, res) => {
 
         const saltedRound = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, saltedRound);
-
         const profilePicResult = await cloudinary.uploader.upload(file.path)
         fs.unlinkSync(file.path);
         let user;
 
         if (email === '') {
             user = new userModel({
-                fullname,
+                fullname: nameFormat,
                 email,
                 username,
                 phoneNumber,
@@ -85,7 +86,7 @@ exports.registerUser = async (req, res) => {
             })
         } else {
             user = new userModel({
-                fullname,
+                fullname: nameFormat,
                 email,
                 username,
                 phoneNumber,
@@ -104,7 +105,7 @@ exports.registerUser = async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
         const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${token}`;
-        const firstName = fullname.split(' ')[0];
+        const firstName = nameFormat.split(' ')[0];
         const html = verifyMail(link, firstName);
 
         const mailDetails = {
@@ -761,15 +762,14 @@ exports.updateAddress = async (req, res) => {
 
         const userAddress = address.split(' ');
 
-
         const data = {
             number: userAddress[0],
             name: userAddress[1],
             lga: userAddress[2],
             state: userAddress[3]
-        }
+        };
 
-        user.address = data
+        user.address = data;
         await user.save();
 
         res.status(200).json({
