@@ -7,84 +7,103 @@ const { verifyMail, reset } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 const jwtSecret = process.env.JWT_SECRET;
 
-
 exports.registerUser = async (req, res) => {
     try {
-        const { fullname, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword } = req.body;
+        const { fullname, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword, category, lga, state } = req.body;
         const file = req.file;
         const name = fullname.split(' ');
-        const nameFormat = name.map((e) => { return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase() }).join(' ');
+        const nameFormat = name.map((e) => e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()).join(' ');
+
         
         if (password !== confirmPassword) {
-            fs.unlinkSync(file.path);
+            if (file) fs.unlinkSync(file.path);
             return res.status(400).json({
-                message: 'Password does not match'
-            })
-        };
+                 message: 'Password does not match'
+                 });
+        }
 
+       
         if (age < 18) {
             return res.status(400).json({
-                message: 'Age must be above 18'
-            })
-        };
+                 message: 'Age must be above 18' 
+                });
+        }
 
+       
         if (email !== confirmEmail) {
-            fs.unlinkSync(file.path);
-            return res.status(400).json({
+            if (file) fs.unlinkSync(file.path);
+            return res.status(400).json({ 
                 message: 'Email does not match'
-            })
-        };
+             });
+        }
 
-        const checkEmail = await userModel.find({ email: email.toLowerCase() });
-
-        if (checkEmail.length === 1) {
-            fs.unlinkSync(file.path);
+        const emailExists = await userModel.findOne({ email: email.toLowerCase() });
+        if (emailExists) {
+            if (file) fs.unlinkSync(file.path);
             return res.status(400).json({
-                message: `${email.toLowerCase()} has already been used`
-            })
-        };
+                 message: `${email.toLowerCase()} has already been used`
+                 });
+        }
 
-        const checkUsername = await userModel.find({ username: username.toLowerCase() });
-
-        if (checkUsername.length === 1) {
-            fs.unlinkSync(file.path);
+        const usernameExists = await userModel.findOne({ username: username.toLowerCase() });
+        if (usernameExists) {
+            if (file) fs.unlinkSync(file.path);
             return res.status(400).json({
-                message: 'Username already exist'
-            })
-        };
+                 message: 'Username already exists'
+                 });
+        }
 
-        const checkPhoneNumber = await userModel.find({ phoneNumber: phoneNumber });
-
-        if (checkPhoneNumber.length === 1) {
-            fs.unlinkSync(file.path);
-            return res.status(400).json({
+        // Check if phone number is already in use
+        const phoneExists = await userModel.findOne({ phoneNumber });
+        if (phoneExists) {
+            if (file) fs.unlinkSync(file.path);
+            return res.status(400).json({ 
                 message: 'Phone number has already been used'
-            })
-        };
+             });
+        }
 
+      
         const saltedRound = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, saltedRound);
-        const profilePicResult = await cloudinary.uploader.upload(file.path)
-        fs.unlinkSync(file.path);
+
+       
+        let profilePicResult = null;
+        if (file) {
+            profilePicResult = await cloudinary.uploader.upload(file.path);
+            fs.unlinkSync(file.path);
+        }
+
         let user;
 
         if (email === '') {
+           
             user = new userModel({
                 fullname: nameFormat,
                 email,
                 username,
                 phoneNumber,
                 gender,
-                age: `${age} years`,
+                age:  `${age} years`,
                 password: hashedPassword,
-                profilePic: {
-                    public_id: profilePicResult.public_id,
-                    image_url: profilePicResult.secure_url
-                },
+                profilePic: profilePicResult
+                    ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
+                    : {},
                 role: 'Admin',
                 subscription: 'Unlimited',
-            })
+            });
         } else {
+            // Regular user registration (Worker)
+            if (!category) {
+                return res.status(400).json({ 
+                    message: 'Job category is required' 
+                });
+            }
+            if (!lga || !state) {
+                return res.status(400).json({ 
+                    message: 'LGA and State are required'
+                 });
+            }
+
             user = new userModel({
                 fullname: nameFormat,
                 email,
@@ -93,27 +112,30 @@ exports.registerUser = async (req, res) => {
                 gender,
                 age: `${age} years`,
                 password: hashedPassword,
-                profilePic: {
-                    public_id: profilePicResult.public_id,
-                    image_url: profilePicResult.secure_url
-                },
+                profilePic: profilePicResult
+                    ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
+                    : {},
                 role: 'User',
+                category, // Store worker category
+                address: { lga, state }, // Store address
                 subscription: 'Demo',
-                expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3)
+                expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3), 
             });
-        };
+        }
 
+        
         const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
         const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${token}`;
         const firstName = nameFormat.split(' ')[0];
         const html = verifyMail(link, firstName);
 
+       
         const mailDetails = {
             email: user.email,
             subject: 'ACCOUNT VERIFICATION',
             html,
             id: user._id,
-            public_id: user.profilePic.public_id
+            public_id: user.profilePic.public_id,
         };
 
         await mail_sender(mailDetails);
@@ -122,15 +144,12 @@ exports.registerUser = async (req, res) => {
         res.status(201).json({
             message: 'Account Registered Successfully',
             data: user
-        })
+        });
     } catch (error) {
         console.log(error.message);
-        res.status(500).json({
-            message: 'Error registering user'
-        })
+        res.status(500).json({ message: 'Error registering user' });
     }
 };
-
 
 exports.verifyUser = async (req, res) => {
     try {
@@ -826,3 +845,122 @@ exports.deleteUser = async (req, res) => {
         })
     }
 };
+
+// Controller function to get a single worker by category
+exports.getWorkerByCategory = async (req, res) => {
+    try {
+        // Extract category from the request body
+        const { category } = req.body;
+
+        // Check if category is provided
+        if (!category) {
+            return res.status(400).json({
+                message: "Category is required"
+            });
+        }
+
+        // Find a single worker in the given category
+        const worker = await userModel.findOne({ category });
+
+        // If no worker is found, return a 404 response
+        if (!worker) {
+            return res.status(404).json({
+                message: "No worker found in this category"
+            });
+        }
+
+        // If a worker is found, return success response
+        res.status(200).json({
+            message: "Worker found",
+            data: worker
+        });
+    } catch (error) {
+        // Log the error for debugging
+        console.error("Error fetching worker by category:", error.message);
+
+        // Send a server error response
+        res.status(500).json({
+            message: "Error fetching worker by category"
+        });
+    }
+};
+
+
+  exports.getAllWorkersInCategory = async (req, res) => {
+    try {
+      // Extract category from the request body
+      const { category } = req.body;
+  
+      // Ensure category is provided
+      if (!category) {
+        return res.status(400).json({
+          message: "Category is required",
+        });
+      }
+  
+      // Query to fetch all workers in the specified category
+      const workers = await userModel.find({ category });
+  
+      // If no workers are found, return a 404 response
+      if (workers.length === 0) {
+        return res.status(404).json({
+          message: "No workers found in this category",
+        });
+      }
+  
+      // Send the response with workers data
+      res.status(200).json({
+        message: "Workers retrieved successfully",
+        data: workers,
+      });
+    } catch (error) {
+      console.error(error.message); // Log the error for debugging
+      res.status(500).json({
+        message: "Error fetching workers in category",
+      });
+    }
+  };
+  
+  exports.getWorkersByLocalGovt = async (req, res) => {
+    try {
+      // Extract LGA and verification filter from request body
+      const { lga, isVerified } = req.body;
+  
+      // Ensure LGA is provided
+      if (!lga) {
+        return res.status(400).json({
+          message: "Local Government (LGA) is required",
+        });
+      }
+  
+      // Create a query object to search for workers by LGA
+      const query = { "address.lga": lga };
+  
+      // If isVerified is provided, filter by verification status
+      if (isVerified !== undefined) {
+        query.isVerified = isVerified === "true";
+      }
+  
+      // Find all workers matching the query (no pagination)
+      const workers = await userModel.find(query);
+  
+      // If no workers are found, return a 404 response
+      if (workers.length === 0) {
+        return res.status(404).json({
+          message: "No workers found in this local government",
+        });
+      }
+  
+      // Send the response with workers data
+      res.status(200).json({
+        message: "Workers retrieved successfully",
+        data: workers,
+      });
+    } catch (error) {
+      console.error(error.message); // Log the error for debugging
+      res.status(500).json({
+        message: "Error fetching workers by local government",
+      });
+    }
+  };
+  
