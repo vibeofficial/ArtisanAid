@@ -1,48 +1,78 @@
 const mongoose = require('mongoose');
 
+const allowedAdminEmail = "artisanaid.team@gmail.com"; 
+
 const userSchema = new mongoose.Schema({
-  fullname: {
+  fullName: {
     type: String,
-    require: true
+    required: true,
+    trim: true,
+    set: (v) => v.replace(/\s+/g, ' ') 
   },
   email: {
     type: String,
-    require: true,
-    lowercase: true
+    required: true,
+    lowercase: true,
+    unique: true,
+    trim: true
   },
   username: {
     type: String,
-    require: true,
-    lowercase: true
+    required: true,
+    lowercase: true,
+    unique: true,
+    trim: true
   },
   gender: {
     type: String,
-    require: true,
-    enum: ['Male', 'Female']
+    required: true,
+    enum: ['Male', 'Female'],
+    trim: true
   },
   age: {
-    type: String,
-    require: true,
+    type: String, 
+    required: true,
+    trim: true
   },
   phoneNumber: {
     type: String,
-    require: true,
+    required: true,
+    unique: true,
+    trim: true
   },
   password: {
     type: String,
-    require: true,
+    required: true,
+    trim: true
   },
   profilePic: {
-    public_id: { type: String },
-    image_url: { type: String }
+    public_id: { type: String, trim: true },
+    image_url: { type: String, trim: true }
   },
   role: {
     type: String,
     enum: ['Admin', 'User'],
-    default: 'User'
+    default: function() {
+      return this.email === allowedAdminEmail ? 'Admin' : 'User'; 
+    },
+    trim: true
   },
-  category: {
-    type: String,
+  jobCategory: {
+    type: String, 
+    required: true,
+    trim: true
+  },
+  address: {
+    lga: {
+      type: String, 
+      required: true,
+      trim: true
+    }, 
+    state: { 
+      type: String, 
+      required: true,
+      trim: true
+    }
   },
   isLoggedIn: {
     type: Boolean,
@@ -71,6 +101,7 @@ const userSchema = new mongoose.Schema({
   subscription: {
     type: String,
     enum: ['Unlimited', 'Demo', 'Active', 'Expired'],
+    trim: true
   },
   subscriptionId: [{
     type: mongoose.SchemaTypes.ObjectId,

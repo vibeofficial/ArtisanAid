@@ -10,6 +10,7 @@ const subscriptionRouter = require('./routes/subscription');
 
 
 app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use('/v1', userRouter);
