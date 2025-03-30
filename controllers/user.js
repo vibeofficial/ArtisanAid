@@ -857,66 +857,55 @@ exports.deleteUser = async (req, res) => {
 
 };
 
-
-// Controller function to get a single worker by category
-exports.getWorkerByCategory = async (req, res) => {
+exports.getWorkerById = async (req, res) => {
     try {
-        // Extract category from the request body
-        const { category } = req.body;
-
-        // Check if category is provided
-        if (!category) {
-            return res.status(400).json({
-                message: "Category is required"
-            });
-        }
-
-        // Find a single worker in the given category
-        const worker = await userModel.findOne({ category });
-
-        // If no worker is found, return a 404 response
-        if (!worker) {
-            return res.status(404).json({
-                message: "No worker found in this category"
-            });
-        }
-
-        // If a worker is found, return success response
-        res.status(200).json({
-            message: "Worker found",
-            data: worker
-        });
-    } catch (error) {
-        // Log the error for debugging
-        console.error("Error fetching worker by category:", error.message);
-
-        // Send a server error response
-        res.status(500).json({
-            message: "Error fetching worker by category"
-        });
-    }
-};
-
-
-  exports.getAllWorkersInCategory = async (req, res) => {
-    try {
-      // Extract category from the request body
-      const { category } = req.body;
+     
+      const { id } = req.params;
   
-      // Ensure category is provided
-      if (!category) {
+        if (!id) {
         return res.status(400).json({
-          message: "Category is required",
+          message: "Worker ID is required",
+        });
+      }
+      const worker = await userModel.findById(id);
+  
+      if (!worker) {
+        return res.status(404).json({
+          message: "No worker found with this ID",
+        });
+      }
+      res.status(200).json({
+        message: "Worker retrieved successfully",
+        data: worker,
+      });
+    } catch (error) {
+      console.log(error.message); 
+      res.status(500).json({
+        message: "Error fetching worker by ID",
+      });
+    }
+  };
+  
+
+exports.getAllWorkersInCategory = async (req, res) => {
+    try {
+      // Extract jobCategory from the URL parameter
+      const { jobCategory } = req.params;
+  
+      // Ensure jobCategory is provided
+      if (!jobCategory) {
+        return res.status(400).json({
+          message: "Job category is required",
         });
       }
   
-      // Query to fetch all workers in the specified category
-      const workers = await userModel.find({ category });
+      // Query to fetch all workers in the specified jobCategory
+      const workers = await userModel.find({ jobCategory });
   
       // If no workers are found, return a 404 response
       if (workers.length === 0) {
         return res.status(404).json({
-          message: "No workers found in this category",
+          message: "No workers found in this job category",
         });
       }
   
@@ -928,52 +917,51 @@ exports.getWorkerByCategory = async (req, res) => {
     } catch (error) {
       console.error(error.message); // Log the error for debugging
       res.status(500).json({
-        message: "Error fetching workers in category",
+        message: "Error fetching workers in job category",
       });
     }
   };
   
   exports.getWorkersByLocalGovt = async (req, res) => {
     try {
-      // Extract LGA and verification filter from request body
-      const { lga, isVerified } = req.body;
-  
-      // Ensure LGA is provided
-      if (!lga) {
-        return res.status(400).json({
-          message: "Local Government (LGA) is required",
-        });
-      }
-  
-      // Create a query object to search for workers by LGA
-      const query = { "address.lga": lga };
-  
-      // If isVerified is provided, filter by verification status
-      if (isVerified !== undefined) {
-        query.isVerified = isVerified === "true";
-      }
-  
-      // Find all workers matching the query (no pagination)
-      const workers = await userModel.find(query);
-  
-      // If no workers are found, return a 404 response
-      if (workers.length === 0) {
-        return res.status(404).json({
-          message: "No workers found in this local government",
-        });
-      }
-  
-      // Send the response with workers data
-      res.status(200).json({
-        message: "Workers retrieved successfully",
-        data: workers,
-      });
-    } catch (error) {
-      console.error(error.message); // Log the error for debugging
-      res.status(500).json({
-        message: "Error fetching workers by local government",
-      });
-    }
-  };
-  
+        // Extract LGA from request parameters
+        const { lga } = req.params;
+        const { isVerified } = req.query; // Extract verification filter from query params
 
+        // Ensure LGA is provided
+        if (!lga) {
+            return res.status(400).json({
+                message: "Local Government (LGA) is required",
+            });
+        }
+
+        // Create a query object to search for workers by LGA
+        const query = { "address.lga": lga };
+
+        // If isVerified is provided, filter by verification status
+        if (isVerified !== undefined) {
+            query.isVerified = isVerified === "true";
+        }
+
+        // Find all workers matching the query
+        const workers = await userModel.find(query);
+
+        // If no workers are found, return a 404 response
+        if (workers.length === 0) {
+            return res.status(404).json({
+                message: "No workers found in this local government",
+            });
+        }
+
+        // Send the response with workers data
+        res.status(200).json({
+            message: "Workers retrieved successfully",
+            data: workers,
+        });
+    } catch (error) {
+        console.error("Error fetching workers by LGA:", error.message); // Log the error for debugging
+        res.status(500).json({
+            message: "Error fetching workers by local government",
+        });
+    }
+};
