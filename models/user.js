@@ -5,45 +5,68 @@ const allowedAdminEmail = "artisanaid.team@gmail.com";
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
+
     required: true,
     trim: true,
     set: (v) => v.replace(/\s+/g, ' ') 
+
+    required: true
+
   },
   email: {
     type: String,
     required: true,
     lowercase: true,
+
     unique: true,
-    trim: true
+    trim: true,
+
   },
   username: {
     type: String,
     required: true,
     lowercase: true,
+
     unique: true,
     trim: true
+
+    unique: true
+
   },
   gender: {
     type: String,
     required: true,
     enum: ['Male', 'Female'],
     trim: true
+
+    enum: ['Male', 'Female']
+
   },
   age: {
     type: String, 
     required: true,
+
     trim: true
+
+
   },
   phoneNumber: {
     type: String,
     required: true,
+
     unique: true,
     trim: true
+
+    unique: true
+
   },
   password: {
     type: String,
     required: true,
+
     trim: true
+
+
   },
   profilePic: {
     public_id: { type: String, trim: true },
@@ -52,6 +75,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ['Admin', 'User'],
+
     default: function() {
       return this.email === allowedAdminEmail ? 'Admin' : 'User'; 
     },
@@ -72,6 +96,22 @@ const userSchema = new mongoose.Schema({
       type: String, 
       required: true,
       trim: true
+
+    default: 'User'
+  },
+  category: {
+    type: String, // Allows users to input their job type freely
+    required: true
+  },
+  address: {
+    lga: {
+       type: String, 
+       required: true // Used in querying workers by local government
+      }, 
+    state: 
+    { type: String, 
+      required: true 
+
     }
   },
   isLoggedIn: {
@@ -112,3 +152,43 @@ const userSchema = new mongoose.Schema({
 const userModel = mongoose.model('users', userSchema);
 
 module.exports = userModel;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

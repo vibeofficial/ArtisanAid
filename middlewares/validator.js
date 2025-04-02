@@ -1,3 +1,4 @@
+
 const Joi = require('joi');
 
 const allowedAdminEmail = "artisanaid.team@gmail.com";
@@ -72,7 +73,6 @@ exports.registerValidation = (req, res, next) => {
     role: Joi.string().valid("User", "Admin").default("User").messages({
       "any.only": "Role must be either 'User' or 'Admin'"
     }),
-  });
 
   const { error } = schema.validate(req.body, { abortEarly: false });
 

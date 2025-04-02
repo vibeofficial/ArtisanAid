@@ -23,6 +23,16 @@ exports.registerUser = async (req, res) => {
 
 
 
+const jwtSecret = process.env.JWT_SECRET;
+
+exports.registerUser = async (req, res) => {
+    try {
+        const { fullname, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword, category, lga, state } = req.body;
+        const file = req.file;
+        const name = fullname.split(' ');
+        const nameFormat = name.map((e) => e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()).join(' ');
+
+        
         if (password !== confirmPassword) {
             if (file) fs.unlinkSync(file.path);
             return res.status(400).json({
@@ -80,6 +90,7 @@ exports.registerUser = async (req, res) => {
             profilePicResult = await cloudinary.uploader.upload(file.path);
             fs.unlinkSync(file.path);
         }
+
         const allowedAdminEmail = "artisanaid.team@gmail.com"; 
 
         let user;
@@ -87,21 +98,36 @@ exports.registerUser = async (req, res) => {
         if (email.toLowerCase() === allowedAdminEmail) {  
             user = new userModel({
                 fullName: nameFormat,
+
+
+        let user;
+
+        if (email === '') {
+           
+            user = new userModel({
+                fullname: nameFormat,
                 email,
                 username,
                 phoneNumber,
                 gender,
-                age: `${age} years`,
+                age:  `${age} years`,
                 password: hashedPassword,
                 profilePic: profilePicResult
                     ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
-                    : {},
+
                 role: 'Admin', // Assign "Admin" role
+
+                role: 'Admin',
+
                 subscription: 'Unlimited',
             });
         } else {
             // Regular user registration (Worker)
+
             if (!jobCategory) {
+
+            if (!category) {
+
                 return res.status(400).json({ 
                     message: 'Job category is required' 
                 });
@@ -113,7 +139,11 @@ exports.registerUser = async (req, res) => {
             }
 
             user = new userModel({
+
                 fullName: nameFormat,
+
+                fullname: nameFormat,
+
                 email,
                 username,
                 phoneNumber,
@@ -124,7 +154,11 @@ exports.registerUser = async (req, res) => {
                     ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
                     : {},
                 role: 'User',
+
                 jobCategory, // Store worker category
+
+                category, // Store worker category
+
                 address: { lga, state }, // Store address
                 subscription: 'Demo',
                 expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3), 
@@ -132,7 +166,9 @@ exports.registerUser = async (req, res) => {
         }
 
         
-        const token = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '5mins' });
+
+
+        const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
         const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${token}`;
         const firstName = nameFormat.split(' ')[0];
         const html = verifyMail(link, firstName);
@@ -855,6 +891,7 @@ exports.deleteUser = async (req, res) => {
         })
     }
 
+
 };
 
 exports.getWorkerById = async (req, res) => {
@@ -901,11 +938,68 @@ exports.getAllWorkersInCategory = async (req, res) => {
   
       // Query to fetch all workers in the specified jobCategory
       const workers = await userModel.find({ jobCategory });
+
+};
+
+// Controller function to get a single worker by category
+exports.getWorkerByCategory = async (req, res) => {
+    try {
+        // Extract category from the request body
+        const { category } = req.body;
+
+        // Check if category is provided
+        if (!category) {
+            return res.status(400).json({
+                message: "Category is required"
+            });
+        }
+
+        // Find a single worker in the given category
+        const worker = await userModel.findOne({ category });
+
+        // If no worker is found, return a 404 response
+        if (!worker) {
+            return res.status(404).json({
+                message: "No worker found in this category"
+            });
+        }
+
+        // If a worker is found, return success response
+        res.status(200).json({
+            message: "Worker found",
+            data: worker
+        });
+    } catch (error) {
+        // Log the error for debugging
+        console.error("Error fetching worker by category:", error.message);
+
+        // Send a server error response
+        res.status(500).json({
+            message: "Error fetching worker by category"
+        });
+    }
+};
+
+
+  exports.getAllWorkersInCategory = async (req, res) => {
+    try {
+      // Extract category from the request body
+      const { category } = req.body;
+  
+      // Ensure category is provided
+      if (!category) {
+        return res.status(400).json({
+          message: "Category is required",
+        });
+      }
+  
+      // Query to fetch all workers in the specified category
+      const workers = await userModel.find({ category });
   
       // If no workers are found, return a 404 response
       if (workers.length === 0) {
         return res.status(404).json({
-          message: "No workers found in this job category",
+          message: "No workers found in this category",
         });
       }
   
@@ -917,6 +1011,55 @@ exports.getAllWorkersInCategory = async (req, res) => {
     } catch (error) {
       console.error(error.message); // Log the error for debugging
       res.status(500).json({
+        message: "Error fetching workers in category",
+      });
+    }
+  };
+  
+  exports.getWorkersByLocalGovt = async (req, res) => {
+    try {
+      // Extract LGA and verification filter from request body
+      const { lga, isVerified } = req.body;
+  
+      // Ensure LGA is provided
+      if (!lga) {
+        return res.status(400).json({
+          message: "Local Government (LGA) is required",
+        });
+      }
+  
+      // Create a query object to search for workers by LGA
+      const query = { "address.lga": lga };
+  
+      // If isVerified is provided, filter by verification status
+      if (isVerified !== undefined) {
+        query.isVerified = isVerified === "true";
+      }
+  
+      // Find all workers matching the query (no pagination)
+      const workers = await userModel.find(query);
+
+  
+      // If no workers are found, return a 404 response
+      if (workers.length === 0) {
+        return res.status(404).json({
+
+          message: "No workers found in this job category",
+
+          message: "No workers found in this local government",
+
+        });
+      }
+  
+      // Send the response with workers data
+      res.status(200).json({
+        message: "Workers retrieved successfully",
+        data: workers,
+      });
+    } catch (error) {
+      console.error(error.message); // Log the error for debugging
+      res.status(500).json({
+
         message: "Error fetching workers in job category",
       });
     }
@@ -965,3 +1108,10 @@ exports.getAllWorkersInCategory = async (req, res) => {
         });
     }
 };
+
+        message: "Error fetching workers by local government",
+      });
+    }
+  };
+  
+
