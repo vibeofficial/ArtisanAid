@@ -9,7 +9,7 @@ exports.mail_sender = (options) => {
     port: 587,
     secure: false, // true for port 465, false for other ports
     auth: {
-      user: process.env.APP_USERNAME,
+      user: process.env.APP_EMAIL,
       pass: process.env.APP_PASSWORD,
     },
   });
@@ -18,7 +18,7 @@ exports.mail_sender = (options) => {
   async function main() {
     // send mail with defined transport object
     const info = await transporter.sendMail({
-      from: `APPLICATION <${process.env.APP_USERNAME}>`, // sender address
+      from: `APPLICATION <${process.env.APP_EMAIL}>`, // sender address
       to: options.email, // list of receivers
       subject: options.subject, // Subject line
       html: options.html, // html body

@@ -1,4 +1,6 @@
-const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, getAdmin, restrictAccount, unrestrictAccount, getWorkerByCategory,getAllWorkersInCategory, getWorkersByLocalGovt} = require('../controllers/user');
+
+const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, getAdmin, restrictAccount, unrestrictAccount, getWorkerById,getAllWorkersInCategory, getWorkersByLocalGovt} = require('../controllers/user');
+
 const { authorize, authenticate } = require('../middlewares/authorization');
 const { registerValidation } = require('../middlewares/validator');
 const uploads = require('../middlewares/multer');
@@ -25,9 +27,10 @@ router.put('/update/address', authenticate, updateAddress);
 router.delete('/delete/user/:userId', authorize, deleteUser);
 
 // workers route
-router.post('/getworker', getWorkerByCategory )
-router.post('/getAllWorkers', getAllWorkersInCategory)
-router.post('/getworkersbylg', getWorkersByLocalGovt)
+
+router.get('/getWorker/:id', getWorkerById )
+router.get('/getAllWorkers/:jobCategory', getAllWorkersInCategory)
+router.get('/getWorkersByLGA/:lga', getWorkersByLocalGovt);
 
 
 module.exports = router;

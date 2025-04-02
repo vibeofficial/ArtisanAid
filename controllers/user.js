@@ -5,6 +5,24 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { verifyMail, reset } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
+const jwtSecret = process.env.SECRET;
+
+exports.registerUser = async (req, res) => {
+    try {
+        console.log("Full Name Debug:", `"${req.body.fullName}"`);
+
+
+        
+        const { fullName, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword, jobCategory, lga, state } = req.body;
+        if (!fullName) {
+            return res.status(400).json({ message: "Fullname is required" });
+        }
+        const file = req.file;
+        const name = fullName.split(' ');
+        const nameFormat = name.map((e) => e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()).join(' ');
+
+
+
 const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerUser = async (req, res) => {
@@ -73,6 +91,15 @@ exports.registerUser = async (req, res) => {
             fs.unlinkSync(file.path);
         }
 
+        const allowedAdminEmail = "artisanaid.team@gmail.com"; 
+
+        let user;
+        
+        if (email.toLowerCase() === allowedAdminEmail) {  
+            user = new userModel({
+                fullName: nameFormat,
+
+
         let user;
 
         if (email === '') {
@@ -87,13 +114,20 @@ exports.registerUser = async (req, res) => {
                 password: hashedPassword,
                 profilePic: profilePicResult
                     ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
-                    : {},
+
+                role: 'Admin', // Assign "Admin" role
+
                 role: 'Admin',
+
                 subscription: 'Unlimited',
             });
         } else {
             // Regular user registration (Worker)
+
+            if (!jobCategory) {
+
             if (!category) {
+
                 return res.status(400).json({ 
                     message: 'Job category is required' 
                 });
@@ -105,7 +139,11 @@ exports.registerUser = async (req, res) => {
             }
 
             user = new userModel({
+
+                fullName: nameFormat,
+
                 fullname: nameFormat,
+
                 email,
                 username,
                 phoneNumber,
@@ -116,7 +154,11 @@ exports.registerUser = async (req, res) => {
                     ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
                     : {},
                 role: 'User',
+
+                jobCategory, // Store worker category
+
                 category, // Store worker category
+
                 address: { lga, state }, // Store address
                 subscription: 'Demo',
                 expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3), 
@@ -124,6 +166,8 @@ exports.registerUser = async (req, res) => {
         }
 
         
+
+
         const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
         const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${token}`;
         const firstName = nameFormat.split(' ')[0];
@@ -179,7 +223,7 @@ exports.verifyUser = async (req, res) => {
                         })
                     }
 
-                    const newToken = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+                    const newToken = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '5mins' });
                     const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${newToken}`;
                     const firstName = user.fullname.split(' ')[0];
                     const html = verifyMail(link, firstName);
@@ -246,7 +290,7 @@ exports.forgotPassword = async (req, res) => {
             })
         };
 
-        const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '5mins' });
         const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`;
         const firstName = user.fullname.split(' ')[0];
         const html = reset(link, firstName);
@@ -288,7 +332,7 @@ exports.resetPassword = async (req, res) => {
             })
         };
 
-        const { userId } = jwt.verify(token, jwtSecret);
+        const { userId } = jwt.verify(token, process.env.SECRET);
         const user = await userModel.findById(userId);
 
         if (!user) {
@@ -374,10 +418,12 @@ exports.login = async (req, res) => {
 
         user.isLoggedIn = true;
         const token = jwt.sign({ userId: user._id, isLoggedIn: user.isLoggedIn }, jwtSecret, { expiresIn: '1day' });
+        const  {password: hashedPassword, ...data} = user._doc;
         await user.save();
 
         res.status(200).json({
             message: 'Login successfully',
+            data: data,
             token
         })
     } catch (error) {
@@ -844,6 +890,55 @@ exports.deleteUser = async (req, res) => {
             message: 'Error deleting account'
         })
     }
+
+
+};
+
+exports.getWorkerById = async (req, res) => {
+    try {
+     
+      const { id } = req.params;
+  
+        if (!id) {
+        return res.status(400).json({
+          message: "Worker ID is required",
+        });
+      }
+      const worker = await userModel.findById(id);
+  
+      if (!worker) {
+        return res.status(404).json({
+          message: "No worker found with this ID",
+        });
+      }
+      res.status(200).json({
+        message: "Worker retrieved successfully",
+        data: worker,
+      });
+    } catch (error) {
+      console.log(error.message); 
+      res.status(500).json({
+        message: "Error fetching worker by ID",
+      });
+    }
+  };
+  
+
+exports.getAllWorkersInCategory = async (req, res) => {
+    try {
+      // Extract jobCategory from the URL parameter
+      const { jobCategory } = req.params;
+  
+      // Ensure jobCategory is provided
+      if (!jobCategory) {
+        return res.status(400).json({
+          message: "Job category is required",
+        });
+      }
+  
+      // Query to fetch all workers in the specified jobCategory
+      const workers = await userModel.find({ jobCategory });
+
 };
 
 // Controller function to get a single worker by category
@@ -943,11 +1038,16 @@ exports.getWorkerByCategory = async (req, res) => {
   
       // Find all workers matching the query (no pagination)
       const workers = await userModel.find(query);
+
   
       // If no workers are found, return a 404 response
       if (workers.length === 0) {
         return res.status(404).json({
+
+          message: "No workers found in this job category",
+
           message: "No workers found in this local government",
+
         });
       }
   
@@ -959,8 +1059,59 @@ exports.getWorkerByCategory = async (req, res) => {
     } catch (error) {
       console.error(error.message); // Log the error for debugging
       res.status(500).json({
+
+        message: "Error fetching workers in job category",
+      });
+    }
+  };
+  
+  exports.getWorkersByLocalGovt = async (req, res) => {
+    try {
+        // Extract LGA from request parameters
+        const { lga } = req.params;
+        const { isVerified } = req.query; // Extract verification filter from query params
+
+        // Ensure LGA is provided
+        if (!lga) {
+            return res.status(400).json({
+                message: "Local Government (LGA) is required",
+            });
+        }
+
+        // Create a query object to search for workers by LGA
+        const query = { "address.lga": lga };
+
+        // If isVerified is provided, filter by verification status
+        if (isVerified !== undefined) {
+            query.isVerified = isVerified === "true";
+        }
+
+        // Find all workers matching the query
+        const workers = await userModel.find(query);
+
+        // If no workers are found, return a 404 response
+        if (workers.length === 0) {
+            return res.status(404).json({
+                message: "No workers found in this local government",
+            });
+        }
+
+        // Send the response with workers data
+        res.status(200).json({
+            message: "Workers retrieved successfully",
+            data: workers,
+        });
+    } catch (error) {
+        console.error("Error fetching workers by LGA:", error.message); // Log the error for debugging
+        res.status(500).json({
+            message: "Error fetching workers by local government",
+        });
+    }
+};
+
         message: "Error fetching workers by local government",
       });
     }
   };
   
+
