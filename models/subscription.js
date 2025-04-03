@@ -10,7 +10,11 @@ const subscriptionSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'plans',
   },
-  userName: {
+  fullname: {
+    type: String,
+    require: true
+  },
+  businessName: {
     type: String,
     require: true
   },
@@ -26,9 +30,13 @@ const subscriptionSchema = new mongoose.Schema({
     type: String,
     require: true
   },
+  reference: {
+    type: String,
+    require: true
+  },
   status: {
     type: String,
-    enum: ['Pending', 'Success', 'Failed'],
+    enum: ['Pending', 'Successful', 'Failed'],
     default: 'Pending'
   },
   subscriptionDate: {
@@ -40,10 +48,6 @@ const subscriptionSchema = new mongoose.Schema({
     type: Number,
     require: true,
     default: 0
-  },
-  reference: {
-    type: String,
-    require: true
   }
 });
 

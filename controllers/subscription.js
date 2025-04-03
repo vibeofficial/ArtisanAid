@@ -9,8 +9,7 @@ const axios = require('axios');
 
 exports.initializeSubscription = async (req, res) => {
   try {
-    const { userId } = req.user;
-    const { planId } = req.params;
+    const { userId, planId } = req.params;
     const user = await userModel.findById(userId);
 
     if (!user) {
@@ -31,7 +30,7 @@ exports.initializeSubscription = async (req, res) => {
       amount: plan.amount,
       currency: 'NGN',
       reference: ref,
-      customer: { email: user.email, name: user.fullname }
+      customer: { email: user.email, name: user.businessName }
     };
 
     const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentDetails, {
@@ -45,7 +44,8 @@ exports.initializeSubscription = async (req, res) => {
     const subscription = new subscriptionModel({
       userId: user._id,
       planId: plan._id,
-      userName: user.fullname,
+      fullname: user.fullname,
+      businessName: user.businessName,
       plan: plan.planName,
       amount: `#${plan.amount}`,
       duration: plan.duration,
@@ -74,15 +74,14 @@ exports.verifySubscription = async (req, res) => {
   try {
     const { reference } = req.query;
     const subscription = await subscriptionModel.findOne({ reference: reference });
-    const user = await userModel.findById(subscription.userId);
-    const plan = await planModel.findById(subscription.planId);
-    const month = parseInt(plan.duration.split(' ')[0]);
 
-    if (!plan) {
+    if (!subscription) {
       return res.status(404).json({
-        message: 'Plan not found'
+        message: 'subscription not found'
       })
     };
+
+    const user = await userModel.findById(subscription.userId);
 
     if (!user) {
       return res.status(404).json({
@@ -90,11 +89,15 @@ exports.verifySubscription = async (req, res) => {
       })
     };
 
-    if (!subscription) {
+    const plan = await planModel.findById(subscription.planId);
+
+    if (!plan) {
       return res.status(404).json({
-        message: 'subscription not found'
+        message: 'Plan not found'
       })
     };
+
+    const month = parseInt(plan.duration.split(' ')[0]);
 
     const response = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`, {
       headers: {
@@ -105,11 +108,13 @@ exports.verifySubscription = async (req, res) => {
     const { data } = response;
 
     if (data.status && data.data.status === 'success') {
-      subscription.status = 'Success';
+      subscription.status = 'Successful';
       subscription.subscriptionDate = new Date().toLocaleString();
-      subscription.expireDate = Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * month),
-        await subscription.save();
-      user.subscriptionId.push(subscription._id);
+      subscription.expireDate = Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * month);
+      await subscription.save();
+
+      user.subscription = 'Active';
+      user.subscriptionPlan = plan.planName;
       await user.save();
 
       res.status(200).json({
