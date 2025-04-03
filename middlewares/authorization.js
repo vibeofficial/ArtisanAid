@@ -9,7 +9,7 @@ exports.authenticate = async (req, res, next) => {
 
     if (!auth) {
       return res.status(404).json({
-        message: 'Token not passed to headers'
+        message: 'Token is not passed to headers'
       })
     };
 
@@ -33,7 +33,7 @@ exports.authenticate = async (req, res, next) => {
 
     if (user.isLoggedIn !== decodedToken.isLoggedIn) {
       return res.status(401).json({
-        message: 'Authentication failed: User is not logged in'
+        message: 'Authentication failed: Account is not logged in'
       })
     };
 
@@ -61,7 +61,7 @@ exports.authorize = async (req, res, next) => {
 
     if (!auth) {
       return res.status(404).json({
-        message: 'Token not passed to headers'
+        message: 'Token is not passed to headers'
       })
     };
 
@@ -83,18 +83,18 @@ exports.authorize = async (req, res, next) => {
       })
     };
 
+    if (user.isLoggedIn !== decodedToken.isLoggedIn) {
+      return res.status(401).json({
+        message: 'Authentication failed: Account is not logged in'
+      })
+    };
+    
     if (user.role !== 'Admin') {
       return res.status(401).json({
         message: 'Authorization failed: Contact admin'
       })
     };
-
-    if (user.isLoggedIn !== decodedToken.isLoggedIn) {
-      return res.status(401).json({
-        message: 'Authentication failed: User is not logged in'
-      })
-    };
-
+    
     req.user = decodedToken;
     next();
   } catch (error) {

@@ -5,1113 +5,829 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { verifyMail, reset } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
-const jwtSecret = process.env.SECRET;
-
-exports.registerUser = async (req, res) => {
-    try {
-        console.log("Full Name Debug:", `"${req.body.fullName}"`);
-
-
-        
-        const { fullName, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword, jobCategory, lga, state } = req.body;
-        if (!fullName) {
-            return res.status(400).json({ message: "Fullname is required" });
-        }
-        const file = req.file;
-        const name = fullName.split(' ');
-        const nameFormat = name.map((e) => e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()).join(' ');
-
-
-
 const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerUser = async (req, res) => {
-    try {
-        const { fullname, email, confirmEmail, username, phoneNumber, gender, age, password, confirmPassword, category, lga, state } = req.body;
-        const file = req.file;
-        const name = fullname.split(' ');
-        const nameFormat = name.map((e) => e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()).join(' ');
+  try {
+    const { fullname, email, confirmEmail, businessName, phoneNumber, password, confirmPassword } = req.body;
 
-        
-        if (password !== confirmPassword) {
-            if (file) fs.unlinkSync(file.path);
-            return res.status(400).json({
-                 message: 'Password does not match'
-                 });
-        }
+    const full_name = fullname.split(' ');
+    const nameFormat = full_name?.map((e) => {
+      return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
+    }).join(' ');
 
-       
-        if (age < 18) {
-            return res.status(400).json({
-                 message: 'Age must be above 18' 
-                });
-        }
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        message: 'Password does not match'
+      });
+    };
 
-       
-        if (email !== confirmEmail) {
-            if (file) fs.unlinkSync(file.path);
-            return res.status(400).json({ 
-                message: 'Email does not match'
-             });
-        }
+    if (email !== confirmEmail) {
+      return res.status(400).json({
+        message: 'Email does not match'
+      });
+    };
 
-        const emailExists = await userModel.findOne({ email: email.toLowerCase() });
-        if (emailExists) {
-            if (file) fs.unlinkSync(file.path);
-            return res.status(400).json({
-                 message: `${email.toLowerCase()} has already been used`
-                 });
-        }
+    const emailExists = await userModel.findOne({ email: email?.toLowerCase() });
 
-        const usernameExists = await userModel.findOne({ username: username.toLowerCase() });
-        if (usernameExists) {
-            if (file) fs.unlinkSync(file.path);
-            return res.status(400).json({
-                 message: 'Username already exists'
-                 });
-        }
+    if (emailExists) {
+      return res.status(400).json({
+        message: `User with email: ${email.toLowerCase()} already exist`
+      });
+    };
 
-        // Check if phone number is already in use
-        const phoneExists = await userModel.findOne({ phoneNumber });
-        if (phoneExists) {
-            if (file) fs.unlinkSync(file.path);
-            return res.status(400).json({ 
-                message: 'Phone number has already been used'
-             });
-        }
+    const phoneNumberExists = await userModel.findOne({ phoneNumber: phoneNumber });
 
-      
-        const saltedRound = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, saltedRound);
+    if (phoneNumberExists) {
+      return res.status(400).json({
+        message: 'Phone number has already been used'
+      });
+    };
 
-       
-        let profilePicResult = null;
-        if (file) {
-            profilePicResult = await cloudinary.uploader.upload(file.path);
-            fs.unlinkSync(file.path);
-        }
+    const saltedRound = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, saltedRound);
 
-        const allowedAdminEmail = "artisanaid.team@gmail.com"; 
+    let user;
 
-        let user;
-        
-        if (email.toLowerCase() === allowedAdminEmail) {  
-            user = new userModel({
-                fullName: nameFormat,
+    if (email === 'artisanaid.team@gmail.com') {
+      user = new userModel({
+        fullname: nameFormat,
+        email,
+        phoneNumber,
+        password: hashedPassword,
+        role: 'Admin',
+        kycStatus: 'Approved',
+        subscription: 'Unlimited',
+        subscriptionPlan: 'Unlimited'
+      });
+    } else {
+      user = new userModel({
+        fullname: nameFormat,
+        email,
+        businessName,
+        phoneNumber,
+        password: hashedPassword,
+        role: 'Artisan',
+        kycStatus: 'Not yet',
+        subscription: 'Demo',
+        subscriptionPlan: 'Demo',
+        expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3),
+      });
+    };
 
+    const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+    const html = verifyMail(link, user.businessName);
 
-        let user;
+    const mailDetails = {
+      email: user.email,
+      subject: 'ACCOUNT VERIFICATION',
+      html
+    };
 
-        if (email === '') {
-           
-            user = new userModel({
-                fullname: nameFormat,
-                email,
-                username,
-                phoneNumber,
-                gender,
-                age:  `${age} years`,
-                password: hashedPassword,
-                profilePic: profilePicResult
-                    ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
+    await mail_sender(mailDetails);
+    await user.save();
 
-                role: 'Admin', // Assign "Admin" role
-
-                role: 'Admin',
-
-                subscription: 'Unlimited',
-            });
-        } else {
-            // Regular user registration (Worker)
-
-            if (!jobCategory) {
-
-            if (!category) {
-
-                return res.status(400).json({ 
-                    message: 'Job category is required' 
-                });
-            }
-            if (!lga || !state) {
-                return res.status(400).json({ 
-                    message: 'LGA and State are required'
-                 });
-            }
-
-            user = new userModel({
-
-                fullName: nameFormat,
-
-                fullname: nameFormat,
-
-                email,
-                username,
-                phoneNumber,
-                gender,
-                age: `${age} years`,
-                password: hashedPassword,
-                profilePic: profilePicResult
-                    ? { public_id: profilePicResult.public_id, image_url: profilePicResult.secure_url }
-                    : {},
-                role: 'User',
-
-                jobCategory, // Store worker category
-
-                category, // Store worker category
-
-                address: { lga, state }, // Store address
-                subscription: 'Demo',
-                expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3), 
-            });
-        }
-
-        
-
-
-        const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
-        const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${token}`;
-        const firstName = nameFormat.split(' ')[0];
-        const html = verifyMail(link, firstName);
-
-       
-        const mailDetails = {
-            email: user.email,
-            subject: 'ACCOUNT VERIFICATION',
-            html,
-            id: user._id,
-            public_id: user.profilePic.public_id,
-        };
-
-        await mail_sender(mailDetails);
-        await user.save();
-
-        res.status(201).json({
-            message: 'Account Registered Successfully',
-            data: user
-        });
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message: 'Error registering user' });
-    }
+    res.status(201).json({
+      message: 'Account Registered Successfully',
+      data: user
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: 'Error registering user' });
+  }
 };
 
+
 exports.verifyUser = async (req, res) => {
-    try {
-        const { token } = req.params;
+  try {
+    const { token } = req.params;
 
-        if (!token) {
-            return res.status(404).json({
-                message: 'Token not found'
-            })
-        };
+    if (!token) {
+      return res.status(404).json({
+        message: 'Token not found'
+      })
+    };
 
-        jwt.verify(token, jwtSecret, async (error, payload) => {
-            if (error) {
-                if (error instanceof jwt.JsonWebTokenError) {
-                    const { userId } = jwt.decode(token);
-                    const user = await userModel.findById(userId);
-
-                    if (!user) {
-                        return res.status(404).json({
-                            message: 'User not found'
-                        })
-                    };
-
-                    if (user.isVerified === true) {
-                        return res.status(400).json({
-                            message: 'Account has already been verified'
-                        })
-                    }
-
-                    const newToken = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '5mins' });
-                    const link = `${req.protocol}://${req.get('host')}/v1/verify/user/${newToken}`;
-                    const firstName = user.fullname.split(' ')[0];
-                    const html = verifyMail(link, firstName);
-
-                    const mailDetails = {
-                        email: user.email,
-                        subject: 'RESEND: ACCOUNT VERIFICATION',
-                        html
-                    };
-
-                    await mail_sender(mailDetails);
-
-                    res.status(200).json({
-                        message: 'Session has expired, link has been sent to your email address'
-                    })
-                }
-            } else {
-                const user = await userModel.findById(payload.userId);
-
-                if (!user) {
-                    return res.status(404).json({
-                        message: 'User not found'
-                    })
-                };
-
-                if (user.isVerified === true) {
-                    return res.status(400).json({
-                        message: 'Account has already been verified'
-                    })
-                };
-
-                user.isVerified = true;
-                await user.save();
-
-                res.status(200).json({
-                    message: 'Account verified successfully'
-                })
-            }
-        })
-    } catch (error) {
-        console.log(error.message);
-
+    jwt.verify(token, jwtSecret, async (error, payload) => {
+      if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session has expired, link has been sent to your email address'
+          const { userId } = jwt.decode(token);
+          const user = await userModel.findById(userId);
+
+          if (!user) {
+            return res.status(404).json({
+              message: 'User not found'
             })
+          };
+
+          if (user.isVerified === true) {
+            return res.status(400).json({
+              message: 'Account has already been verified'
+            })
+          };
+
+          const newToken = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+          const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${newToken}`;
+          const html = verifyMail(link, user.businessName);
+
+          const mailDetails = {
+            email: user.email,
+            subject: 'RESEND: ACCOUNT VERIFICATION',
+            html
+          };
+
+          await mail_sender(mailDetails);
+
+          res.status(200).json({
+            message: 'Session has expired, link has been sent to your email address'
+          })
+        };
+      } else {
+        const user = await userModel.findById(payload.userId);
+
+        if (!user) {
+          return res.status(404).json({
+            message: 'User not found'
+          })
         };
 
-        res.status(500).json({
-            message: 'Error verifying user account'
+        if (user.isVerified === true) {
+          return res.status(400).json({
+            message: 'Account has already been verified'
+          })
+        };
+
+        user.isVerified = true;
+        await user.save();
+
+        res.status(200).json({
+          message: 'Account verified successfully'
         })
-    }
+      }
+    })
+  } catch (error) {
+    console.log(error.message);
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session has expired'
+      })
+    };
+
+    res.status(500).json({
+      message: 'Error verifying user account'
+    })
+  }
 };
 
 
 exports.forgotPassword = async (req, res) => {
-    try {
-        const { email } = req.body;
-        const user = await userModel.findOne({ email: email.toLowerCase() });
+  try {
+    const { email } = req.body;
+    const user = await userModel.findOne({ email: email?.toLowerCase() });
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        const token = jwt.sign({ userId: user._id }, process.env.SECRET, { expiresIn: '5mins' });
-        const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`;
-        const firstName = user.fullname.split(' ')[0];
-        const html = reset(link, firstName);
+    const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+    const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`; // Reset password url 
+    const html = reset(link, user.businessName);
 
-        const mailDetails = {
-            email: user.email,
-            subject: 'RESET PASSWORD',
-            html
-        };
+    const mailDetails = {
+      email: user.email,
+      subject: 'RESET YOUR PASSWORD',
+      html
+    };
 
-        await mail_sender(mailDetails);
+    await mail_sender(mailDetails);
 
-        res.status(200).json({
-            message: 'Reset link has been sent to email address'
-        })
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-            message: 'Error forgetting password'
-        })
-    }
+    res.status(200).json({
+      message: 'Reset password link has been sent to email address'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error forgetting password'
+    })
+  }
 };
 
 
 exports.resetPassword = async (req, res) => {
-    try {
-        const { token } = req.params;
-        const { newPassword, confirmPassword } = req.body;
+  try {
+    const { token } = req.params;
+    const { newPassword, confirmPassword } = req.body;
 
-        if (!token) {
-            return res.status(404).json({
-                message: 'Token not found'
-            })
-        };
+    if (!token) {
+      return res.status(404).json({
+        message: 'Token not found'
+      })
+    };
 
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({
-                message: 'Password does not match'
-            })
-        };
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: 'Password does not match'
+      })
+    };
 
-        const { userId } = jwt.verify(token, process.env.SECRET);
-        const user = await userModel.findById(userId);
+    const { userId } = jwt.verify(token, jwtSecret);
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        const saltedRound = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, saltedRound);
-        user.password = hashedPassword;
-        await user.save();
+    const saltedRound = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
+    user.password = hashedPassword;
+    await user.save();
 
-        res.status(200).json({
-            message: 'Password changed successfully'
-        })
-    } catch (error) {
-        console.log(error.message);
+    res.status(200).json({
+      message: 'Password changed successfully'
+    })
+  } catch (error) {
+    console.log(error.message);
 
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session has expired, re-enter your email address'
-            })
-        };
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session has expired, re-enter your email address'
+      })
+    };
 
-        res.status(500).json({
-            message: 'Error resetting password'
-        })
-    }
+    res.status(500).json({
+      message: 'Error resetting password'
+    })
+  }
 };
 
 
 exports.login = async (req, res) => {
-    try {
-        const { username, email, phoneNumber, password } = req.body;
-        let user;
+  try {
+    const { email, phoneNumber, password } = req.body;
+    let user;
 
-        if (username) {
-            user = await userModel.findOne({ username: username.toLowerCase() });
+    if (email) {
+      user = await userModel.findOne({ email: email?.toLowerCase() });
 
-            if (!user) {
-                return res.status(404).json({
-                    message: 'No account found'
-                })
-            }
-        } else if (email) {
-            user = await userModel.findOne({ email: email.toLowerCase() });
-
-            if (!user) {
-                return res.status(404).json({
-                    message: 'No account found'
-                })
-            }
-        } else if (phoneNumber) {
-            user = await userModel.findOne({ phoneNumber: phoneNumber });
-
-            if (!user) {
-                return res.status(404).json({
-                    message: 'No account found'
-                })
-            }
-        };
-
-        const correctPassword = await bcrypt.compare(password, user.password);
-
-        if (!correctPassword) {
-            return res.status(400).json({
-                message: 'Incorrect password'
-            })
-        };
-
-        if (user.isVerified !== true) {
-            return res.status(400).json({
-                message: 'Your account is not verified'
-            })
-        };
-
-        if (user.isRestricted === true) {
-            return res.status(400).json({
-                message: 'Your account is restricted, contact: jueffizzy@gmail.com for complaints'
-            })
-        };
-
-        user.isLoggedIn = true;
-        const token = jwt.sign({ userId: user._id, isLoggedIn: user.isLoggedIn }, jwtSecret, { expiresIn: '1day' });
-        const  {password: hashedPassword, ...data} = user._doc;
-        await user.save();
-
-        res.status(200).json({
-            message: 'Login successfully',
-            data: data,
-            token
+      if (!user) {
+        return res.status(404).json({
+          message: 'No account found'
         })
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-            message: 'Error logging user in'
+      }
+    } else if (phoneNumber) {
+      user = await userModel.findOne({ phoneNumber: phoneNumber });
+
+      if (!user) {
+        return res.status(404).json({
+          message: 'No account found'
         })
-    }
+      }
+    };
+
+    const correctPassword = await bcrypt.compare(password, user.password);
+
+    if (!correctPassword) {
+      return res.status(400).json({
+        message: 'Incorrect password'
+      })
+    };
+
+    if (user.isVerified !== true) {
+      const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+      const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+      const html = verifyMail(link, user.businessName);
+
+      const mailDetails = {
+        email: user.email,
+        subject: 'ACCOUNT VERIFICATION',
+        html
+      };
+
+      await mail_sender(mailDetails);
+      return res.status(400).json({
+        message: 'Your account is not verified, link has been sent to email address'
+      })
+    };
+
+    if (user.isRestricted === true) {
+      return res.status(400).json({
+        message: 'Your account is restricted, contact: artisanaid.team@gmail.com to resolve'
+      })
+    };
+
+    user.isLoggedIn = true;
+    const token = jwt.sign({ userId: user._id, isLoggedIn: user.isLoggedIn, role: user.role }, jwtSecret, { expiresIn: '1day' });
+    await user.save();
+
+    res.status(200).json({
+      message: 'Login successfully',
+      token
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error logging user in'
+    })
+  }
 };
 
 
 exports.logout = async (req, res) => {
-    try {
-        const { userId } = req.user;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.user;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'User not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      })
+    };
 
-        user.isLoggedIn = false
-        await user.save();
+    user.isLoggedIn = false
+    await user.save();
 
-        res.status(200).json({
-            message: 'Logout successfully'
-        })
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-            message: 'Error logging user out'
-        })
-    }
+    res.status(200).json({
+      message: 'Logout successfully'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error logging user out'
+    })
+  }
 };
 
 
 exports.createAdmin = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.params;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      })
+    };
 
-        if (user.role === 'Admin') {
-            return res.status(400).json({
-                message: 'User is already an admin'
-            })
-        };
+    if (user.role === 'Admin') {
+      return res.status(400).json({
+        message: 'User is already an admin'
+      })
+    };
 
-        user.role = 'Admin';
-        await user.save();
+    if (user.isRestricted === true) {
+      return res.status(400).json({
+        message: 'User is restricted'
+      })
+    };
 
-        res.status(200).json({
-            message: 'This user is now an admin'
-        })
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-            message: 'Error creating an admin'
-        })
-    }
+    user.role = 'Admin';
+    user.kycStatus = 'Approved';
+    user.subscription = 'Unlimited';
+    user.subscriptionPlan = 'Unlimited';
+    user.isRecommended = false;
+    user.isSubscribed = false;
+    user.expires = 0;
+    await user.save();
+
+    res.status(200).json({
+      message: 'This user is now an admin'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error creating an admin'
+    })
+  }
 };
 
 
 exports.removeAdmin = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.params;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        if (user.role === 'User') {
-            return res.status(404).json({
-                message: 'User is not an admin'
-            })
-        };
+    if (user.role === 'Artisan') {
+      return res.status(404).json({
+        message: 'User is not an admin'
+      })
+    };
 
-        user.role = 'User';
-        await user.save();
+    user.role = 'Artisan';
+    user.kycStatus = 'Approved';
+    user.subscription = 'Expired';
+    user.subscriptionPlan = 'Regular';
+    user.isRecommended = false;
+    user.isSubscribed = false;
+    user.expires = 0;
+    await user.save();
 
-        res.status(200).json({
-            message: 'This user is no longer an admin'
-        })
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-            message: 'Error creating an admin'
-        })
-    }
+    res.status(200).json({
+      message: 'This user is no longer an admin'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error creating an admin'
+    })
+  }
 };
 
 
 exports.restrictAccount = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const user = await userModel.findOne({ _id: userId });
+  try {
+    const { userId } = req.params;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        if (user.isRestricted === true) {
-            return res.status(404).json({
-                message: 'This account is already restricted'
-            })
-        };
+    if (user.isRestricted === true) {
+      return res.status(404).json({
+        message: 'This account is already restricted'
+      })
+    };
 
-        user.isRestricted = true;
-        await user.save();
+    user.isRestricted = true;
+    await user.save();
 
-        res.status(200).json({
-            message: 'Account is restricted successfully'
-        })
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-            message: 'Error restricting account'
-        })
-    }
+    res.status(200).json({
+      message: 'Account is restricted successfully'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error restricting account'
+    })
+  }
 };
 
 
 exports.unrestrictAccount = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const user = await userModel.findOne({ _id: userId });
+  try {
+    const { userId } = req.params;
+    const user = await userModel.findOne({ _id: userId });
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        if (user.isRestricted === false) {
-            return res.status(404).json({
-                message: 'This account is not restricted'
-            })
-        };
+    if (user.isRestricted === false) {
+      return res.status(404).json({
+        message: 'This account is not restricted'
+      })
+    };
 
-        user.isRestricted = false;
-        await user.save();
+    user.isRestricted = false;
+    await user.save();
 
-        res.status(200).json({
-            message: 'Account is no longer restricted'
-        })
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({
-            message: 'Error unrestricting account'
-        })
-    }
+    res.status(200).json({
+      message: 'Account is no longer restricted'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error unrestricting account'
+    })
+  }
 };
 
 
 exports.getAdmins = async (req, res) => {
-    try {
-        const users = await userModel.find({ role: 'Admin' });
+  try {
+    const users = await userModel.find({ role: 'Admin' });
 
-        if (users.length < 1) {
-            return res.status(404).json({
-                message: 'No user found'
-            })
-        };
+    if (users.length < 1) {
+      return res.status(404).json({
+        message: 'No user found'
+      })
+    };
 
-        res.status(200).json({
-            message: 'All admins',
-            total: users.length,
-            data: users
-        })
-    } catch (error) {
-        console.log(error.message);
+    res.status(200).json({
+      message: 'All admins',
+      total: users.length,
+      data: users
+    })
+  } catch (error) {
+    console.log(error.message);
 
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, please login to continue'
+      })
+    };
 
-        res.status(500).json({
-            message: 'Error getting all admin'
-        })
-    }
-};
-
-
-exports.getAdmin = async (req, res) => {
-    try {
-        const { userId } = req.params
-        const users = await userModel.findOne({ _id: userId } && { role: 'Admin' });
-
-        if (users.length < 1) {
-            return res.status(404).json({
-                message: 'No user found'
-            })
-        };
-
-        res.status(200).json({
-            message: 'All admins',
-            total: users.length,
-            data: users
-        })
-    } catch (error) {
-        console.log(error.message);
-
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
-
-        res.status(500).json({
-            message: 'Error getting all admin'
-        })
-    }
+    res.status(500).json({
+      message: 'Error getting all admin'
+    })
+  }
 };
 
 
 exports.getUsers = async (req, res) => {
-    try {
-        const users = await userModel.find({ role: 'User' });
+  try {
+    const users = await userModel.find({ role: 'User' } && { kycStatus: 'Approved' });
 
-        if (users.length < 1) {
-            return res.status(404).json({
-                message: 'No user found'
-            })
-        };
+    if (users.length < 1) {
+      return res.status(404).json({
+        message: 'No user found'
+      })
+    };
 
-        res.status(200).json({
-            message: 'All users',
-            total: users.length,
-            data: users
-        })
-    } catch (error) {
-        console.log(error.message);
+    res.status(200).json({
+      message: 'All users',
+      total: users.length,
+      data: users
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error getting all users'
+    })
+  }
+};
 
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
 
-        res.status(500).json({
-            message: 'Error getting all users'
-        })
-    }
+exports.getRecommendedUsers = async (req, res) => {
+  try {
+    const users = await userModel.find({ role: 'User' } && { isRecommended: true } && { kycStatus: 'Approved' });
+
+    if (users.length < 1) {
+      return res.status(404).json({
+        message: 'No recommended user found'
+      })
+    };
+
+    res.status(200).json({
+      message: 'All recommended users',
+      total: users.length,
+      data: users
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error getting all users'
+    })
+  }
+};
+
+
+exports.getUsersByCategory = async (req, res) => {
+  try {
+    const { category } = req.body;
+    const users = await userModel.find({ role: 'Artisan' } && { category: category } && { kycStatus: 'Approved' });
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        message: "No user found in this category",
+      });
+    };
+
+    res.status(200).json({
+      message: "All users in this category",
+      total: users.length,
+      data: users
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: "Error getting users in category",
+    });
+  }
+};
+
+
+exports.getUsersByLocalGovt = async (req, res) => {
+  try {
+    const { lga } = req.body;
+    const users = await userModel.find({ role: 'Artisan' } && { lga: lga } && { kycStatus: 'Approved' });
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        message: "All users in this lga",
+        total: users.length,
+        data: users
+      });
+    };
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      message: "Error fetching workers by local government",
+    });
+  }
 };
 
 
 exports.getUser = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.params;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        res.status(200).json({
-            message: 'User',
-            data: user
-        })
-    } catch (error) {
-        console.log(error.message);
-
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
-
-        res.status(500).json({
-            message: 'Error getting user'
-        })
-    }
+    res.status(200).json({
+      message: 'User below',
+      data: user
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error getting user'
+    })
+  }
 };
 
 
 exports.changePassword = async (req, res) => {
-    try {
-        const { userId } = req.user;
-        const { password, newPassword, confirmPassword } = req.body;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.user;
+    const { password, newPassword, confirmPassword } = req.body;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        const correctPassword = await bcrypt.compare(password, user.password);
+    const correctPassword = await bcrypt.compare(password, user.password);
 
-        if (!correctPassword) {
-            return res.status(400).json({
-                message: 'Incorrect password'
-            })
-        };
+    if (!correctPassword) {
+      return res.status(400).json({
+        message: 'Incorrect password'
+      })
+    };
 
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({
-                message: 'Password does not match'
-            })
-        };
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        message: 'Password does not match'
+      })
+    };
 
-        const saltedRound = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
-        user.password = hashedPassword;
-        await user.save();
+    const saltedRound = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
+    user.password = hashedPassword;
+    await user.save();
 
-        res.status(200).json({
-            message: 'Password changed successfully'
-        });
-    } catch (error) {
-        console.log(error.message);
+    res.status(200).json({
+      message: 'Password changed successfully'
+    });
+  } catch (error) {
+    console.log(error.message);
 
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, please login to continue'
+      })
+    };
 
-        res.status(500).json({
-            message: 'Error changing password'
-        })
-    }
+    res.status(500).json({
+      message: 'Error changing password'
+    })
+  }
 };
 
 
 exports.updateProfilePic = async (req, res) => {
-    try {
-        const { userId } = req.user;
-        const file = req.file;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.user;
+    const file = req.file;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        const data = {
-            profilePic: user.profilePic
-        };
+    const data = {
+      profilePic: user.profilePic
+    };
 
-        if (file && file.path) {
-            await cloudinary.uploader.destroy(user.profilePic.public_id);
-            const profilePicresult = await cloudinary.uploader.upload(file.path);
-            fs.unlinkSync(file.path);
+    if (file && file.path) {
+      await cloudinary.uploader.destroy(user.profilePic.public_id);
+      const profilePicresult = await cloudinary.uploader.upload(file.path);
+      fs.unlinkSync(file.path);
 
-            data.profilePic = {
-                public_id: profilePicresult.public_id,
-                image_url: profilePicresult.secure_url
-            };
+      data.profilePic = {
+        public_id: profilePicresult.public_id,
+        image_url: profilePicresult.secure_url
+      };
 
-            const updatedProfilePic = await userModel.findByIdAndUpdate(user._id, data, { new: true });
+      const updatedProfilePic = await userModel.findByIdAndUpdate(user._id, data, { new: true });
 
-            res.status(200).json({
-                message: 'Profile picture updated successfully',
-                data: updatedProfilePic
-            })
-        }
-    } catch (error) {
-        console.log(error.message);
-
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
-
-        res.status(500).json({
-            message: 'Error updating profile picture'
-        })
+      res.status(200).json({
+        message: 'Profile picture updated successfully',
+        data: updatedProfilePic
+      })
     }
+  } catch (error) {
+    console.log(error.message);
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, please login to continue'
+      })
+    };
+
+    res.status(500).json({
+      message: 'Error updating profile picture'
+    })
+  }
 };
 
 
 exports.updateAddress = async (req, res) => {
-    try {
-        const { userId } = req.user;
-        const { address } = req.body;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.user;
+    const { lga, state } = req.body;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'Account not found'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
-        const userAddress = address.split(' ');
+    const data = {
+      lga: lga,
+      state: state
+    };
 
-        const data = {
-            number: userAddress[0],
-            name: userAddress[1],
-            lga: userAddress[2],
-            state: userAddress[3]
-        };
+    user.location = data;
+    await user.save();
 
-        user.address = data;
-        await user.save();
+    res.status(200).json({
+      message: 'Location updated successfully'
+    })
+  } catch (error) {
+    console.log(error);
 
-        res.status(200).json({
-            message: 'Address updated successfully',
-            data: updatedAddress
-        })
-    } catch (error) {
-        console.log(error);
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, please login to continue'
+      })
+    };
 
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
-
-        res.status(500).json({
-            message: 'Error updating address'
-        })
-    }
+    res.status(500).json({
+      message: 'Error updating address'
+    })
+  }
 };
 
 
 exports.deleteUser = async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const user = await userModel.findById(userId);
+  try {
+    const { userId } = req.params;
+    const user = await userModel.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({
-                message: 'User does not exist'
-            })
-        };
+    if (!user) {
+      return res.status(404).json({
+        message: 'User does not exist'
+      })
+    };
 
-        const deletedUser = await userModel.findByIdAndDelete(user._id);
+    const deletedUser = await userModel.findByIdAndDelete(user._id);
 
-        if (deletedUser) {
-            await cloudinary.uploader.destroy(user.profilePic.public_id);
-        };
+    if (deletedUser) {
+      await cloudinary.uploader.destroy(user.profilePic.public_id);
+    };
 
-        res.status(200).json({
-            message: 'Account deleted successfully'
-        })
-    } catch (error) {
-        console.log(error.message);
+    res.status(200).json({
+      message: 'Account deleted successfully'
+    })
+  } catch (error) {
+    console.log(error.message);
 
-        if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(400).json({
-                message: 'Session expired, please login to continue'
-            })
-        };
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, please login to continue'
+      })
+    };
 
-        res.status(500).json({
-            message: 'Error deleting account'
-        })
-    }
-
-
+    res.status(500).json({
+      message: 'Error deleting account'
+    })
+  }
 };
-
-exports.getWorkerById = async (req, res) => {
-    try {
-     
-      const { id } = req.params;
-  
-        if (!id) {
-        return res.status(400).json({
-          message: "Worker ID is required",
-        });
-      }
-      const worker = await userModel.findById(id);
-  
-      if (!worker) {
-        return res.status(404).json({
-          message: "No worker found with this ID",
-        });
-      }
-      res.status(200).json({
-        message: "Worker retrieved successfully",
-        data: worker,
-      });
-    } catch (error) {
-      console.log(error.message); 
-      res.status(500).json({
-        message: "Error fetching worker by ID",
-      });
-    }
-  };
-  
-
-exports.getAllWorkersInCategory = async (req, res) => {
-    try {
-      // Extract jobCategory from the URL parameter
-      const { jobCategory } = req.params;
-  
-      // Ensure jobCategory is provided
-      if (!jobCategory) {
-        return res.status(400).json({
-          message: "Job category is required",
-        });
-      }
-  
-      // Query to fetch all workers in the specified jobCategory
-      const workers = await userModel.find({ jobCategory });
-
-};
-
-// Controller function to get a single worker by category
-exports.getWorkerByCategory = async (req, res) => {
-    try {
-        // Extract category from the request body
-        const { category } = req.body;
-
-        // Check if category is provided
-        if (!category) {
-            return res.status(400).json({
-                message: "Category is required"
-            });
-        }
-
-        // Find a single worker in the given category
-        const worker = await userModel.findOne({ category });
-
-        // If no worker is found, return a 404 response
-        if (!worker) {
-            return res.status(404).json({
-                message: "No worker found in this category"
-            });
-        }
-
-        // If a worker is found, return success response
-        res.status(200).json({
-            message: "Worker found",
-            data: worker
-        });
-    } catch (error) {
-        // Log the error for debugging
-        console.error("Error fetching worker by category:", error.message);
-
-        // Send a server error response
-        res.status(500).json({
-            message: "Error fetching worker by category"
-        });
-    }
-};
-
-
-  exports.getAllWorkersInCategory = async (req, res) => {
-    try {
-      // Extract category from the request body
-      const { category } = req.body;
-  
-      // Ensure category is provided
-      if (!category) {
-        return res.status(400).json({
-          message: "Category is required",
-        });
-      }
-  
-      // Query to fetch all workers in the specified category
-      const workers = await userModel.find({ category });
-  
-      // If no workers are found, return a 404 response
-      if (workers.length === 0) {
-        return res.status(404).json({
-          message: "No workers found in this category",
-        });
-      }
-  
-      // Send the response with workers data
-      res.status(200).json({
-        message: "Workers retrieved successfully",
-        data: workers,
-      });
-    } catch (error) {
-      console.error(error.message); // Log the error for debugging
-      res.status(500).json({
-        message: "Error fetching workers in category",
-      });
-    }
-  };
-  
-  exports.getWorkersByLocalGovt = async (req, res) => {
-    try {
-      // Extract LGA and verification filter from request body
-      const { lga, isVerified } = req.body;
-  
-      // Ensure LGA is provided
-      if (!lga) {
-        return res.status(400).json({
-          message: "Local Government (LGA) is required",
-        });
-      }
-  
-      // Create a query object to search for workers by LGA
-      const query = { "address.lga": lga };
-  
-      // If isVerified is provided, filter by verification status
-      if (isVerified !== undefined) {
-        query.isVerified = isVerified === "true";
-      }
-  
-      // Find all workers matching the query (no pagination)
-      const workers = await userModel.find(query);
-
-  
-      // If no workers are found, return a 404 response
-      if (workers.length === 0) {
-        return res.status(404).json({
-
-          message: "No workers found in this job category",
-
-          message: "No workers found in this local government",
-
-        });
-      }
-  
-      // Send the response with workers data
-      res.status(200).json({
-        message: "Workers retrieved successfully",
-        data: workers,
-      });
-    } catch (error) {
-      console.error(error.message); // Log the error for debugging
-      res.status(500).json({
-
-        message: "Error fetching workers in job category",
-      });
-    }
-  };
-  
-  exports.getWorkersByLocalGovt = async (req, res) => {
-    try {
-        // Extract LGA from request parameters
-        const { lga } = req.params;
-        const { isVerified } = req.query; // Extract verification filter from query params
-
-        // Ensure LGA is provided
-        if (!lga) {
-            return res.status(400).json({
-                message: "Local Government (LGA) is required",
-            });
-        }
-
-        // Create a query object to search for workers by LGA
-        const query = { "address.lga": lga };
-
-        // If isVerified is provided, filter by verification status
-        if (isVerified !== undefined) {
-            query.isVerified = isVerified === "true";
-        }
-
-        // Find all workers matching the query
-        const workers = await userModel.find(query);
-
-        // If no workers are found, return a 404 response
-        if (workers.length === 0) {
-            return res.status(404).json({
-                message: "No workers found in this local government",
-            });
-        }
-
-        // Send the response with workers data
-        res.status(200).json({
-            message: "Workers retrieved successfully",
-            data: workers,
-        });
-    } catch (error) {
-        console.error("Error fetching workers by LGA:", error.message); // Log the error for debugging
-        res.status(500).json({
-            message: "Error fetching workers by local government",
-        });
-    }
-};
-
-        message: "Error fetching workers by local government",
-      });
-    }
-  };
-  
-
