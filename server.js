@@ -12,6 +12,7 @@ const kycRouter = require('./routes/kyc');
 
 
 app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 const swaggerJsdoc = require("swagger-jsdoc");
