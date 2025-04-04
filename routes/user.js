@@ -1,6 +1,6 @@
 const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt, updateCoverPhoto } = require('../controllers/user');
 const { authorize, authenticate } = require('../middlewares/authorization');
-const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateAddressValidation } = require('../middlewares/validator');
+const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateAddressValidation } = require('../middlewares/artisanValidator');
 const uploads = require('../middlewares/multer');
 
 const router = require('express').Router();

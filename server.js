@@ -8,7 +8,6 @@ const userRouter = require('./routes/user');
 const planRouter = require('./routes/plan');
 const subscriptionRouter = require('./routes/subscription');
 const contactRouter = require('./routes/contact');
-const kycRouter = require('./routes/kyc');
 
 
 app.use(express.json());
@@ -29,7 +28,8 @@ const options = {
         name: 'BASE URL: https://artisanaid.onrender.com',
       },
       contact: {
-        name: "Backend Group",
+        name: "Backend Repo",
+        url: "https://github.com/vibeofficial/ArtisanAid.git"
       }
     },
     components: {
@@ -64,7 +64,6 @@ app.use('/v1', userRouter);
 app.use('/v1', planRouter);
 app.use('/v1', subscriptionRouter);
 app.use('/v1', contactRouter);
-app.use('/v1', kycRouter);
 
 
 app.listen(PORT, () => {
