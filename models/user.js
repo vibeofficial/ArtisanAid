@@ -35,7 +35,9 @@ const userSchema = new mongoose.Schema({
   category: {
     type: String,
   },
-  location: {
+  address: {
+    number: {type: String},
+    street: {type: String},
     lga: { type: String },
     state: { type: String }
   },
@@ -43,10 +45,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['Admin', 'Artisan'],
   },
-  kycStatus: {
+  accountVerification: {
     type: String,
-    enum: ['Not yet','Processing', 'Approved', 'Declined'],
-    default: 'Not yet'
+    enum: ['Unverified','Pending', 'Verified', 'Declined'],
+    default: 'Unverified'
   },
   subscription: {
     type: String,
