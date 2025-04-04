@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     public_id: { type: String },
     image_url: { type: String }
   },
+  coverPhoto: {
+    public_id: { type: String },
+    image_url: { type: String }
+  },
   category: {
     type: String,
   },

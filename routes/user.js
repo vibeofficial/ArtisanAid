@@ -1,4 +1,4 @@
-const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt } = require('../controllers/user');
+const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt, updateCoverPhoto } = require('../controllers/user');
 const { authorize, authenticate } = require('../middlewares/authorization');
 const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateAddressValidation } = require('../middlewares/validator');
 const uploads = require('../middlewares/multer');
@@ -806,16 +806,6 @@ router.put('/change/password', changePasswordValidation, authenticate, changePas
  *                 type: string
  *                 format: binary
  *                 description: The profile picture image file to upload.
- *               name:
- *                 type: string
- *                 description: The name of the user.
- *               email:
- *                 type: string
- *                 format: email
- *                 description: The email address of the user.
- *               phoneNumber:
- *                 type: string
- *                 description: The phone number of the user.
  *     responses:
  *       '200':
  *         description: Profile updated successfully.
@@ -839,15 +829,6 @@ router.put('/change/password', changePasswordValidation, authenticate, changePas
  *                         image_url:
  *                           type: string
  *                           example: 'https://res.cloudinary.com/sample-cloud/image/upload/v1616161616/profile_pic_12345.jpg'
- *                     name:
- *                       type: string
- *                       example: 'John Doe'
- *                     email:
- *                       type: string
- *                       example: 'johndoe@sample.com'
- *                     phoneNumber:
- *                       type: string
- *                       example: '08012345679'
  *       '400':
  *         description: Invalid session or session expired.
  *         content:
@@ -880,6 +861,82 @@ router.put('/change/password', changePasswordValidation, authenticate, changePas
  *                   example: 'Error updating profile'
  */
 router.put('/update/profile', authenticate, uploads.single('profilePic'), updateProfilePic);
+
+
+/**
+ * @swagger
+ * /v1/update/cover:
+ *   put:
+ *     summary: Update user cover and cover picture
+ *     description: Allows a user to update their cover details, including uploading a new cover picture.
+ *     security:
+ *       - Bearer: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               coverPhoto:
+ *                 type: string
+ *                 format: binary
+ *                 description: The cover picture image file to upload.
+ *     responses:
+ *       '200':
+ *         description: Profile updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Profile updated successfully'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     profilePic:
+ *                       type: object
+ *                       properties:
+ *                         public_id:
+ *                           type: string
+ *                           example: 'profile_pic_12345'
+ *                         image_url:
+ *                           type: string
+ *                           example: 'https://res.cloudinary.com/sample-cloud/image/upload/v1616161616/profile_pic_12345.jpg'
+ *       '400':
+ *         description: Invalid session or session expired.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Session expired, please login to continue'
+ *       '404':
+ *         description: Account not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Account not found'
+ *       '500':
+ *         description: Error updating cover.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error updating cover'
+ */
+router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCoverPhoto);
 
 
 
