@@ -36,6 +36,9 @@ const router = require('express').Router();
  *               phoneNumber:
  *                 type: string
  *                 example: "08012345678"
+ *               category:
+ *                 type: string
+ *                 example: Technician
  *               password:
  *                 type: string
  *                 format: password
