@@ -26,7 +26,7 @@ const options = {
       version: '1.0.0',
       description: "Documentation for ArtisanAid, a platform that help Artisans connects to clients and grow/build their business",
       license: {
-        name: 'DEMO',
+        name: 'BASE URL: https://artisanaid.onrender.com',
       },
       contact: {
         name: "Backend Group",
@@ -44,7 +44,7 @@ const options = {
     security: [{ BearerAuth: [] }],
     servers: [
       {
-        url: "https://express-buy-swagger-documenttion.onrender.com",
+        url: 'https://artisanaid.onrender.com',
         description: "Production Server"
       },
       {
