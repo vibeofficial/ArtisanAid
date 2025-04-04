@@ -618,7 +618,9 @@ exports.getUsersByCategory = async (req, res) => {
 exports.getUsersByLocalGovt = async (req, res) => {
   try {
     const { lga } = req.body;
-    const users = await userModel.find({ role: 'Artisan' } && { lga: lga } && { kycStatus: 'Approved' });
+
+    const location = { lga, state }
+    const users = await userModel.find({ role: 'Artisan' } && { location: location } && { kycStatus: 'Approved' });
 
     if (users.length === 0) {
       return res.status(404).json({
