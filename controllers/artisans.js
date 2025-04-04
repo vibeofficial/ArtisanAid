@@ -1,4 +1,4 @@
-const userModel = require('../models/user');
+const artisanModel = require('../models/artisans');
 const bcrypt = require('bcrypt');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
@@ -28,7 +28,7 @@ exports.registerUser = async (req, res) => {
       });
     };
 
-    const emailExists = await userModel.findOne({ email: email?.toLowerCase() });
+    const emailExists = await artisanModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
       return res.status(400).json({
@@ -36,7 +36,7 @@ exports.registerUser = async (req, res) => {
       });
     };
 
-    const phoneNumberExists = await userModel.findOne({ phoneNumber: phoneNumber });
+    const phoneNumberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
 
     if (phoneNumberExists) {
       return res.status(400).json({
@@ -50,7 +50,7 @@ exports.registerUser = async (req, res) => {
     let user;
 
     if (email === 'artisanaid.team@gmail.com') {
-      user = new userModel({
+      user = new artisanModel({
         fullname: nameFormat,
         email,
         phoneNumber,
@@ -61,7 +61,7 @@ exports.registerUser = async (req, res) => {
         subscriptionPlan: 'Unlimited'
       });
     } else {
-      user = new userModel({
+      user = new artisanModel({
         fullname: nameFormat,
         email,
         businessName,
@@ -114,7 +114,7 @@ exports.verifyUser = async (req, res) => {
       if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
           const { userId } = jwt.decode(token);
-          const user = await userModel.findById(userId);
+          const user = await artisanModel.findById(userId);
 
           if (!user) {
             return res.status(404).json({
@@ -145,7 +145,7 @@ exports.verifyUser = async (req, res) => {
           })
         };
       } else {
-        const user = await userModel.findById(payload.userId);
+        const user = await artisanModel.findById(payload.userId);
 
         if (!user) {
           return res.status(404).json({
@@ -186,7 +186,7 @@ exports.verifyUser = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await userModel.findOne({ email: email?.toLowerCase() });
+    const user = await artisanModel.findOne({ email: email?.toLowerCase() });
 
     if (!user) {
       return res.status(404).json({
@@ -236,7 +236,7 @@ exports.resetPassword = async (req, res) => {
     };
 
     const { userId } = jwt.verify(token, jwtSecret);
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -274,7 +274,7 @@ exports.login = async (req, res) => {
     let user;
 
     if (email) {
-      user = await userModel.findOne({ email: email?.toLowerCase() });
+      user = await artisanModel.findOne({ email: email?.toLowerCase() });
 
       if (!user) {
         return res.status(404).json({
@@ -282,7 +282,7 @@ exports.login = async (req, res) => {
         })
       }
     } else if (phoneNumber) {
-      user = await userModel.findOne({ phoneNumber: phoneNumber });
+      user = await artisanModel.findOne({ phoneNumber: phoneNumber });
 
       if (!user) {
         return res.status(404).json({
@@ -342,7 +342,7 @@ exports.login = async (req, res) => {
 exports.logout = async (req, res) => {
   try {
     const { userId } = req.user;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -368,7 +368,7 @@ exports.logout = async (req, res) => {
 exports.createAdmin = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -412,7 +412,7 @@ exports.createAdmin = async (req, res) => {
 exports.removeAdmin = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -450,7 +450,7 @@ exports.removeAdmin = async (req, res) => {
 exports.restrictAccount = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -482,7 +482,7 @@ exports.restrictAccount = async (req, res) => {
 exports.unrestrictAccount = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await userModel.findOne({ _id: userId });
+    const user = await artisanModel.findOne({ _id: userId });
 
     if (!user) {
       return res.status(404).json({
@@ -513,7 +513,7 @@ exports.unrestrictAccount = async (req, res) => {
 
 exports.getAdmins = async (req, res) => {
   try {
-    const users = await userModel.find({ role: 'Admin' });
+    const users = await artisanModel.find({ role: 'Admin' });
 
     if (users.length < 1) {
       return res.status(404).json({
@@ -544,7 +544,7 @@ exports.getAdmins = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    const users = await userModel.find({ role: 'User' } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'User' } && { kycStatus: 'Approved' });
 
     if (users.length < 1) {
       return res.status(404).json({
@@ -568,7 +568,7 @@ exports.getUsers = async (req, res) => {
 
 exports.getRecommendedUsers = async (req, res) => {
   try {
-    const users = await userModel.find({ role: 'User' } && { isRecommended: true } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'User' } && { isRecommended: true } && { kycStatus: 'Approved' });
 
     if (users.length < 1) {
       return res.status(404).json({
@@ -593,7 +593,7 @@ exports.getRecommendedUsers = async (req, res) => {
 exports.getUsersByCategory = async (req, res) => {
   try {
     const { category } = req.body;
-    const users = await userModel.find({ role: 'Artisan' } && { category: category } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'Artisan' } && { category: category } && { kycStatus: 'Approved' });
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -620,7 +620,7 @@ exports.getUsersByLocalGovt = async (req, res) => {
     const { lga } = req.body;
 
     const location = { lga, state }
-    const users = await userModel.find({ role: 'Artisan' } && { location: location } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'Artisan' } && { location: location } && { kycStatus: 'Approved' });
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -641,7 +641,7 @@ exports.getUsersByLocalGovt = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -666,7 +666,7 @@ exports.changePassword = async (req, res) => {
   try {
     const { userId } = req.user;
     const { password, newPassword, confirmPassword } = req.body;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -716,7 +716,7 @@ exports.updateProfilePic = async (req, res) => {
   try {
     const { userId } = req.user;
     const file = req.file;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -738,7 +738,7 @@ exports.updateProfilePic = async (req, res) => {
         image_url: profilePicResult.secure_url
       };
 
-      const updatedProfilePic = await userModel.findByIdAndUpdate(user._id, data, { new: true });
+      const updatedProfilePic = await artisanModel.findByIdAndUpdate(user._id, data, { new: true });
 
       res.status(200).json({
         message: 'Profile picture updated successfully',
@@ -765,7 +765,7 @@ exports.updateCoverPhoto = async (req, res) => {
   try {
     const { userId } = req.user;
     const file = req.file;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -787,7 +787,7 @@ exports.updateCoverPhoto = async (req, res) => {
         image_url: coverPhotoResult.secure_url
       };
 
-      const updatedCoverPhoto = await userModel.findByIdAndUpdate(user._id, data, { new: true });
+      const updatedCoverPhoto = await artisanModel.findByIdAndUpdate(user._id, data, { new: true });
 
       res.status(200).json({
         message: 'Profile picture updated successfully',
@@ -814,7 +814,7 @@ exports.updateAddress = async (req, res) => {
   try {
     const { userId } = req.user;
     const { lga, state } = req.body;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -852,7 +852,7 @@ exports.updateAddress = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const user = await artisanModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({
@@ -860,7 +860,7 @@ exports.deleteUser = async (req, res) => {
       })
     };
 
-    const deletedUser = await userModel.findByIdAndDelete(user._id);
+    const deletedUser = await artisanModel.findByIdAndDelete(user._id);
 
     if (deletedUser) {
       await cloudinary.uploader.destroy(user.profilePic.public_id);
