@@ -9,7 +9,7 @@ const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerUser = async (req, res) => {
   try {
-    const { fullname, email, confirmEmail, businessName, phoneNumber, password, confirmPassword } = req.body;
+    const { fullname, email, confirmEmail, businessName, phoneNumber, category, password, confirmPassword } = req.body;
 
     const full_name = fullname.split(' ');
     const nameFormat = full_name?.map((e) => {
@@ -66,6 +66,7 @@ exports.registerUser = async (req, res) => {
         email,
         businessName,
         phoneNumber,
+        category,
         password: hashedPassword,
         role: 'Artisan',
         kycStatus: 'Not yet',
