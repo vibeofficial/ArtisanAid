@@ -618,7 +618,9 @@ exports.getUsersByCategory = async (req, res) => {
 exports.getUsersByLocalGovt = async (req, res) => {
   try {
     const { lga } = req.body;
-    const users = await userModel.find({ role: 'Artisan' } && { lga: lga } && { kycStatus: 'Approved' });
+
+    const location = { lga, state }
+    const users = await userModel.find({ role: 'Artisan' } && { location: location } && { kycStatus: 'Approved' });
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -728,12 +730,12 @@ exports.updateProfilePic = async (req, res) => {
 
     if (file && file.path) {
       await cloudinary.uploader.destroy(user.profilePic.public_id);
-      const profilePicresult = await cloudinary.uploader.upload(file.path);
+      const profilePicResult = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(file.path);
 
       data.profilePic = {
-        public_id: profilePicresult.public_id,
-        image_url: profilePicresult.secure_url
+        public_id: profilePicResult.public_id,
+        image_url: profilePicResult.secure_url
       };
 
       const updatedProfilePic = await userModel.findByIdAndUpdate(user._id, data, { new: true });
@@ -754,6 +756,55 @@ exports.updateProfilePic = async (req, res) => {
 
     res.status(500).json({
       message: 'Error updating profile picture'
+    })
+  }
+};
+
+
+exports.updateCoverPhoto = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const file = req.file;
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
+
+    const data = {
+      coverPhoto: user.coverPhoto
+    };
+
+    if (file && file.path) {
+      await cloudinary.uploader.destroy(user.coverPhoto.public_id);
+      const coverPhotoResult = await cloudinary.uploader.upload(file.path);
+      fs.unlinkSync(file.path);
+
+      data.coverPhoto = {
+        public_id: coverPhotoResult.public_id,
+        image_url: coverPhotoResult.secure_url
+      };
+
+      const updatedCoverPhoto = await userModel.findByIdAndUpdate(user._id, data, { new: true });
+
+      res.status(200).json({
+        message: 'Profile picture updated successfully',
+        data: updatedCoverPhoto
+      })
+    }
+  } catch (error) {
+    console.log(error.message);
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, please login to continue'
+      })
+    };
+
+    res.status(500).json({
+      message: 'Error updating cover photo'
     })
   }
 };
