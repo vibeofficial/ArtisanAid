@@ -1,5 +1,5 @@
 const subscriptionModel = require('../models/subscription');
-const userModel = require('../models/user');
+const userModel = require('../models/artisans');
 const planModel = require('../models/plan');
 const generator = require('otp-generator');
 const ref = generator.generate(15, { lowerCaseAlphabets: true, upperCaseAlphabets: true, specialChars: false });

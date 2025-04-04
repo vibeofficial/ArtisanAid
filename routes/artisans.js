@@ -1,4 +1,4 @@
-const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt, updateCoverPhoto } = require('../controllers/user');
+const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt, updateCoverPhoto } = require('../controllers/artisans');
 const { authorize, authenticate } = require('../middlewares/authorization');
 const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateAddressValidation } = require('../middlewares/artisanValidator');
 const uploads = require('../middlewares/multer');
@@ -12,6 +12,8 @@ const router = require('express').Router();
  *   post:
  *     summary: Register a new user
  *     description: This endpoint registers a new user, ensuring email and phone number uniqueness and sending a verification email.
+ *     tags:
+ *       - Artisans
  *     requestBody:
  *       required: true
  *       content:
@@ -103,6 +105,8 @@ router.post('/register', registerValidation, registerUser);
  *   get:
  *     summary: Verify user account
  *     description: Confirms the authenticity of a user's email address by validating the provided token.
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - in: path
  *         name: token
@@ -129,6 +133,8 @@ router.get('/verify/account/:token', verifyUser);
  *   post:
  *     summary: Request a password reset
  *     description: Allows users to request a password reset link by providing their email address.
+ *     tags:
+ *       - Artisans
  *     requestBody:
  *       required: true
  *       content:
@@ -139,7 +145,7 @@ router.get('/verify/account/:token', verifyUser);
  *               email:
  *                 type: string
  *                 format: email
- *                 example: "johndoe@example.com"
+ *                 example: "johndoe@sample.com"
  *     responses:
  *       200:
  *         description: Password reset link sent successfully.
@@ -165,6 +171,8 @@ router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
  *   post:
  *     summary: Reset password
  *     description: Allows users to reset their password using a valid reset token. The new password must match the confirmation password.
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - name: token
  *         in: path
@@ -238,6 +246,8 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
  *   post:
  *     summary: Login a user
  *     description: Logs in a user with either email or phone number and validates the provided password.
+ *     tags:
+ *       - Artisans
  *     requestBody:
  *       required: true
  *       content:
@@ -320,6 +330,8 @@ router.post('/login', loginValidation, login);
  * /v1/logout:
  *   get:
  *     summary: Log out a user
+ *     tags:
+ *       - Artisans
  *     security:
  *       - Bearer: []
  *     responses:
@@ -338,6 +350,8 @@ router.get('/logout', authenticate, logout);
  * /v1/create/admin/{userId}:
  *   get:
  *     summary: Promote a user to Admin
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - name: userId
  *         in: path
@@ -363,6 +377,8 @@ router.get('/create/admin/:userId', authorize, createAdmin);
  * /v1/remove/admin/{userId}:
  *   get:
  *     summary: Remove admin role from a user
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - name: userId
  *         in: path
@@ -387,6 +403,8 @@ router.get('/remove/admin/:userId', authorize, removeAdmin);
  *   get:
  *     summary: Restrict a user account
  *     description: Restrict the account of a user, preventing them from using the platform.
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - name: userId
  *         in: path
@@ -411,6 +429,8 @@ router.get('/restrict/account/:userId', authorize, restrictAccount);
  *   get:
  *     summary: Unrestrict a user account
  *     description: Removes restrictions from a user account, allowing them full access to the platform.
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - name: userId
  *         in: path
@@ -435,6 +455,8 @@ router.get('/unrestrict/account/:userId', authorize, unrestrictAccount);
  *   get:
  *     summary: Get all admins
  *     description: Retrieves a list of all users with the 'Admin' role. Requires authorization.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -478,6 +500,8 @@ router.get('/admins', authorize, getAdmins);
  *   get:
  *     summary: Get all approved users
  *     description: Retrieves a list of all users with the role 'User' and approved KYC status. Requires authorization.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -523,6 +547,8 @@ router.get('/users', getUsers);
  *   get:
  *     summary: Get all recommended users
  *     description: Retrieves a list of all recommended users with the role 'User' and approved KYC status. Requires authorization.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -570,6 +596,8 @@ router.get('/recommended/users', getRecommendedUsers);
  *   get:
  *     summary: Get all users in a specific category
  *     description: Retrieves all users with the role 'Artisan' in the specified category and approved KYC status.
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - in: query
  *         name: category
@@ -621,6 +649,8 @@ router.get('/users/category', getByCategoryValidation, getUsersByCategory);
  *   get:
  *     summary: Get all users in a specific local government area (LGA)
  *     description: Retrieves all users with the role 'Artisan' in the specified LGA and approved KYC status.
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - in: query
  *         name: lga
@@ -672,6 +702,8 @@ router.get('/users/lga', getByLgaValidation, getUsersByLocalGovt);
  *   get:
  *     summary: Get a specific user by ID
  *     description: Fetches a single user based on the provided user ID.
+ *     tags:
+ *       - Artisans
  *     parameters:
  *       - in: path
  *         name: userId
@@ -720,6 +752,8 @@ router.get('/user/:userId', getUser);
  *   put:
  *     summary: Change user password
  *     description: Allows a user to change their password by providing the current password, new password, and confirming the new password.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - Bearer: []
  *     requestBody:
@@ -793,6 +827,8 @@ router.put('/change/password', changePasswordValidation, authenticate, changePas
  *   put:
  *     summary: Update user profile and profile picture
  *     description: Allows a user to update their profile details, including uploading a new profile picture.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - Bearer: []
  *     requestBody:
@@ -869,6 +905,8 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *   put:
  *     summary: Update user cover and cover picture
  *     description: Allows a user to update their cover details, including uploading a new cover picture.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - Bearer: []
  *     requestBody:
@@ -946,6 +984,8 @@ router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCo
  *   put:
  *     summary: Update user address
  *     description: Allows a user to update their location details, including Local Government Area (LGA) and state.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - Bearer: []
  *     requestBody:
@@ -1014,6 +1054,8 @@ router.put('/update/address', updateAddressValidation, authenticate, updateAddre
  *   delete:
  *     summary: Delete a user account
  *     description: Allows an admin to delete a user account from the system.
+ *     tags:
+ *       - Artisans
  *     security:
  *       - Bearer: []
  *     parameters:
