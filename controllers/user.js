@@ -310,7 +310,7 @@ exports.login = async (req, res) => {
       };
 
       await mail_sender(mailDetails);
-      return res.status(400).json({
+      return res.status(401).json({
         message: 'Your account is not verified, link has been sent to email address'
       })
     };
@@ -440,7 +440,7 @@ exports.removeAdmin = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error creating an admin'
+      message: 'Error removing an admin'
     })
   }
 };
