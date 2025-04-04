@@ -7,6 +7,7 @@ exports.registerValidation = async (req, res, next) => {
     email: joi.string().email().trim().required(),
     confirmEmail: joi.string().email().trim().required(),
     businessName: joi.string().min(3).trim().required(),
+    category: joi.string().required().pattern(/^[A-Za-z]/),
     phoneNumber: joi.string().min(11).max(11).required().pattern(/^[0-9]+$/),
     password: joi.string().required().pattern(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/),
     confirmPassword: joi.string().required().pattern(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/),
