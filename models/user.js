@@ -1,118 +1,58 @@
 const mongoose = require('mongoose');
 
-const allowedAdminEmail = "artisanaid.team@gmail.com"; 
-
 const userSchema = new mongoose.Schema({
-  fullName: {
+  fullname: {
     type: String,
-
-    required: true,
-    trim: true,
-    set: (v) => v.replace(/\s+/g, ' ') 
-
     required: true
-
+  },
+  businessName: {
+    type: String,
+    unique: true
+  },
+  phoneNumber: {
+    type: String,
+    required: true,
+    unique: true
   },
   email: {
     type: String,
     required: true,
     lowercase: true,
-
-    unique: true,
-    trim: true,
-
-  },
-  username: {
-    type: String,
-    required: true,
-    lowercase: true,
-
-    unique: true,
-    trim: true
-
     unique: true
-
-  },
-  gender: {
-    type: String,
-    required: true,
-    enum: ['Male', 'Female'],
-    trim: true
-
-    enum: ['Male', 'Female']
-
-  },
-  age: {
-    type: String, 
-    required: true,
-
-    trim: true
-
-
-  },
-  phoneNumber: {
-    type: String,
-    required: true,
-
-    unique: true,
-    trim: true
-
-    unique: true
-
   },
   password: {
     type: String,
     required: true,
-
-    trim: true
-
-
   },
   profilePic: {
-    public_id: { type: String, trim: true },
-    image_url: { type: String, trim: true }
+    public_id: { type: String },
+    image_url: { type: String }
+  },
+  category: {
+    type: String
+  },
+  location: {
+    lga: { type: String },
+    state: { type: String }
   },
   role: {
     type: String,
-    enum: ['Admin', 'User'],
-
-    default: function() {
-      return this.email === allowedAdminEmail ? 'Admin' : 'User'; 
-    },
-    trim: true
+    enum: ['Admin', 'Artisan'],
   },
-  jobCategory: {
-    type: String, 
-    required: true,
-    trim: true
+  kycStatus: {
+    type: String,
+    enum: ['Not yet','Processing', 'Approved', 'Declined'],
+    default: 'Not yet'
   },
-  address: {
-    lga: {
-      type: String, 
-      required: true,
-      trim: true
-    }, 
-    state: { 
-      type: String, 
-      required: true,
-      trim: true
-
-    default: 'User'
+  subscription: {
+    type: String,
+    enum: ['Unlimited', 'Demo', 'Active', 'Expired'],
+    default: 'Demo'
   },
-  category: {
-    type: String, // Allows users to input their job type freely
-    required: true
-  },
-  address: {
-    lga: {
-       type: String, 
-       required: true // Used in querying workers by local government
-      }, 
-    state: 
-    { type: String, 
-      required: true 
-
-    }
+  subscriptionPlan: {
+    type: String,
+    enum: ['Unlimited', 'Demo', 'Regular', 'Premium'],
+    default: 'Demo'
   },
   isLoggedIn: {
     type: Boolean,
@@ -138,57 +78,8 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  subscription: {
-    type: String,
-    enum: ['Unlimited', 'Demo', 'Active', 'Expired'],
-    trim: true
-  },
-  subscriptionId: [{
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'subscriptions'
-  }]
 }, { timestamps: true });
 
 const userModel = mongoose.model('users', userSchema);
 
 module.exports = userModel;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
