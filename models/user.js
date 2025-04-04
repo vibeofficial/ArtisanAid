@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     image_url: { type: String }
   },
   category: {
-    type: String
+    type: String,
   },
   location: {
     lga: { type: String },
