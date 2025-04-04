@@ -1,6 +1,6 @@
 const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateAddress, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt } = require('../controllers/user');
 const { authorize, authenticate } = require('../middlewares/authorization');
-const { registerValidation } = require('../middlewares/validator');
+const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateAddressValidation } = require('../middlewares/validator');
 const uploads = require('../middlewares/multer');
 
 const router = require('express').Router();
@@ -156,7 +156,7 @@ router.get('/verify/account/:token', verifyUser);
  *       500:
  *         description: Error processing password reset request.
  */
-router.post('/forgot/password', forgotPassword);
+router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
 
 
 /**
@@ -229,7 +229,7 @@ router.post('/forgot/password', forgotPassword);
  *                   type: string
  *                   example: "Error resetting password"
  */
-router.post('/reset/password/:token', resetPassword);
+router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
 
 
 /**
@@ -312,7 +312,7 @@ router.post('/reset/password/:token', resetPassword);
  *                   type: string
  *                   example: "Error logging user in"
  */
-router.post('/login', login);
+router.post('/login', loginValidation, login);
 
 
 /**
@@ -612,7 +612,7 @@ router.get('/recommended/users', getRecommendedUsers);
  *       '500':
  *         description: Error retrieving users in the category.
  */
-router.get('/users/category', getUsersByCategory);
+router.get('/users/category', getByCategoryValidation, getUsersByCategory);
 
 
 /**
@@ -663,7 +663,7 @@ router.get('/users/category', getUsersByCategory);
  *       '500':
  *         description: Error retrieving users by local government.
  */
-router.get('/users/lga', getUsersByLocalGovt);
+router.get('/users/lga', getByLgaValidation, getUsersByLocalGovt);
 
 
 /**
@@ -783,7 +783,7 @@ router.get('/user/:userId', getUser);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', authenticate, changePassword);
+router.put('/change/password', changePasswordValidation, authenticate, changePassword);
 
 
 
@@ -948,7 +948,7 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address', authenticate, updateAddress);
+router.put('/update/address', updateAddressValidation, authenticate, updateAddress);
 
 
 /**
