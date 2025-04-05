@@ -10,7 +10,7 @@ exports.registerValidation = (req, res, next) => {
       "string.pattern.base": "Full name should only contain alphabets",
       "string.min": "Full name should not be less than 3 letters"
     }),
-    email: Joi.string().email().required().messages({
+    email: Joi.string().trim().email().required().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
