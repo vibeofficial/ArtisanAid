@@ -19,7 +19,7 @@ exports.registerValidation = (req, res, next) => {
       "string.min": "Username must be at least 3 characters",
       "string.max": "Username must be at most 30 characters"
     }),
-    phoneNumber: Joi.string().pattern(/^\d{11,11}$/).required().messages({
+    phoneNumber: Joi.string().trim().pattern(/^\d{11,11}$/).required().messages({
       "any.required": "Phone number is required",
       "string.pattern.base": "Phone number must be 11 digits"
     }),
