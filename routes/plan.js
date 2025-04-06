@@ -1,5 +1,5 @@
 const { createPlan, getAllPlans, getPlan, updatePlan, deletePlan } = require('../controllers/plan');
-const { authorize, authenticate } = require('../middlewares/authorization');
+const { authorize, authenticate } = require('../middlewares/authentication');
 
 const router = require('express').Router();
 

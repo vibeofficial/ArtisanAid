@@ -1,5 +1,5 @@
-const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateLocation, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt, updateCoverPhoto } = require('../controllers/artisans');
-const { authorize, authenticate } = require('../middlewares/authorization');
+const { registerArtisan, verifyAccount, login, forgotPassword, resetPassword, getArtisans, getUser, changePassword, updateProfilePic, updateLocation, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto } = require('../controllers/artisan');
+const { authorize, authenticate } = require('../middlewares/authentication');
 const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateLocationValidation } = require('../middlewares/artisanValidator');
 const uploads = require('../middlewares/multer');
 
@@ -92,7 +92,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: "Error registering user"
  */
-router.post('/register', registerValidation, registerUser);
+router.post('/register/artisan', registerValidation, registerArtisan);
 
 
 /**
@@ -120,7 +120,7 @@ router.post('/register', registerValidation, registerUser);
  *       500:
  *         description: Error verifying user account.
  */
-router.get('/verify/account/:token', verifyUser);
+router.get('/verify/account/:token', verifyAccount);
 
 
 /**
@@ -343,58 +343,6 @@ router.get('/logout', authenticate, logout);
 
 /**
  * @swagger
- * /v1/create/admin/{id}:
- *   get:
- *     summary: Promote a user to Admin
- *     tags:
- *       - Artisans
- *     parameters:
- *       - name: id
- *         in: path
- *         description: ID of the user to be promoted to Admin
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: User has been promoted to Admin successfully
- *       '400':
- *         description: User is already an admin or is restricted
- *       '404':
- *         description: User not found
- *       '500':
- *         description: Error creating an admin
- */
-router.get('/create/admin/:id', authorize, createAdmin);
-
-
-/**
- * @swagger
- * /v1/remove/admin/{id}:
- *   get:
- *     summary: Remove admin role from a user
- *     tags:
- *       - Artisans
- *     parameters:
- *       - name: id
- *         in: path
- *         description: ID of the user whose admin role is to be removed
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: User is no longer an admin
- *       '404':
- *         description: User not found or user is not an admin
- *       '500':
- *         description: Error removing an admin'
- */
-router.get('/remove/admin/:id', authorize, removeAdmin);
-
-
-/**
- * @swagger
  * /v1/restrict/account/{id}:
  *   get:
  *     summary: Restrict a user account
@@ -494,7 +442,7 @@ router.get('/admins', authorize, getAdmins);
  * @swagger
  * /v1/users:
  *   get:
- *     summary: Get all approved users
+ *     summary: Get all approved artisans
  *     description: Retrieves a list of all users with the role 'User' and approved KYC status. Requires authorization.
  *     tags:
  *       - Artisans
@@ -510,7 +458,7 @@ router.get('/admins', authorize, getAdmins);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: All users
+ *                   example: All artisans
  *                 total:
  *                   type: integer
  *                   example: 5
@@ -530,26 +478,26 @@ router.get('/admins', authorize, getAdmins);
  *                       kycStatus:
  *                         type: string
  *       '404':
- *         description: No users found.
+ *         description: No artisan found.
  *       '500':
- *         description: Error retrieving users.
+ *         description: Error retrieving artisans.
  */
-router.get('/users', getUsers);
+router.get('/artisans', getArtisans);
 
 
 /**
  * @swagger
- * /v1/recommended/users:
+ * /v1/recommended/artisans:
  *   get:
  *     summary: Get all recommended users
- *     description: Retrieves a list of all recommended users with the role 'User' and approved KYC status. Requires authorization.
+ *     description: Retrieves a list of all recommended artisans with approved account verification status.
  *     tags:
  *       - Artisans
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       '200':
- *         description: Successfully fetched all recommended users.
+ *         description: Successfully fetched all recommended artisans.
  *         content:
  *           application/json:
  *             schema:
@@ -557,7 +505,7 @@ router.get('/users', getUsers);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: All recommended users
+ *                   example: All recommended artisans
  *                 total:
  *                   type: integer
  *                   example: 3
@@ -579,11 +527,11 @@ router.get('/users', getUsers);
  *                       isRecommended:
  *                         type: boolean
  *       '404':
- *         description: No recommended users found.
+ *         description: No recommended artisans found.
  *       '500':
- *         description: Error retrieving recommended users.
+ *         description: Error retrieving recommended artisans.
  */
-router.get('/recommended/users', getRecommendedUsers);
+router.get('/recommended/artisans', getRecommendedArtisans);
 
 
 /**
@@ -636,7 +584,7 @@ router.get('/recommended/users', getRecommendedUsers);
  *       '500':
  *         description: Error retrieving users in the category.
  */
-router.get('/users/category', getByCategoryValidation, getUsersByCategory);
+router.get('/artisans/category', getByCategoryValidation, getArtisansByCategory);
 
 
 /**
@@ -644,7 +592,7 @@ router.get('/users/category', getByCategoryValidation, getUsersByCategory);
  * /v1/users/lga:
  *   get:
  *     summary: Get all users in a specific local government area (LGA)
- *     description: Retrieves all users with the role 'Artisan' in the specified LGA and approved KYC status.
+ *     description: Retrieves all artisans in the specified LGA and approved account verification status.
  *     tags:
  *       - Artisans
  *     parameters:
@@ -654,10 +602,10 @@ router.get('/users/category', getByCategoryValidation, getUsersByCategory);
  *         schema:
  *           type: string
  *           example: "Ikorodu"
- *         description: The local government area (LGA) of the users.
+ *         description: The local government area (LGA) of the artisans.
  *     responses:
  *       '200':
- *         description: Successfully fetched all users in the specified LGA.
+ *         description: Successfully fetched all artisans in the specified LGA.
  *         content:
  *           application/json:
  *             schema:
@@ -665,7 +613,7 @@ router.get('/users/category', getByCategoryValidation, getUsersByCategory);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: All users in this LGA
+ *                   example: All artisans in this LGA
  *                 total:
  *                   type: integer
  *                   example: 3
@@ -685,11 +633,11 @@ router.get('/users/category', getByCategoryValidation, getUsersByCategory);
  *                       kycStatus:
  *                         type: string
  *       '404':
- *         description: No users found in this LGA.
+ *         description: No artisans found in this LGA.
  *       '500':
- *         description: Error retrieving users by local government.
+ *         description: Error retrieving artisans by local government.
  */
-router.get('/users/lga', getByLgaValidation, getUsersByLocalGovt);
+router.get('/artisans/lga', getByLgaValidation, getArtisansByLocalGovt);
 
 
 /**
