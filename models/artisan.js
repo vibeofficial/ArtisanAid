@@ -3,25 +3,31 @@ const mongoose = require('mongoose');
 const artisanSchema = new mongoose.Schema({
   fullname: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   email: {
     type: String,
     required: true,
     lowercase: true,
-    unique: true
+    unique: true,
+    trim: true
   },
   businessName: {
     type: String,
-    unique: true
+    unique: true,
+    trim: true
   },
   phoneNumber: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    trim: true
   },
   category: {
     type: String,
+    require: true,
+    trim: true
   },
   password: {
     type: String,
@@ -40,14 +46,14 @@ const artisanSchema = new mongoose.Schema({
     image_url: { type: String }
   },
   location: {
-    number: {type: String},
-    street: {type: String},
-    lga: { type: String },
-    state: { type: String }
+    number: { type: String, trim: true },
+    street: { type: String, trim: true },
+    lga: { type: String, trim: true },
+    state: { type: String, trim: true },
   },
   accountVerification: {
     type: String,
-    enum: ['Unverified','Pending', 'Verified', 'Declined'],
+    enum: ['Unverified', 'Pending', 'Verified', 'Declined'],
     default: 'Unverified'
   },
   rating: {
@@ -56,7 +62,7 @@ const artisanSchema = new mongoose.Schema({
   },
   subscription: {
     type: String,
-    enum: [ 'Demo', 'Active', 'Expired'],
+    enum: ['Demo', 'Active', 'Expired'],
     default: 'Demo'
   },
   subscriptionPlan: {

@@ -18,6 +18,11 @@ exports.registerArtisan = async (req, res) => {
       return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
     }).join(' ');
 
+    const business_name = businessName.split(' ');
+    const bnameFormat = business_name?.map((e) => {
+      return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
+    }).join(' ');
+
     if (password !== confirmPassword) {
       return res.status(400).json({
         message: 'Password does not match'
@@ -46,7 +51,7 @@ exports.registerArtisan = async (req, res) => {
     const artisan = new artisanModel({
       fullname: nameFormat,
       email,
-      businessName,
+      businessName: bnameFormat,
       phoneNumber,
       category,
       password: hashedPassword,
@@ -552,23 +557,23 @@ exports.getRecommendedArtisans = async (req, res) => {
 exports.getArtisansByCategory = async (req, res) => {
   try {
     const { category } = req.body;
-    const artisan = await artisanModel.find({ category: category } && { accountVerification: 'Verified' });
+    const artisans = await artisanModel.find({ category: category } && { accountVerification: 'Verified' });
 
-    if (users.length === 0) {
+    if (artisans.length === 0) {
       return res.status(404).json({
         message: "No artisan found in this category",
       });
     };
 
     res.status(200).json({
-      message: "All users in this category",
-      total: users.length,
-      data: users
+      message: "All artisans in this category",
+      total: artisans.length,
+      data: artisans
     });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({
-      message: "Error getting users in category",
+      message: "Error getting artisans in category",
     });
   }
 };
