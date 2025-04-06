@@ -29,7 +29,10 @@ const employerSchema = new mongoose.Schema({
     public_id: { type: String },
     image_url: { type: String }
   },
-
+  role: {
+    type: String,
+    default: 'Employer'
+  }
 }, { timestamps: true });
 
 const employerModel = mongoose.model('employers', employerSchema);

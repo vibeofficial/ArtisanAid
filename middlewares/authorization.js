@@ -1,4 +1,4 @@
-const userModel = require('../models/user');
+const artisanModel = require('../models/artisans');
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -22,22 +22,22 @@ exports.authenticate = async (req, res, next) => {
     };
 
     const decodedToken = jwt.verify(token, jwtSecret);
-    const { userId } = decodedToken;
-    const user = await userModel.findById(userId);
+    const { id } = decodedToken;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
-        message: 'Authentication failed: User not found'
+        message: 'Authentication failed: Artisan not found'
       })
     };
 
-    if (user.isLoggedIn !== decodedToken.isLoggedIn) {
+    if (artisan.isLoggedIn !== decodedToken.isLoggedIn) {
       return res.status(401).json({
         message: 'Authentication failed: Account is not logged in'
       })
     };
 
-    req.user = decodedToken;
+    req.artisan = decodedToken;
     next();
   } catch (error) {
     console.log(error.message);
@@ -49,7 +49,7 @@ exports.authenticate = async (req, res, next) => {
     };
 
     res.status(500).json({
-      message: 'Error authenticating user'
+      message: 'Error authenticating artisan'
     })
   }
 };
@@ -74,12 +74,12 @@ exports.authorize = async (req, res, next) => {
     };
 
     const decodedToken = jwt.verify(token, jwtSecret);
-    const { userId } = decodedToken;
-    const user = await userModel.findById(userId);
+    const { id } = decodedToken;
+    const user = await artisanModel.findById(id);
 
     if (!user) {
       return res.status(404).json({
-        message: 'Authentication failed: User not found'
+        message: 'Authentication failed: Artisan not found'
       })
     };
 
@@ -107,7 +107,7 @@ exports.authorize = async (req, res, next) => {
     };
 
     res.status(500).json({
-      message: 'Error authorizating user'
+      message: 'Error authorizating User'
     })
   }
 };

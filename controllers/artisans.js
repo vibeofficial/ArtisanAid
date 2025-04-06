@@ -1,4 +1,4 @@
-const userModel = require('../models/user');
+const artisanModel = require('../models/artisans');
 const bcrypt = require('bcrypt');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
@@ -9,7 +9,7 @@ const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerUser = async (req, res) => {
   try {
-    const { fullname, email, confirmEmail, businessName, phoneNumber, category, password, confirmPassword } = req.body;
+    const { fullname, email, businessName, phoneNumber, category, password, confirmPassword } = req.body;
 
     const full_name = fullname.split(' ');
     const nameFormat = full_name?.map((e) => {
@@ -22,21 +22,15 @@ exports.registerUser = async (req, res) => {
       });
     };
 
-    if (email !== confirmEmail) {
-      return res.status(400).json({
-        message: 'Email does not match'
-      });
-    };
-
-    const emailExists = await userModel.findOne({ email: email?.toLowerCase() });
+    const emailExists = await artisanModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
       return res.status(400).json({
-        message: `User with email: ${email.toLowerCase()} already exist`
+        message: `Artisan with email: ${email.toLowerCase()} already exist`
       });
     };
 
-    const phoneNumberExists = await userModel.findOne({ phoneNumber: phoneNumber });
+    const phoneNumberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
 
     if (phoneNumberExists) {
       return res.status(400).json({
@@ -47,21 +41,21 @@ exports.registerUser = async (req, res) => {
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
-    let user;
+    let artisan;
 
     if (email === 'artisanaid.team@gmail.com') {
-      user = new userModel({
+      artisan = new artisanModel({
         fullname: nameFormat,
         email,
         phoneNumber,
         password: hashedPassword,
         role: 'Admin',
-        kycStatus: 'Approved',
+        accountVerification: 'Verified',
         subscription: 'Unlimited',
         subscriptionPlan: 'Unlimited'
       });
     } else {
-      user = new userModel({
+      artisan = new artisanModel({
         fullname: nameFormat,
         email,
         businessName,
@@ -69,33 +63,33 @@ exports.registerUser = async (req, res) => {
         category,
         password: hashedPassword,
         role: 'Artisan',
-        kycStatus: 'Not yet',
+        accountVerification: 'Unverified',
         subscription: 'Demo',
         subscriptionPlan: 'Demo',
         expires: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3),
       });
     };
 
-    const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+    const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
-    const html = verifyMail(link, user.businessName);
+    const html = verifyMail(link, artisan.businessName);
 
     const mailDetails = {
-      email: user.email,
+      email: artisan.email,
       subject: 'ACCOUNT VERIFICATION',
       html
     };
 
     await mail_sender(mailDetails);
-    await user.save();
+    await artisan.save();
 
     res.status(201).json({
       message: 'Account Registered Successfully',
-      data: user
+      data: artisan
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: 'Error registering user' });
+    res.status(500).json({ message: 'Error registering artisan' });
   }
 };
 
@@ -113,27 +107,27 @@ exports.verifyUser = async (req, res) => {
     jwt.verify(token, jwtSecret, async (error, payload) => {
       if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
-          const { userId } = jwt.decode(token);
-          const user = await userModel.findById(userId);
+          const { id } = jwt.decode(token);
+          const artisan = await artisanModel.findById(id);
 
-          if (!user) {
+          if (!artisan) {
             return res.status(404).json({
-              message: 'User not found'
+              message: 'Artisan not found'
             })
           };
 
-          if (user.isVerified === true) {
+          if (artisan.isVerified === true) {
             return res.status(400).json({
               message: 'Account has already been verified'
             })
           };
 
-          const newToken = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+          const newToken = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
           const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${newToken}`;
-          const html = verifyMail(link, user.businessName);
+          const html = verifyMail(link, artisan.businessName);
 
           const mailDetails = {
-            email: user.email,
+            email: artisan.email,
             subject: 'RESEND: ACCOUNT VERIFICATION',
             html
           };
@@ -145,22 +139,22 @@ exports.verifyUser = async (req, res) => {
           })
         };
       } else {
-        const user = await userModel.findById(payload.userId);
+        const artisan = await artisanModel.findById(payload.id);
 
-        if (!user) {
+        if (!artisan) {
           return res.status(404).json({
-            message: 'User not found'
+            message: 'Artisan not found'
           })
         };
 
-        if (user.isVerified === true) {
+        if (artisan.isVerified === true) {
           return res.status(400).json({
             message: 'Account has already been verified'
           })
         };
 
-        user.isVerified = true;
-        await user.save();
+        artisan.isVerified = true;
+        await artisan.save();
 
         res.status(200).json({
           message: 'Account verified successfully'
@@ -177,7 +171,7 @@ exports.verifyUser = async (req, res) => {
     };
 
     res.status(500).json({
-      message: 'Error verifying user account'
+      message: 'Error verifying artisan account'
     })
   }
 };
@@ -186,20 +180,20 @@ exports.verifyUser = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await userModel.findOne({ email: email?.toLowerCase() });
+    const artisan = await artisanModel.findOne({ email: email?.toLowerCase() });
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
-    const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+    const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`; // Reset password url 
-    const html = reset(link, user.businessName);
+    const html = reset(link, artisan.businessName);
 
     const mailDetails = {
-      email: user.email,
+      email: artisan.email,
       subject: 'RESET YOUR PASSWORD',
       html
     };
@@ -235,10 +229,10 @@ exports.resetPassword = async (req, res) => {
       })
     };
 
-    const { userId } = jwt.verify(token, jwtSecret);
-    const user = await userModel.findById(userId);
+    const { id } = jwt.verify(token, jwtSecret);
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
@@ -246,8 +240,8 @@ exports.resetPassword = async (req, res) => {
 
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
-    user.password = hashedPassword;
-    await user.save();
+    artisan.password = hashedPassword;
+    await artisan.save();
 
     res.status(200).json({
       message: 'Password changed successfully'
@@ -271,27 +265,27 @@ exports.resetPassword = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, phoneNumber, password } = req.body;
-    let user;
+    let artisan;
 
     if (email) {
-      user = await userModel.findOne({ email: email?.toLowerCase() });
+      artisan = await artisanModel.findOne({ email: email?.toLowerCase() });
 
-      if (!user) {
+      if (!artisan) {
         return res.status(404).json({
           message: 'No account found'
         })
       }
     } else if (phoneNumber) {
-      user = await userModel.findOne({ phoneNumber: phoneNumber });
+      artisan = await artisanModel.findOne({ phoneNumber: phoneNumber });
 
-      if (!user) {
+      if (!artisan) {
         return res.status(404).json({
           message: 'No account found'
         })
       }
     };
 
-    const correctPassword = await bcrypt.compare(password, user.password);
+    const correctPassword = await bcrypt.compare(password, artisan.password);
 
     if (!correctPassword) {
       return res.status(400).json({
@@ -299,13 +293,13 @@ exports.login = async (req, res) => {
       })
     };
 
-    if (user.isVerified !== true) {
-      const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '5mins' });
+    if (artisan.isVerified !== true) {
+      const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
       const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
-      const html = verifyMail(link, user.businessName);
+      const html = verifyMail(link, artisan.businessName);
 
       const mailDetails = {
-        email: user.email,
+        email: artisan.email,
         subject: 'ACCOUNT VERIFICATION',
         html
       };
@@ -316,15 +310,15 @@ exports.login = async (req, res) => {
       })
     };
 
-    if (user.isRestricted === true) {
+    if (artisan.isRestricted === true) {
       return res.status(400).json({
         message: 'Your account is restricted, contact: artisanaid.team@gmail.com to resolve'
       })
     };
 
-    user.isLoggedIn = true;
-    const token = jwt.sign({ userId: user._id, isLoggedIn: user.isLoggedIn, role: user.role }, jwtSecret, { expiresIn: '1day' });
-    await user.save();
+    artisan.isLoggedIn = true;
+    const token = jwt.sign({ id: artisan._id, isLoggedIn: artisan.isLoggedIn, role: artisan.role }, jwtSecret, { expiresIn: '1day' });
+    await artisan.save();
 
     res.status(200).json({
       message: 'Login successfully',
@@ -333,7 +327,7 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error logging user in'
+      message: 'Error logging artisan in'
     })
   }
 };
@@ -341,17 +335,17 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    const { userId } = req.user;
-    const user = await userModel.findById(userId);
+    const { id } = req.user;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
-        message: 'User not found'
+        message: 'Artisan not found'
       })
     };
 
-    user.isLoggedIn = false
-    await user.save();
+    artisan.isLoggedIn = false
+    await artisan.save();
 
     res.status(200).json({
       message: 'Logout successfully'
@@ -359,7 +353,7 @@ exports.logout = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error logging user out'
+      message: 'Error logging artisan out'
     })
   }
 };
@@ -367,38 +361,38 @@ exports.logout = async (req, res) => {
 
 exports.createAdmin = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const { id } = req.params;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
-        message: 'User not found'
+        message: 'Artisan not found'
       })
     };
 
-    if (user.role === 'Admin') {
+    if (artisan.role === 'Admin') {
       return res.status(400).json({
-        message: 'User is already an admin'
+        message: 'Artisan is already an admin'
       })
     };
 
-    if (user.isRestricted === true) {
+    if (artisan.isRestricted === true) {
       return res.status(400).json({
-        message: 'User is restricted'
+        message: 'Artisan is restricted'
       })
     };
 
-    user.role = 'Admin';
-    user.kycStatus = 'Approved';
-    user.subscription = 'Unlimited';
-    user.subscriptionPlan = 'Unlimited';
-    user.isRecommended = false;
-    user.isSubscribed = false;
-    user.expires = 0;
-    await user.save();
+    artisan.role = 'Admin';
+    artisan.accountVerification = 'Verified';
+    artisan.subscription = 'Unlimited';
+    artisan.subscriptionPlan = 'Unlimited';
+    artisan.isRecommended = false;
+    artisan.isSubscribed = false;
+    artisan.expires = 0;
+    await artisan.save();
 
     res.status(200).json({
-      message: 'This user is now an admin'
+      message: 'This artisan is now an admin'
     })
   } catch (error) {
     console.log(error.message);
@@ -411,32 +405,32 @@ exports.createAdmin = async (req, res) => {
 
 exports.removeAdmin = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const { id } = req.params;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
-    if (user.role === 'Artisan') {
+    if (artisan.role === 'Artisan') {
       return res.status(404).json({
-        message: 'User is not an admin'
+        message: 'Artisan is not an admin'
       })
     };
 
-    user.role = 'Artisan';
-    user.kycStatus = 'Approved';
-    user.subscription = 'Expired';
-    user.subscriptionPlan = 'Regular';
-    user.isRecommended = false;
-    user.isSubscribed = false;
-    user.expires = 0;
-    await user.save();
+    artisan.role = 'Artisan';
+    artisan.accountVerification = 'Verified';
+    artisan.subscription = 'Expired';
+    artisan.subscriptionPlan = 'Regular';
+    artisan.isRecommended = false;
+    artisan.isSubscribed = false;
+    artisan.expires = 0;
+    await artisan.save();
 
     res.status(200).json({
-      message: 'This user is no longer an admin'
+      message: 'This artisan is no longer an admin'
     })
   } catch (error) {
     console.log(error.message);
@@ -449,23 +443,23 @@ exports.removeAdmin = async (req, res) => {
 
 exports.restrictAccount = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const { id } = req.params;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
-    if (user.isRestricted === true) {
+    if (artisan.isRestricted === true) {
       return res.status(404).json({
         message: 'This account is already restricted'
       })
     };
 
-    user.isRestricted = true;
-    await user.save();
+    artisan.isRestricted = true;
+    await artisan.save();
 
     res.status(200).json({
       message: 'Account is restricted successfully'
@@ -481,23 +475,23 @@ exports.restrictAccount = async (req, res) => {
 
 exports.unrestrictAccount = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await userModel.findOne({ _id: userId });
+    const { id } = req.params;
+    const artisan = await artisanModel.findOne({ _id: id });
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
-    if (user.isRestricted === false) {
+    if (artisan.isRestricted === false) {
       return res.status(404).json({
         message: 'This account is not restricted'
       })
     };
 
-    user.isRestricted = false;
-    await user.save();
+    artisan.isRestricted = false;
+    await artisan.save();
 
     res.status(200).json({
       message: 'Account is no longer restricted'
@@ -513,11 +507,11 @@ exports.unrestrictAccount = async (req, res) => {
 
 exports.getAdmins = async (req, res) => {
   try {
-    const users = await userModel.find({ role: 'Admin' });
+    const users = await artisanModel.find({ role: 'Admin' });
 
     if (users.length < 1) {
       return res.status(404).json({
-        message: 'No user found'
+        message: 'No artisan found'
       })
     };
 
@@ -544,11 +538,11 @@ exports.getAdmins = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    const users = await userModel.find({ role: 'User' } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'Artisan' } && { accountVerification: 'Verified' });
 
     if (users.length < 1) {
       return res.status(404).json({
-        message: 'No user found'
+        message: 'No artisan found'
       })
     };
 
@@ -568,11 +562,11 @@ exports.getUsers = async (req, res) => {
 
 exports.getRecommendedUsers = async (req, res) => {
   try {
-    const users = await userModel.find({ role: 'User' } && { isRecommended: true } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'Artisan' } && { isRecommended: true } && { accountVerification: 'Verified' });
 
     if (users.length < 1) {
       return res.status(404).json({
-        message: 'No recommended user found'
+        message: 'No recommended artisan found'
       })
     };
 
@@ -593,11 +587,11 @@ exports.getRecommendedUsers = async (req, res) => {
 exports.getUsersByCategory = async (req, res) => {
   try {
     const { category } = req.body;
-    const users = await userModel.find({ role: 'Artisan' } && { category: category } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'Artisan' } && { category: category } && { accountVerification: 'Verified' });
 
     if (users.length === 0) {
       return res.status(404).json({
-        message: "No user found in this category",
+        message: "No artisan found in this category",
       });
     };
 
@@ -620,7 +614,7 @@ exports.getUsersByLocalGovt = async (req, res) => {
     const { lga } = req.body;
 
     const location = { lga, state }
-    const users = await userModel.find({ role: 'Artisan' } && { location: location } && { kycStatus: 'Approved' });
+    const users = await artisanModel.find({ role: 'Artisan' } && { location: location } && { accountVerification: 'Verified' });
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -640,23 +634,23 @@ exports.getUsersByLocalGovt = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const { id } = req.params;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
     res.status(200).json({
-      message: 'User below',
-      data: user
+      message: 'Artisan below',
+      data: artisan
     })
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error getting user'
+      message: 'Error getting artisan'
     })
   }
 };
@@ -664,17 +658,17 @@ exports.getUser = async (req, res) => {
 
 exports.changePassword = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id } = req.user;
     const { password, newPassword, confirmPassword } = req.body;
-    const user = await userModel.findById(userId);
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
-    const correctPassword = await bcrypt.compare(password, user.password);
+    const correctPassword = await bcrypt.compare(password, artisan.password);
 
     if (!correctPassword) {
       return res.status(400).json({
@@ -690,8 +684,8 @@ exports.changePassword = async (req, res) => {
 
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
-    user.password = hashedPassword;
-    await user.save();
+    artisan.password = hashedPassword;
+    await artisan.save();
 
     res.status(200).json({
       message: 'Password changed successfully'
@@ -714,22 +708,22 @@ exports.changePassword = async (req, res) => {
 
 exports.updateProfilePic = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id } = req.user;
     const file = req.file;
-    const user = await userModel.findById(userId);
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
     const data = {
-      profilePic: user.profilePic
+      profilePic: artisan.profilePic
     };
 
     if (file && file.path) {
-      await cloudinary.uploader.destroy(user.profilePic.public_id);
+      await cloudinary.uploader.destroy(artisan.profilePic.public_id);
       const profilePicResult = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(file.path);
 
@@ -738,7 +732,7 @@ exports.updateProfilePic = async (req, res) => {
         image_url: profilePicResult.secure_url
       };
 
-      const updatedProfilePic = await userModel.findByIdAndUpdate(user._id, data, { new: true });
+      const updatedProfilePic = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
 
       res.status(200).json({
         message: 'Profile picture updated successfully',
@@ -763,22 +757,22 @@ exports.updateProfilePic = async (req, res) => {
 
 exports.updateCoverPhoto = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { id } = req.user;
     const file = req.file;
-    const user = await userModel.findById(userId);
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
     const data = {
-      coverPhoto: user.coverPhoto
+      coverPhoto: artisan.coverPhoto
     };
 
     if (file && file.path) {
-      await cloudinary.uploader.destroy(user.coverPhoto.public_id);
+      await cloudinary.uploader.destroy(artisan.coverPhoto.public_id);
       const coverPhotoResult = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(file.path);
 
@@ -787,7 +781,7 @@ exports.updateCoverPhoto = async (req, res) => {
         image_url: coverPhotoResult.secure_url
       };
 
-      const updatedCoverPhoto = await userModel.findByIdAndUpdate(user._id, data, { new: true });
+      const updatedCoverPhoto = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
 
       res.status(200).json({
         message: 'Profile picture updated successfully',
@@ -810,25 +804,30 @@ exports.updateCoverPhoto = async (req, res) => {
 };
 
 
-exports.updateAddress = async (req, res) => {
+exports.updateLocation = async (req, res) => {
   try {
-    const { userId } = req.user;
-    const { lga, state } = req.body;
-    const user = await userModel.findById(userId);
+    const { id } = req.user;
+    const { number, street, lga, state } = req.body;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
         message: 'Account not found'
       })
     };
 
     const data = {
-      lga: lga,
-      state: state
+      location: artisan.location
     };
 
-    user.location = data;
-    await user.save();
+    data.location = {
+      number,
+      street,
+      lga,
+      state
+    };
+
+    const updatedLocation = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true })
 
     res.status(200).json({
       message: 'Location updated successfully'
@@ -851,19 +850,19 @@ exports.updateAddress = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const user = await userModel.findById(userId);
+    const { id } = req.params;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
-        message: 'User does not exist'
+        message: 'Artisan does not exist'
       })
     };
 
-    const deletedUser = await userModel.findByIdAndDelete(user._id);
+    const deletedUser = await artisanModel.findByIdAndDelete(artisan._id);
 
     if (deletedUser) {
-      await cloudinary.uploader.destroy(user.profilePic.public_id);
+      await cloudinary.uploader.destroy(artisan.profilePic.public_id);
     };
 
     res.status(200).json({

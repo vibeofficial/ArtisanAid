@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const artisanSchema = new mongoose.Schema({
   fullname: {
     type: String,
     required: true
@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
   category: {
     type: String,
   },
-  address: {
+  location: {
     number: {type: String},
     street: {type: String},
     lga: { type: String },
@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['Unverified','Pending', 'Verified', 'Declined'],
     default: 'Unverified'
+  },
+  rating: {
+    type: Number,
+    default: 0
   },
   subscription: {
     type: String,
@@ -86,6 +90,6 @@ const userSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-const userModel = mongoose.model('users', userSchema);
+const artisanModel = mongoose.model('artisans', artisanSchema);
 
-module.exports = userModel;
+module.exports = artisanModel;
