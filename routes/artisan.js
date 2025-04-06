@@ -8,7 +8,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /v1/register:
+ * /v1/register/artisan:
  *   post:
  *     summary: Register a new user
  *     description: This endpoint registers a new user, ensuring email and phone number uniqueness and sending a verification email.
@@ -440,7 +440,7 @@ router.get('/admins', authorize, getAdmins);
 
 /**
  * @swagger
- * /v1/users:
+ * /v1/artisans:
  *   get:
  *     summary: Get all approved artisans
  *     description: Retrieves a list of all users with the role 'User' and approved KYC status. Requires authorization.
@@ -536,7 +536,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
 
 /**
  * @swagger
- * /v1/users/category:
+ * /v1/artisans/category:
  *   get:
  *     summary: Get all users in a specific category
  *     description: Retrieves all users with the role 'Artisan' in the specified category and approved KYC status.
@@ -589,7 +589,7 @@ router.get('/artisans/category', getByCategoryValidation, getArtisansByCategory)
 
 /**
  * @swagger
- * /v1/users/lga:
+ * /v1/artisans/lga:
  *   get:
  *     summary: Get all users in a specific local government area (LGA)
  *     description: Retrieves all artisans in the specified LGA and approved account verification status.
@@ -994,7 +994,7 @@ router.put('/update/address', updateLocationValidation, authenticate, updateLoca
 
 /**
  * @swagger
- * /v1/delete/user/{id}:
+ * /v1/delete/{id}:
  *   delete:
  *     summary: Delete a user account
  *     description: Allows an admin to delete a user account from the system.
@@ -1052,7 +1052,7 @@ router.put('/update/address', updateLocationValidation, authenticate, updateLoca
  *                   type: string
  *                   example: 'Error deleting account'
  */
-router.delete('/delete/user/:id', authorize, deleteUser);
+router.delete('/delete/:id', authorize, deleteUser);
 
 
 module.exports = router;
