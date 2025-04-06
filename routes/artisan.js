@@ -1,6 +1,6 @@
 const { registerArtisan, verifyAccount, login, forgotPassword, resetPassword, getArtisans, getUser, changePassword, updateProfilePic, updateLocation, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto } = require('../controllers/artisan');
 const { authorize, authenticate } = require('../middlewares/authentication');
-const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateLocationValidation } = require('../middlewares/artisanValidator');
+const { registerValidation } = require('../middlewares/artisanValidator');
 const uploads = require('../middlewares/multer');
 
 const router = require('express').Router();
@@ -158,7 +158,7 @@ router.get('/verify/account/:token', verifyAccount);
  *       500:
  *         description: Error processing password reset request.
  */
-router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
+router.post('/forgot/password', forgotPassword);
 
 
 /**
@@ -233,7 +233,7 @@ router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
  *                   type: string
  *                   example: "Error resetting password"
  */
-router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
+router.post('/reset/password/:token', resetPassword);
 
 
 /**
@@ -318,7 +318,7 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
  *                   type: string
  *                   example: "Error logging user in"
  */
-router.post('/login', loginValidation, login);
+router.post('/login', login);
 
 
 /**
@@ -584,7 +584,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *       '500':
  *         description: Error retrieving users in the category.
  */
-router.get('/artisans/category', getByCategoryValidation, getArtisansByCategory);
+router.get('/artisans/category', getArtisansByCategory);
 
 
 /**
@@ -637,7 +637,7 @@ router.get('/artisans/category', getByCategoryValidation, getArtisansByCategory)
  *       '500':
  *         description: Error retrieving artisans by local government.
  */
-router.get('/artisans/lga', getByLgaValidation, getArtisansByLocalGovt);
+router.get('/artisans/lga', getArtisansByLocalGovt);
 
 
 /**
@@ -761,7 +761,7 @@ router.get('/user/:id', getUser);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', changePasswordValidation, authenticate, changePassword);
+router.put('/change/password', authenticate, changePassword);
 
 
 
@@ -989,7 +989,7 @@ router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCo
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address', updateLocationValidation, authenticate, updateLocation);
+router.put('/update/address', authenticate, updateLocation);
 
 
 /**
