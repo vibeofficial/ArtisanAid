@@ -1,6 +1,5 @@
 const Joi = require('joi');
 
-const allowedAdminEmail = "artisanaid.team@gmail.com";
 
 exports.registerValidation = (req, res, next) => {
   const schema = Joi.object({
@@ -46,12 +45,6 @@ exports.registerValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
-
   next();
 };
 
@@ -70,12 +63,6 @@ exports.forgotPasswordValidation = (req, res, next) => {
     return res.status(400).json({
       message: "Validation Error",
       errors: error.message,
-    });
-  }
-
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
     });
   }
 
@@ -102,12 +89,6 @@ exports.resetPasswordValidation = (req, res, next) => {
     return res.status(400).json({
       message: "Validation Error",
       errors: error.message,
-    });
-  }
-
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
     });
   }
 
@@ -141,12 +122,6 @@ exports.loginValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
-
   next();
 };
 
@@ -167,12 +142,6 @@ exports.getByCategoryValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
-
   next();
 };
 
@@ -190,12 +159,6 @@ exports.getByLgaValidation = (req, res, next) => {
     return res.status(400).json({
       message: "Validation Error",
       errors: error.message,
-    });
-  }
-
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
     });
   }
 
@@ -230,12 +193,6 @@ exports.changePasswordValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
-
   next();
 };
 
@@ -267,12 +224,6 @@ exports.updateLocationValidation = (req, res, next) => {
     return res.status(400).json({
       message: "Validation Error",
       errors: error.message,
-    });
-  }
-
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
     });
   }
 

@@ -5,6 +5,12 @@ const artisanSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  email: {
+    type: String,
+    required: true,
+    lowercase: true,
+    unique: true
+  },
   businessName: {
     type: String,
     unique: true
@@ -14,15 +20,16 @@ const artisanSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  email: {
+  category: {
     type: String,
-    required: true,
-    lowercase: true,
-    unique: true
   },
   password: {
     type: String,
     required: true,
+  },
+  role: {
+    type: String,
+    default: 'Artisan',
   },
   profilePic: {
     public_id: { type: String },
@@ -32,18 +39,11 @@ const artisanSchema = new mongoose.Schema({
     public_id: { type: String },
     image_url: { type: String }
   },
-  category: {
-    type: String,
-  },
   location: {
     number: {type: String},
     street: {type: String},
     lga: { type: String },
     state: { type: String }
-  },
-  role: {
-    type: String,
-    enum: ['Admin', 'Artisan'],
   },
   accountVerification: {
     type: String,
@@ -56,12 +56,12 @@ const artisanSchema = new mongoose.Schema({
   },
   subscription: {
     type: String,
-    enum: ['Unlimited', 'Demo', 'Active', 'Expired'],
+    enum: [ 'Demo', 'Active', 'Expired'],
     default: 'Demo'
   },
   subscriptionPlan: {
     type: String,
-    enum: ['Unlimited', 'Demo', 'Regular', 'Premium'],
+    enum: ['Demo', 'Regular', 'Premium'],
     default: 'Demo'
   },
   isLoggedIn: {
@@ -84,9 +84,9 @@ const artisanSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  expires: {
+  expiresIn: {
     type: Number,
-    default: 0
+    require: true
   },
 }, { timestamps: true });
 
