@@ -8,6 +8,7 @@ const userRouter = require('./routes/artisans');
 const planRouter = require('./routes/plan');
 const subscriptionRouter = require('./routes/subscription');
 const contactRouter = require('./routes/contact');
+const employersRouter = require('./routes/employers')
 
 
 app.use(express.json());
@@ -64,6 +65,7 @@ app.use('/v1', userRouter);
 app.use('/v1', planRouter);
 app.use('/v1', subscriptionRouter);
 app.use('/v1', contactRouter);
+app.use('/v1', employersRouter);
 
 
 app.listen(PORT, () => {

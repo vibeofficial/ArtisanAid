@@ -44,6 +44,7 @@ const artisanSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ['Admin', 'Artisan'],
+    default: 'Artisan',
   },
   accountVerification: {
     type: String,

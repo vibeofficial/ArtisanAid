@@ -1,11 +1,12 @@
 const artisanModel = require('../models/artisans');
+const employersModel = require('../models/employers');
 const bcrypt = require('bcrypt');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { verifyMail, reset } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.SECRET;
 
 exports.registerUser = async (req, res) => {
   try {
@@ -93,7 +94,6 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-
 exports.verifyUser = async (req, res) => {
   try {
     const { token } = req.params;
@@ -101,10 +101,10 @@ exports.verifyUser = async (req, res) => {
     if (!token) {
       return res.status(404).json({
         message: 'Token not found'
-      })
-    };
+      });
+    }
 
-    jwt.verify(token, jwtSecret, async (error, payload) => {
+    jwt.verify(token, process.env.SECRET, async (error, payload) => {
       if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
           const { id } = jwt.decode(token);
@@ -116,15 +116,26 @@ exports.verifyUser = async (req, res) => {
             })
           };
 
+
+          const user = await artisanModel.findById(id) || 
+                       await employersModel.findById(id);
+
+          if (!user || !['artisan', 'employer'].includes(user.role.toLowerCase())) {
+            return res.status(404).json({
+              message: 'User not found'
+            });
+          }
+
+
           if (artisan.isVerified === true) {
             return res.status(400).json({
               message: 'Account has already been verified'
-            })
-          };
+            });
+          }
 
-          const newToken = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
+          const newToken = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '5mins' });
           const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${newToken}`;
-          const html = verifyMail(link, artisan.businessName);
+          const html = verifyMail(link, user.fullName || user.businessName || user.nameFormat || 'User')
 
           const mailDetails = {
             email: artisan.email,
@@ -134,65 +145,73 @@ exports.verifyUser = async (req, res) => {
 
           await mail_sender(mailDetails);
 
-          res.status(200).json({
-            message: 'Session has expired, link has been sent to your email address'
-          })
-        };
+          return res.status(200).json({
+            message: 'Session expired, a new verification link has been sent to your email address'
+          });
+        }
       } else {
-        const artisan = await artisanModel.findById(payload.id);
+        // Token is valid, verify the user
+        const user = await artisanModel.findById(payload.id) ||
+                     await employersModel.findById(payload.id);
 
-        if (!artisan) {
+        if (!user || !['artisan', 'employer'].includes(user.role.toLowerCase())) {
           return res.status(404).json({
-            message: 'Artisan not found'
-          })
-        };
+            message: 'User not found'
+          });
+        }
+
 
         if (artisan.isVerified === true) {
           return res.status(400).json({
             message: 'Account has already been verified'
-          })
-        };
+          });
+        }
 
         artisan.isVerified = true;
         await artisan.save();
 
-        res.status(200).json({
+        return res.status(200).json({
           message: 'Account verified successfully'
-        })
+        });
       }
-    })
+    });
   } catch (error) {
     console.log(error.message);
 
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(400).json({
         message: 'Session has expired'
-      })
-    };
+      });
+    }
+    return res.status(500).json({
+      message: 'Error verifying account'
+    });
 
-    res.status(500).json({
-      message: 'Error verifying artisan account'
-    })
   }
 };
+
 
 
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const artisan = await artisanModel.findOne({ email: email?.toLowerCase() });
 
-    if (!artisan) {
+    const user = await artisanModel.findOne({ email: email?.toLowerCase() }) ||
+                 await employersModel.findOne({ email: email?.toLowerCase() });
+
+    if (!['artisan','employer'].includes(user.role).toLowerCase()) {
       return res.status(404).json({
         message: 'Account not found'
-      })
-    };
+      });
+    }
 
-    const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`; // Reset password url 
-    const html = reset(link, artisan.businessName);
 
-    const mailDetails = {
+    const token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '5mins' });
+    const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`;
+
+    const name = user.nameFormat || user.businessName || user.fullName || 'User';
+    const html = reset(link, name);  // Only two args: the link and name
+   const mailDetails = {
       email: artisan.email,
       subject: 'RESET YOUR PASSWORD',
       html
@@ -202,14 +221,15 @@ exports.forgotPassword = async (req, res) => {
 
     res.status(200).json({
       message: 'Reset password link has been sent to email address'
-    })
+    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
       message: 'Error forgetting password'
-    })
+    });
   }
 };
+
 
 
 exports.resetPassword = async (req, res) => {
@@ -229,10 +249,15 @@ exports.resetPassword = async (req, res) => {
       })
     };
 
-    const { id } = jwt.verify(token, jwtSecret);
-    const artisan = await artisanModel.findById(id);
 
-    if (!artisan) {
+    const { id } = jwt.verify(token, process.env.SECRET);
+
+  
+
+   const user = await artisanModel.findById(id) ||
+                await employersModel.findById(id);
+    if (!user) {
+
       return res.status(404).json({
         message: 'Account not found'
       })
@@ -240,8 +265,8 @@ exports.resetPassword = async (req, res) => {
 
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
-    artisan.password = hashedPassword;
-    await artisan.save();
+    user.password = hashedPassword;
+    await user.save();
 
     res.status(200).json({
       message: 'Password changed successfully'
@@ -262,41 +287,45 @@ exports.resetPassword = async (req, res) => {
 };
 
 
+
 exports.login = async (req, res) => {
   try {
-    const { email, phoneNumber, password } = req.body;
-    let artisan;
 
-    if (email) {
-      artisan = await artisanModel.findOne({ email: email?.toLowerCase() });
+    const { email,phoneNumber, password } = req.body;
 
-      if (!artisan) {
-        return res.status(404).json({
-          message: 'No account found'
-        })
-      }
-    } else if (phoneNumber) {
-      artisan = await artisanModel.findOne({ phoneNumber: phoneNumber });
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: !email ?'Email is required': 'password is required'
+      });
+    }
 
-      if (!artisan) {
-        return res.status(404).json({
-          message: 'No account found'
-        })
-      }
-    };
+    const user = await artisanModel.findOne({ email: email.toLowerCase() }) ||
+                 await employersModel.findOne({ email: email.toLowerCase() });
 
-    const correctPassword = await bcrypt.compare(password, artisan.password);
+    if (!user) {
+      return res.status(404).json({ message: 'No account found with that email' });
+    }
+
+    if (!['artisan', 'employer'].includes(user.role.toLowerCase())) {
+      return res.status(403).json({
+         message: `Login not allowed for user role: ${user.role}`
+         });
+    }
+
+    const correctPassword = await bcrypt.compare(password, user.password);
 
     if (!correctPassword) {
       return res.status(400).json({
-        message: 'Incorrect password'
-      })
-    };
+         message: 'Incorrect password'
+         });
+    }
 
-    if (artisan.isVerified !== true) {
-      const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
-      const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
-      const html = verifyMail(link, artisan.businessName);
+
+    if (user.isVerified !== true) {
+      const verificationToken = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '5mins' });
+      const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${verificationToken}`;
+      const html = verifyMail(link, user.fullName || user.businessName);
+
 
       const mailDetails = {
         email: artisan.email,
@@ -305,58 +334,159 @@ exports.login = async (req, res) => {
       };
 
       await mail_sender(mailDetails);
+      console.log("Sending verification email to:", user.email);
+
       return res.status(401).json({
-        message: 'Your account is not verified, link has been sent to email address'
-      })
-    };
+        message: 'Your account is not verified, a verification link has been sent to your email address'
+      });
+    }
 
-    if (artisan.isRestricted === true) {
-      return res.status(400).json({
+
+    if (user.isRestricted === true) {
+      return res.status(403).json({
+
         message: 'Your account is restricted, contact: artisanaid.team@gmail.com to resolve'
-      })
-    };
+      });
+    }
 
-    artisan.isLoggedIn = true;
-    const token = jwt.sign({ id: artisan._id, isLoggedIn: artisan.isLoggedIn, role: artisan.role }, jwtSecret, { expiresIn: '1day' });
-    await artisan.save();
+    user.isLoggedIn = true;
+    const loginToken = jwt.sign(
+      { id: user._id, isLoggedIn: user.isLoggedIn, role: user.role }, process.env.SECRET,{ expiresIn: '1d' }
+    );
+    await user.save();
+
 
     res.status(200).json({
-      message: 'Login successfully',
-      token
-    })
+      message: 'Login successful',
+      loginToken
+    });
   } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: 'Error logging artisan in'
-    })
+
+    console.error(error.message);
+    res.status(500).json({ 
+      message: 'Error logging in' 
+    });
+
   }
 };
 
+
+// exports.login = async (req, res) => {
+//   try {
+//     const { email, phoneNumber, password } = req.body;
+//     let artisan;
+
+//     if (email) {
+//       artisan = await artisanModel.findOne({ email: email?.toLowerCase() });
+
+//       if (!artisan) {
+//         return res.status(404).json({
+//           message: 'No account found'
+//         })
+//       }
+//     } else if (phoneNumber) {
+//       artisan = await artisanModel.findOne({ phoneNumber: phoneNumber });
+
+//       if (!artisan) {
+//         return res.status(404).json({
+//           message: 'No account found'
+//         })
+//       }
+//     };
+
+//     const correctPassword = await bcrypt.compare(password, artisan.password);
+
+//     if (!correctPassword) {
+//       return res.status(400).json({
+//         message: 'Incorrect password'
+//       })
+//     };
+
+//     if (artisan.isVerified !== true) {
+//       const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
+//       const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+//       const html = verifyMail(link, artisan.businessName);
+
+//       const mailDetails = {
+//         email: artisan.email,
+//         subject: 'ACCOUNT VERIFICATION',
+//         html
+//       };
+
+//       await mail_sender(mailDetails);
+//       return res.status(401).json({
+//         message: 'Your account is not verified, link has been sent to email address'
+//       })
+//     };
+
+//     if (artisan.isRestricted === true) {
+//       return res.status(400).json({
+//         message: 'Your account is restricted, contact: artisanaid.team@gmail.com to resolve'
+//       })
+//     };
+
+//     artisan.isLoggedIn = true;
+//     const token = jwt.sign({ id: artisan._id, isLoggedIn: artisan.isLoggedIn, role: artisan.role }, jwtSecret, { expiresIn: '1day' });
+//     await artisan.save();
+
+//     res.status(200).json({
+//       message: 'Login successfully',
+//       token
+//     })
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({
+//       message: 'Error logging artisan in'
+//     })
+//   }
+// };
 
 exports.logout = async (req, res) => {
   try {
     const { id } = req.user;
-    const artisan = await artisanModel.findById(id);
 
-    if (!artisan) {
+
+    if (!id) {
+      return res.status(400).json({
+        message: 'User is not logged in'
+      });
+    }
+
+    // Try to find user in both models
+    user = await artisanModel.findById(id) || 
+           await employersModel.findById(id);
+
+
+    if (!user) {
       return res.status(404).json({
-        message: 'Artisan not found'
-      })
-    };
 
-    artisan.isLoggedIn = false
-    await artisan.save();
+        message: 'User not found'
+      });
+    }
+
+    if (!['artisan', 'employer'].includes(user.role)) {
+      return res.status(403).json({
+        message: 'Invalid user role'
+      });
+    }
+
+    user.isLoggedIn = false;
+    await user.save();
+
 
     res.status(200).json({
       message: 'Logout successfully'
-    })
+    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error logging artisan out'
-    })
+
+      message: 'Error logging user out'
+    });
+
   }
 };
+
 
 
 exports.createAdmin = async (req, res) => {
@@ -660,9 +790,14 @@ exports.changePassword = async (req, res) => {
   try {
     const { id } = req.user;
     const { password, newPassword, confirmPassword } = req.body;
-    const artisan = await artisanModel.findById(id);
 
-    if (!artisan) {
+    let user;
+
+        user = await artisanModel.findById(id) ||
+               await employersModel.findById(id)
+
+    if (!['artisan', 'employer'].includes(user.role)) {
+
       return res.status(404).json({
         message: 'Account not found'
       })

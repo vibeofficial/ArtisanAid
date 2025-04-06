@@ -1,5 +1,8 @@
 const { registerUser, verifyUser, login, forgotPassword, resetPassword, getUsers, getUser, changePassword, updateProfilePic, updateLocation, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedUsers, getUsersByCategory, getUsersByLocalGovt, updateCoverPhoto } = require('../controllers/artisans');
 const { authorize, authenticate } = require('../middlewares/authorization');
+
+const { loginEmployerValidation, employerForgotPasswordValidation,employerResetPasswordValidation, employersChangePasswordValidation } = require('../middlewares/employerValidator')
+
 const { registerValidation, forgotPasswordValidation, resetPasswordValidation, loginValidation, getByCategoryValidation, getByLgaValidation, changePasswordValidation, updateLocationValidation } = require('../middlewares/artisanValidator');
 const uploads = require('../middlewares/multer');
 
@@ -158,7 +161,7 @@ router.get('/verify/account/:token', verifyUser);
  *       500:
  *         description: Error processing password reset request.
  */
-router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
+router.post('/forgot/password', employerForgotPasswordValidation, forgotPasswordValidation, forgotPassword);
 
 
 /**
@@ -233,7 +236,7 @@ router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
  *                   type: string
  *                   example: "Error resetting password"
  */
-router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
+router.post('/reset/password/:token',employerResetPasswordValidation, resetPasswordValidation, resetPassword);
 
 
 /**
@@ -318,8 +321,7 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
  *                   type: string
  *                   example: "Error logging user in"
  */
-router.post('/login', loginValidation, login);
-
+router.post('/login', loginEmployerValidation, loginValidation,  login);
 
 /**
  * @swagger
@@ -813,7 +815,7 @@ router.get('/user/:id', getUser);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', changePasswordValidation, authenticate, changePassword);
+router.put('/change/password', employersChangePasswordValidation, changePasswordValidation, authenticate, changePassword);
 
 
 

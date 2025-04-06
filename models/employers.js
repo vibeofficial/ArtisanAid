@@ -23,7 +23,8 @@ const employerSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    require: true
+    trim:true,
+    required: true
   },
   profilePic: {
     public_id: { type: String },
@@ -32,6 +33,16 @@ const employerSchema = new mongoose.Schema({
   role: {
     type: String,
     default: 'Employer'
+  },
+  artisanId:{
+    type:mongoose.SchemaTypes.ObjectId,
+    ref: 'employers' , 
+    require:true 
+  },
+  isVerified:{
+    type: Boolean,
+    default: false
+
   }
 }, { timestamps: true });
 
