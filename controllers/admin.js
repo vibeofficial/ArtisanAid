@@ -90,7 +90,6 @@ exports.restrictAccount = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find user in both artisan and employer models
     let user = await artisanModel.findById(id) ||
       await employerModel.findById(id)
 
@@ -98,13 +97,13 @@ exports.restrictAccount = async (req, res) => {
       return res.status(404).json({
         message: 'User not found'
       });
-    }
+    };
 
     if (user.isRestricted === true) {
       return res.status(400).json({
         message: 'This account is already restricted'
       });
-    }
+    };
 
     user.isRestricted = true;
     await user.save();
@@ -209,15 +208,7 @@ exports.getEmployers = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Search in all models sequentially
-    const models = [artisanModel, employerModel, adminModel];
-    let user = null;
-
-    for (let model of models) {
-      user = await model.findById(id);
-      if (user) break; // If user is found, stop searching
-    }
+    const user = await employerModel.findById(id) || await artisanModel.findById(id) || await adminModel.findById(id);
 
     if (!user) {
       return res.status(404).json({
