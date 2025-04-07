@@ -9,7 +9,7 @@ const router = require('express').Router();
  *     summary: Get all admins
  *     description: Retrieves a list of all users with the 'Admin' role. Requires authorization.
  *     tags:
- *       - Artisans
+ *       - Admin
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -54,7 +54,7 @@ router.get('/admins', getAdmins);
  *     summary: Restrict a user account
  *     description: Restrict the account of a user, preventing them from using the platform.
  *     tags:
- *       - Artisans
+ *       - Admin
  *     parameters:
  *       - name: id
  *         in: path
@@ -80,7 +80,7 @@ router.get('/restrict/account/:id', restrictAccount);
  *     summary: Unrestrict a user account
  *     description: Removes restrictions from a user account, allowing them full access to the platform.
  *     tags:
- *       - Artisans
+ *       - Admin
  *     parameters:
  *       - name: id
  *         in: path
@@ -106,7 +106,7 @@ router.get('/unrestrict/account/:id', unrestrictAccount);
  *     summary: Get all approved artisans
  *     description: Retrieves a list of all artisans with approved account verification status..
  *     tags:
- *       - Artisans
+ *       - General
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -151,7 +151,7 @@ router.get('/artisans', getArtisans);
  *     summary: Get all verified employers
  *     description: Retrieves a list of all employers that are verified
  *     tags:
- *       - Genaral
+ *       - Admin
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -196,7 +196,7 @@ router.get('/employers', getEmployers);
  *     summary: Get a specific user by ID
  *     description: Fetches a single user based on the provided user ID.
  *     tags:
- *       - Artisans
+ *       - General
  *     parameters:
  *       - in: path
  *         name: id
@@ -246,7 +246,7 @@ router.get('/user/:id', getUser);
  *     summary: Delete a user account
  *     description: Allows an admin to delete a user account from the system.
  *     tags:
- *       - Artisans
+ *       - Admin
  *     security:
  *       - Bearer: []
  *     parameters:
