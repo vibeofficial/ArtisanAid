@@ -7,7 +7,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { verifyMail } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
-const jwtSecret = process.env.SECRET;
+const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerEmployer = async (req, res) => {
   try {

@@ -7,7 +7,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const { verifyMail, reset } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
-const jwtSecret = process.env.SECRET;
+const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerArtisan = async (req, res) => {
   try {
@@ -165,6 +165,42 @@ exports.verifyAccount = async (req, res) => {
 
     return res.status(500).json({
       message: 'Error verifying account'
+    });
+  }
+};
+
+
+exports.resendVerifyLink = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      })
+    };
+
+    const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
+    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+    const html = verifyMail(link, user.fullname);
+
+    const mailDetails = {
+      email: user.email,
+      subject: 'ACCOUNT VERIFICATION',
+      html
+    };
+
+    await mail_sender(mailDetails);
+
+    res.status(201).json({
+      message: 'Link has been sent to email address'
+    });
+  } catch (error) {
+    console.error(error.message);
+
+    return res.status(500).json({
+      message: 'Error sending mail'
     });
   }
 };

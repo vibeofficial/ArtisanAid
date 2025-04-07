@@ -1,4 +1,4 @@
-const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation } = require('../controllers/artisan');
+const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink } = require('../controllers/artisan');
 const uploads = require('../middlewares/multer');
 
 const router = require('express').Router();
@@ -119,6 +119,61 @@ router.post('/register/artisan', registerArtisan);
  *         description: Error verifying user account.
  */
 router.get('/verify/account/:token', verifyAccount);
+
+
+/**
+ * @swagger
+ * /v1/resend/email:
+ *   post:
+ *     summary: Resend account verification email
+ *     description: Resends the account verification link to the provided email address if the user exists.
+ *     tags:
+ *       - General
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@sample.com
+ *                 description: The email address of the user.
+ *     responses:
+ *       '201':
+ *         description: Verification link sent successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Link has been sent to email address
+ *       '404':
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       '500':
+ *         description: Server error while sending verification email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error sending mail
+ */
+router.post('/resend/email', resendVerifyLink);
 
 
 /**
