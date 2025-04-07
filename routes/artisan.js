@@ -539,7 +539,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  * /v1/artisans/category:
  *   get:
  *     summary: Get all users in a specific category
- *     description: Retrieves all users with the role 'Artisan' in the specified category and approved KYC status.
+ *     description: Retrieves all users artisan the specified category and approved account verificatoon status.
  *     tags:
  *       - Artisans
  *     parameters:
