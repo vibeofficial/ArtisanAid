@@ -4,7 +4,83 @@ const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
 
-
+/**
+ * @swagger
+ * /registerEmployer:
+ *   post:
+ *     summary: Register a new employer
+ *     description: Creates a new employer account with full name, email, phone number, and password. Also checks for existing accounts in both employer and artisan collections.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fullname
+ *               - email
+ *               - phoneNumber
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *                 example: "John Doe"
+ *               email:
+ *                 type: string
+ *                 example: "johndoe@sample.com"
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "08123456789"
+ *               password:
+ *                 type: string
+ *                 example: "SecureP@ssw0rd"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "SecureP@ssw0rd"
+ *     responses:
+ *       '201':
+ *         description: Employer account created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Account Registered Successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     fullName:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     phoneNumber:
+ *                       type: string
+ *       '400':
+ *         description: Duplicate email, phone number, or password mismatch.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password does not match"
+ *       '500':
+ *         description: Server error while registering.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error registering employer"
+ */
 router.post('/registerEmployer', registerEmployer);
 
 
@@ -335,7 +411,6 @@ router.get('/artisans/lga', getArtisansByLocalGovt);
  *                   example: 'Error updating cover'
  */
 router.put('/update/cover', uploads.single('coverPhoto'), updateCoverPhoto);
-
 
 
 module.exports = router;
