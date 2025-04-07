@@ -1,19 +1,24 @@
 require('dotenv').config();
 require('./configs/database')
+
 const express = require('express');
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 1234;
 const cors = require('cors');
+
 const app = express();
+app.use(express.json());
+app.use(cors());
+
 const userRouter = require('./routes/artisan');
 const planRouter = require('./routes/plan');
 const subscriptionRouter = require('./routes/subscription');
 const contactRouter = require('./routes/contact');
-const employersRouter = require('./routes/employers')
-
+const employerRouter = require('./routes/employer');
+const adminRouter = require('./routes/admin');
 
 app.use(express.json());
-
 app.use(cors());
+
 
 const swaggerJsdoc = require("swagger-jsdoc");
 const swagger_UI = require("swagger-ui-express")
@@ -65,7 +70,8 @@ app.use('/v1', userRouter);
 app.use('/v1', planRouter);
 app.use('/v1', subscriptionRouter);
 app.use('/v1', contactRouter);
-app.use('/v1', employersRouter);
+app.use('/v1', employerRouter);
+app.use('/v1', adminRouter);
 
 
 app.listen(PORT, () => {

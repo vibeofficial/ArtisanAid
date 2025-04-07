@@ -13,10 +13,6 @@ exports.employerValidation = (req, res, next) => {
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
-    confirmEmail: Joi.string().valid(Joi.ref("email")).required().messages({
-        "any.only": "Emails do not match",
-        "any.required": "Confirm email is required"
-      }),
       phoneNumber: Joi.string().trim().pattern(/^\d{11,11}$/).required().messages({
       "any.required": "Phone number is required",
       "string.pattern.base": "Phone number must be 11 digits"

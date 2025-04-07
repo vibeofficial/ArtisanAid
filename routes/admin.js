@@ -1,0 +1,304 @@
+const { getAdmins, restrictAccount, unrestrictAccount, getArtisans, getEmployers, getUser, deleteAccount } = require('../controllers/admin');
+
+const router = require('express').Router();
+
+/**
+ * @swagger
+ * /v1/admins:
+ *   get:
+ *     summary: Get all admins
+ *     description: Retrieves a list of all users with the 'Admin' role. Requires authorization.
+ *     tags:
+ *       - Artisans
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all admins.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All admins
+ *                 total:
+ *                   type: integer
+ *                   example: 3
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No admin users found.
+ *       '500':
+ *         description: Error retrieving admins.
+ */
+router.get('/admins', getAdmins);
+
+
+/**
+ * @swagger
+ * /v1/restrict/account/{id}:
+ *   get:
+ *     summary: Restrict a user account
+ *     description: Restrict the account of a user, preventing them from using the platform.
+ *     tags:
+ *       - Artisans
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The ID of the user whose account will be restricted.
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Account is restricted successfully.
+ *       '404':
+ *         description: Account not found or account is already restricted.
+ *       '500':
+ *         description: Internal server error while restricting account.
+ */
+router.get('/restrict/account/:id', restrictAccount);
+
+
+/**
+ * @swagger
+ * /v1/unrestrict/account/{id}:
+ *   get:
+ *     summary: Unrestrict a user account
+ *     description: Removes restrictions from a user account, allowing them full access to the platform.
+ *     tags:
+ *       - Artisans
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The ID of the user whose account will be unrestricted.
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Account is no longer restricted.
+ *       '404':
+ *         description: Account not found or account is not restricted.
+ *       '500':
+ *         description: Internal server error while unrestricting account.
+ */
+router.get('/unrestrict/account/:id', unrestrictAccount);
+
+
+/**
+ * @swagger
+ * /v1/artisans:
+ *   get:
+ *     summary: Get all approved artisans
+ *     description: Retrieves a list of all artisans with approved account verification status..
+ *     tags:
+ *       - Artisans
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all artisans.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All artisans
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No artisan found.
+ *       '500':
+ *         description: Error retrieving artisans.
+ */
+router.get('/artisans', getArtisans);
+
+
+/**
+ * @swagger
+ * /v1/artisans:
+ *   get:
+ *     summary: Get all verified employers
+ *     description: Retrieves a list of all employers that are verified
+ *     tags:
+ *       - Genaral
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all employers.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All artisans
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No artisan found.
+ *       '500':
+ *         description: Error retrieving artisans.
+ */
+router.get('/employers', getEmployers);
+
+
+/**
+ * @swagger
+ * /v1/user/{id}:
+ *   get:
+ *     summary: Get a specific user by ID
+ *     description: Fetches a single user based on the provided user ID.
+ *     tags:
+ *       - Artisans
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "60d2a0ef91b88b7e85b10c5c"
+ *         description: The ID of the user to retrieve.
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched the user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'User below'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     fullname:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                     phoneNumber:
+ *                       type: string
+ *                     kycStatus:
+ *                       type: string
+ *       '404':
+ *         description: User not found with the provided ID.
+ *       '500':
+ *         description: Error retrieving the user.
+ */
+router.get('/user/:id', getUser);
+
+
+/**
+ * @swagger
+ * /v1/delete/{id}:
+ *   delete:
+ *     summary: Delete a user account
+ *     description: Allows an admin to delete a user account from the system.
+ *     tags:
+ *       - Artisans
+ *     security:
+ *       - Bearer: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the user to be deleted.
+ *         schema:
+ *           type: string
+ *           example: '60d21b4667d0d8992e610c85'
+ *     responses:
+ *       '200':
+ *         description: Account deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Account deleted successfully'
+ *       '400':
+ *         description: Invalid session or session expired.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Session expired, please login to continue'
+ *       '404':
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'User does not exist'
+ *       '500':
+ *         description: Error deleting account.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error deleting account'
+ */
+router.delete('/delete/:id', deleteAccount);
+
+module.exports = router;
