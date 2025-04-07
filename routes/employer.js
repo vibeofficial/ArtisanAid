@@ -6,10 +6,12 @@ const uploads = require('../middlewares/multer');
 
 /**
  * @swagger
- * /registerEmployer:
+ * /v1/register/employer:
  *   post:
  *     summary: Register a new employer
  *     description: Creates a new employer account with full name, email, phone number, and password. Also checks for existing accounts in both employer and artisan collections.
+ *     tags:
+ *       - Employers
  *     requestBody:
  *       required: true
  *       content:
@@ -81,7 +83,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error registering employer"
  */
-router.post('/registerEmployer', registerEmployer);
+router.post('/register/employer', registerEmployer);
 
 
 /**
