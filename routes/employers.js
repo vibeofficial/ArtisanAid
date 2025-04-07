@@ -1,5 +1,5 @@
 const { registerEmployer, getArtisanById,getAllArtisans, verifyEmployer } = require('../controllers/employers');
-const {authorize, authenticate} = require('../middlewares/authorization')
+const {authorize, authenticate} = require('../middlewares/authentication')
 const { employerValidation,  } = require('../middlewares/employerValidator')
 
 const router = require('express').Router();

@@ -1,5 +1,5 @@
 const employersModel = require('../models/employers');
-const artisansModel = require('../models/artisans')
+const artisansModel = require('../models/artisan')
 const bcrypt = require('bcrypt');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');

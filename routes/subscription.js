@@ -1,5 +1,5 @@
 const { initializeSubscription, verifySubscription } = require('../controllers/subscription');
-const { authenticate } = require('../middlewares/authorization');
+const { authenticate } = require('../middlewares/authentication');
 
 const router = require('express').Router();
 
