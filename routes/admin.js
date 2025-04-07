@@ -5,10 +5,12 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /admin:
+ * /v1/admin:
  *   post:
  *     summary: Register a new admin
  *     description: Creates a new admin account with full name, phone number, email, and password.
+ *     tags:
+ *       - Admin
  *     requestBody:
  *       required: true
  *       content:
