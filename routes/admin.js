@@ -1,6 +1,87 @@
-const { getAdmins, restrictAccount, unrestrictAccount, getArtisans, getEmployers, getUser, deleteAccount } = require('../controllers/admin');
+const { getAdmins, restrictAccount, unrestrictAccount, getArtisans, getEmployers, getUser, deleteAccount, registerAdmin } = require('../controllers/admin');
 
 const router = require('express').Router();
+
+
+/**
+ * @swagger
+ * /admin:
+ *   post:
+ *     summary: Register a new admin
+ *     description: Creates a new admin account with full name, phone number, email, and password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fullname
+ *               - phoneNumber
+ *               - email
+ *               - password
+ *               - confirmPassword
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *                 example: "Jane Doe"
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "08012345678"
+ *               email:
+ *                 type: string
+ *                 example: "janedoe@sample.com"
+ *               password:
+ *                 type: string
+ *                 example: "StrongP@ssw0rd"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "StrongP@ssw0rd"
+ *     responses:
+ *       '201':
+ *         description: Admin account created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Account registered successully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     fullname:
+ *                       type: string
+ *                     phoneNumber:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       '400':
+ *         description: Password mismatch or email already exists.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password does not match"
+ *       '500':
+ *         description: Server error while registering.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error registering admin"
+ */
+router.post('/admin', registerAdmin);
+
 
 /**
  * @swagger
@@ -300,5 +381,6 @@ router.get('/user/:id', getUser);
  *                   example: 'Error deleting account'
  */
 router.delete('/delete/:id', deleteAccount);
+
 
 module.exports = router;

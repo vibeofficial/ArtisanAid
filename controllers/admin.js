@@ -23,6 +23,31 @@ exports.registerAdmin = async (req, res) => {
         message: 'Password does not match'
       });
     };
+
+    const emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
+
+    if (emailExists) {
+      return res.status(400).json({
+        message: `Admin with ${email.toLowerCase()} already exists`
+      })
+    };
+
+    const saltedRound = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, saltedRound);
+
+    const admin = new adminModel({
+      fullname: nameFormat,
+      phoneNumber,
+      email,
+      password: hashedPassword,
+    });
+
+    await admin.save();
+
+    res.status(201).json({
+      message: 'Account registered successully',
+      data: admin
+    })
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: 'Error registering admin' });
