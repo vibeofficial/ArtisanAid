@@ -1,5 +1,5 @@
 const artisanModel = require('../models/artisan');
-const employerModel = require('../models/employers');
+const employerModel = require('../models/employer');
 const adminModel = require('../models/admin');
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JWT_SECRET;
@@ -100,7 +100,7 @@ exports.authorize = async (req, res, next) => {
         }
       }
     };
-    
+
     if (user.isLoggedIn !== decodedToken.isLoggedIn) {
       return res.status(401).json({
         message: 'Authentication failed: Account is not logged in'

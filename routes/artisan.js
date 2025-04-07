@@ -1,6 +1,4 @@
-const { registerArtisan, verifyAccount, login, forgotPassword, resetPassword, getArtisans, getUser, changePassword, updateProfilePic, updateLocation, deleteUser, logout, createAdmin, removeAdmin, getAdmins, restrictAccount, unrestrictAccount, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto } = require('../controllers/artisan');
-const { authorize, authenticate } = require('../middlewares/authentication');
-const { registerValidation } = require('../middlewares/artisanValidator');
+const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation } = require('../controllers/artisan');
 const uploads = require('../middlewares/multer');
 
 const router = require('express').Router();
@@ -92,7 +90,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: "Error registering user"
  */
-router.post('/register/artisan', registerValidation, registerArtisan);
+router.post('/register/artisan', registerArtisan);
 
 
 /**
@@ -102,7 +100,7 @@ router.post('/register/artisan', registerValidation, registerArtisan);
  *     summary: Verify user account
  *     description: Confirms the authenticity of a user's email address by validating the provided token.
  *     tags:
- *       - Artisans
+ *       - General
  *     parameters:
  *       - in: path
  *         name: token
@@ -130,7 +128,7 @@ router.get('/verify/account/:token', verifyAccount);
  *     summary: Request a password reset
  *     description: Allows users to request a password reset link by providing their email address.
  *     tags:
- *       - Artisans
+ *       - General
  *     requestBody:
  *       required: true
  *       content:
@@ -158,7 +156,10 @@ router.get('/verify/account/:token', verifyAccount);
  *       500:
  *         description: Error processing password reset request.
  */
-router.post('/forgot/password', forgotPassword);
+
+router.post('/forgot/password',  forgotPassword);
+
+
 
 
 /**
@@ -168,7 +169,7 @@ router.post('/forgot/password', forgotPassword);
  *     summary: Reset password
  *     description: Allows users to reset their password using a valid reset token. The new password must match the confirmation password.
  *     tags:
- *       - Artisans
+ *       - General
  *     parameters:
  *       - name: token
  *         in: path
@@ -233,461 +234,7 @@ router.post('/forgot/password', forgotPassword);
  *                   type: string
  *                   example: "Error resetting password"
  */
-router.post('/reset/password/:token', resetPassword);
-
-
-/**
- * @swagger
- * /v1/login:
- *   post:
- *     summary: Login a user
- *     description: Logs in a user with either email or phone number and validates the provided password.
- *     tags:
- *       - Artisans
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email address.
- *                 example: "user@sample.com"
- *               phoneNumber:
- *                 type: string
- *                 description: The user's phone number.
- *                 example: "08012345679"
- *               password:
- *                 type: string
- *                 description: The user's password.
- *                 example: "Password123"
- *     responses:
- *       200:
- *         description: User logged in successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Login successfully"
- *                 token:
- *                   type: string
- *                   description: The JWT token used for authenticating further requests.
- *       400:
- *         description: Incorrect password, account not verified, or account is restricted.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Incorrect password"
- *       401:
- *         description:  Account not verified, or account is restricted.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Your account is not verified, link has been sent to email address"
- *       404:
- *         description: No account found with the provided email or phone number.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "No account found"
- *       500:
- *         description: Error processing login request.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Error logging user in"
- */
-router.post('/login', login);
-
-
-/**
- * @swagger
- * /v1/logout:
- *   get:
- *     summary: Log out a user
- *     tags:
- *       - Artisans
- *     security:
- *       - Bearer: []
- *     responses:
- *       '200':
- *         description: User logged out successfully
- *       '404':
- *         description: User not found
- *       '500':
- *         description: Error logging user out
- */
-router.get('/logout', authenticate, logout);
-
-
-/**
- * @swagger
- * /v1/restrict/account/{id}:
- *   get:
- *     summary: Restrict a user account
- *     description: Restrict the account of a user, preventing them from using the platform.
- *     tags:
- *       - Artisans
- *     parameters:
- *       - name: id
- *         in: path
- *         description: The ID of the user whose account will be restricted.
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Account is restricted successfully.
- *       '404':
- *         description: Account not found or account is already restricted.
- *       '500':
- *         description: Internal server error while restricting account.
- */
-router.get('/restrict/account/:id', authorize, restrictAccount);
-
-
-/**
- * @swagger
- * /v1/unrestrict/account/{id}:
- *   get:
- *     summary: Unrestrict a user account
- *     description: Removes restrictions from a user account, allowing them full access to the platform.
- *     tags:
- *       - Artisans
- *     parameters:
- *       - name: id
- *         in: path
- *         description: The ID of the user whose account will be unrestricted.
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: Account is no longer restricted.
- *       '404':
- *         description: Account not found or account is not restricted.
- *       '500':
- *         description: Internal server error while unrestricting account.
- */
-router.get('/unrestrict/account/:id', authorize, unrestrictAccount);
-
-
-/**
- * @swagger
- * /v1/admins:
- *   get:
- *     summary: Get all admins
- *     description: Retrieves a list of all users with the 'Admin' role. Requires authorization.
- *     tags:
- *       - Artisans
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully fetched all admins.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: All admins
- *                 total:
- *                   type: integer
- *                   example: 3
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       email:
- *                         type: string
- *                       fullname:
- *                         type: string
- *                       role:
- *                         type: string
- *       '404':
- *         description: No admin users found.
- *       '500':
- *         description: Error retrieving admins.
- */
-router.get('/admins', authorize, getAdmins);
-
-
-/**
- * @swagger
- * /v1/artisans:
- *   get:
- *     summary: Get all approved artisans
- *     description: Retrieves a list of all users with the role 'User' and approved KYC status. Requires authorization.
- *     tags:
- *       - Artisans
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully fetched all users.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: All artisans
- *                 total:
- *                   type: integer
- *                   example: 5
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       email:
- *                         type: string
- *                       fullname:
- *                         type: string
- *                       role:
- *                         type: string
- *                       kycStatus:
- *                         type: string
- *       '404':
- *         description: No artisan found.
- *       '500':
- *         description: Error retrieving artisans.
- */
-router.get('/artisans', getArtisans);
-
-
-/**
- * @swagger
- * /v1/recommended/artisans:
- *   get:
- *     summary: Get all recommended users
- *     description: Retrieves a list of all recommended artisans with approved account verification status.
- *     tags:
- *       - Artisans
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully fetched all recommended artisans.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: All recommended artisans
- *                 total:
- *                   type: integer
- *                   example: 3
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       email:
- *                         type: string
- *                       fullname:
- *                         type: string
- *                       role:
- *                         type: string
- *                       kycStatus:
- *                         type: string
- *                       isRecommended:
- *                         type: boolean
- *       '404':
- *         description: No recommended artisans found.
- *       '500':
- *         description: Error retrieving recommended artisans.
- */
-router.get('/recommended/artisans', getRecommendedArtisans);
-
-
-/**
- * @swagger
- * /v1/artisans/category:
- *   get:
- *     summary: Get all users in a specific category
- *     description: Retrieves all users artisan the specified category and approved account verificatoon status.
- *     tags:
- *       - Artisans
- *     parameters:
- *       - in: query
- *         name: category
- *         required: true
- *         schema:
- *           type: string
- *           example: "Plumbing"
- *         description: The category of the users.
- *     responses:
- *       '200':
- *         description: Successfully fetched all users in the specified category.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: All users in this category
- *                 total:
- *                   type: integer
- *                   example: 5
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       email:
- *                         type: string
- *                       fullname:
- *                         type: string
- *                       category:
- *                         type: string
- *                       kycStatus:
- *                         type: string
- *       '404':
- *         description: No users found in this category.
- *       '500':
- *         description: Error retrieving users in the category.
- */
-router.get('/artisans/category', getArtisansByCategory);
-
-
-/**
- * @swagger
- * /v1/artisans/lga:
- *   get:
- *     summary: Get all users in a specific local government area (LGA)
- *     description: Retrieves all artisans in the specified LGA and approved account verification status.
- *     tags:
- *       - Artisans
- *     parameters:
- *       - in: query
- *         name: lga
- *         required: true
- *         schema:
- *           type: string
- *           example: "Ikorodu"
- *         description: The local government area (LGA) of the artisans.
- *     responses:
- *       '200':
- *         description: Successfully fetched all artisans in the specified LGA.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: All artisans in this LGA
- *                 total:
- *                   type: integer
- *                   example: 3
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       email:
- *                         type: string
- *                       fullname:
- *                         type: string
- *                       lga:
- *                         type: string
- *                       kycStatus:
- *                         type: string
- *       '404':
- *         description: No artisans found in this LGA.
- *       '500':
- *         description: Error retrieving artisans by local government.
- */
-router.get('/artisans/lga', getArtisansByLocalGovt);
-
-
-/**
- * @swagger
- * /v1/user/{id}:
- *   get:
- *     summary: Get a specific user by ID
- *     description: Fetches a single user based on the provided user ID.
- *     tags:
- *       - Artisans
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           example: "60d2a0ef91b88b7e85b10c5c"
- *         description: The ID of the user to retrieve.
- *     responses:
- *       '200':
- *         description: Successfully fetched the user.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'User below'
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     email:
- *                       type: string
- *                     fullname:
- *                       type: string
- *                     role:
- *                       type: string
- *                     phoneNumber:
- *                       type: string
- *                     kycStatus:
- *                       type: string
- *       '404':
- *         description: User not found with the provided ID.
- *       '500':
- *         description: Error retrieving the user.
- */
-router.get('/user/:id', getUser);
+router.post('/reset/password/:token',  resetPassword);
 
 
 /**
@@ -697,7 +244,7 @@ router.get('/user/:id', getUser);
  *     summary: Change user password
  *     description: Allows a user to change their password by providing the current password, new password, and confirming the new password.
  *     tags:
- *       - Artisans
+ *       - General
  *     security:
  *       - Bearer: []
  *     requestBody:
@@ -761,7 +308,8 @@ router.get('/user/:id', getUser);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', authenticate, changePassword);
+router.put('/change/password', changePassword);
+
 
 
 
@@ -840,86 +388,7 @@ router.put('/change/password', authenticate, changePassword);
  *                   type: string
  *                   example: 'Error updating profile'
  */
-router.put('/update/profile', authenticate, uploads.single('profilePic'), updateProfilePic);
-
-
-/**
- * @swagger
- * /v1/update/cover:
- *   put:
- *     summary: Update user cover and cover picture
- *     description: Allows a user to update their cover details, including uploading a new cover picture.
- *     tags:
- *       - Artisans
- *     security:
- *       - Bearer: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               coverPhoto:
- *                 type: string
- *                 format: binary
- *                 description: The cover picture image file to upload.
- *     responses:
- *       '200':
- *         description: Profile updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Profile updated successfully'
- *                 data:
- *                   type: object
- *                   properties:
- *                     profilePic:
- *                       type: object
- *                       properties:
- *                         public_id:
- *                           type: string
- *                           example: 'profile_pic_12345'
- *                         image_url:
- *                           type: string
- *                           example: 'https://res.cloudinary.com/sample-cloud/image/upload/v1616161616/profile_pic_12345.jpg'
- *       '400':
- *         description: Invalid session or session expired.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Session expired, please login to continue'
- *       '404':
- *         description: Account not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Account not found'
- *       '500':
- *         description: Error updating cover.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Error updating cover'
- */
-router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCoverPhoto);
-
+router.put('/update/profile', uploads.single('profilePic'), updateProfilePic);
 
 
 /**
@@ -989,70 +458,10 @@ router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCo
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address', authenticate, updateLocation);
+router.put('/update/address', updateLocation);
 
 
-/**
- * @swagger
- * /v1/delete/{id}:
- *   delete:
- *     summary: Delete a user account
- *     description: Allows an admin to delete a user account from the system.
- *     tags:
- *       - Artisans
- *     security:
- *       - Bearer: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: The ID of the user to be deleted.
- *         schema:
- *           type: string
- *           example: '60d21b4667d0d8992e610c85'
- *     responses:
- *       '200':
- *         description: Account deleted successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Account deleted successfully'
- *       '400':
- *         description: Invalid session or session expired.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Session expired, please login to continue'
- *       '404':
- *         description: User not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'User does not exist'
- *       '500':
- *         description: Error deleting account.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Error deleting account'
- */
-router.delete('/delete/:id', authorize, deleteUser);
+
 
 
 module.exports = router;
