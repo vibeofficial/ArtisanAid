@@ -1,18 +1,19 @@
 require('dotenv').config();
 require('./configs/database')
+
 const express = require('express');
 const PORT = process.env.PORT
 const cors = require('cors');
+
 const app = express();
+app.use(express.json());
+app.use(cors());
+
 const userRouter = require('./routes/artisan');
 const planRouter = require('./routes/plan');
 const subscriptionRouter = require('./routes/subscription');
 const contactRouter = require('./routes/contact');
 
-
-app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 const swaggerJsdoc = require("swagger-jsdoc");
 const swagger_UI = require("swagger-ui-express")
