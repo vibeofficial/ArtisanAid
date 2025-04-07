@@ -120,7 +120,7 @@ router.get('/logout', logout);
  *     summary: Get all recommended artisans
  *     description: Retrieves a list of all recommended artisans with approved account verification status.
  *     tags:
- *       - Artisan
+ *       - Artisans
  *     security:
  *       - bearerAuth: []
  *     responses:

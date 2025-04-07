@@ -320,7 +320,7 @@ router.put('/change/password', changePassword);
  *     summary: Update user profile and profile picture
  *     description: Allows a user to update their profile details, including uploading a new profile picture.
  *     tags:
- *       - Artisans
+ *       - General
  *     security:
  *       - Bearer: []
  *     requestBody:
@@ -398,7 +398,7 @@ router.put('/update/profile', uploads.single('profilePic'), updateProfilePic);
  *     summary: Update user address
  *     description: Allows a user to update their location details, including Local Government Area (LGA) and state.
  *     tags:
- *       - Artisans
+ *       - General
  *     security:
  *       - Bearer: []
  *     requestBody:
