@@ -1,6 +1,7 @@
 const { getAdmins, restrictAccount, unrestrictAccount, getArtisans, getEmployers, getUser, deleteAccount, registerAdmin } = require('../controllers/admin');
 
 const router = require('express').Router();
+const uploads = require('../middlewares/multerImages');
 
 
 /**
@@ -8,7 +9,7 @@ const router = require('express').Router();
  * /v1/admin:
  *   post:
  *     summary: Register a new admin
- *     description: Creates a new admin account with full name, phone number, email, and password.
+ *     description: Creates a new admin account with fullname, phone number, email, and password.
  *     tags:
  *       - Admin
  *     security:
@@ -84,7 +85,10 @@ const router = require('express').Router();
  *                   type: string
  *                   example: "Error registering admin"
  */
-router.post('/admin', registerAdmin);
+router.post('/admin', uploads.fields([
+  { name: 'profilePic', maxCount: 1 },
+  { name: 'coverPhoto', maxCount: 1 }
+]), registerAdmin);
 
 
 /**
