@@ -1,4 +1,4 @@
-const { getAdmins, restrictAccount, unrestrictAccount, getArtisans, getEmployers, getUser, deleteAccount, registerAdmin } = require('../controllers/admin');
+const { getAdmins, restrictAccount, unrestrictAccount, getVerifiedArtisans, getEmployers, getUser, deleteAccount, registerAdmin, getUnVerifiedArtisans, getProcessingArtisans, getDeclinedArtisans } = require('../controllers/admin');
 
 const router = require('express').Router();
 const uploads = require('../middlewares/multerImages');
@@ -190,12 +190,12 @@ router.get('/unrestrict/account/:id', unrestrictAccount);
 
 /**
  * @swagger
- * /v1/artisans:
+ * /v1/verified/artisans:
  *   get:
- *     summary: Get all approved artisans
- *     description: Retrieves a list of all artisans with approved account verification status..
+ *     summary: Get all verified artisans
+ *     description: Retrieves a list of all artisans with verified account verification status..
  *     tags:
- *       - General
+ *       - Admin
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -230,7 +230,142 @@ router.get('/unrestrict/account/:id', unrestrictAccount);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/artisans', getArtisans);
+router.get('/verified/artisans', getVerifiedArtisans);
+
+
+/**
+ * @swagger
+ * /v1/unverified/artisans:
+ *   get:
+ *     summary: Get all unverified artisans
+ *     description: Retrieves a list of all artisans with unverified account verification status..
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all artisans.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All artisans
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No artisan found.
+ *       '500':
+ *         description: Error retrieving artisans.
+ */
+router.get('/verified/artisans', getUnVerifiedArtisans);
+
+
+/**
+ * @swagger
+ * /v1/processing/artisans:
+ *   get:
+ *     summary: Get all pending artisans
+ *     description: Retrieves a list of all artisans with pending account verification status..
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all artisans.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All artisans
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No artisan found.
+ *       '500':
+ *         description: Error retrieving artisans.
+ */
+router.get('/processing/artisans', getProcessingArtisans);
+
+
+/**
+ * @swagger
+ * /v1/declined/artisans:
+ *   get:
+ *     summary: Get all declined artisans
+ *     description: Retrieves a list of all artisans with declined account verification status..
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all artisans.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All artisans
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No artisan found.
+ *       '500':
+ *         description: Error retrieving artisans.
+ */
+router.get('/declined/artisans', getDeclinedArtisans);
 
 
 /**

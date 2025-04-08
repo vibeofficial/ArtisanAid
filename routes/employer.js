@@ -1,4 +1,4 @@
-const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink } = require('../controllers/employers');
+const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employers');
 
 const router = require('express').Router();
 const uploads = require('../middlewares/multerImages');
@@ -84,6 +84,51 @@ const uploads = require('../middlewares/multerImages');
  *                   example: "Error registering employer"
  */
 router.post('/register/employer', registerEmployer);
+
+
+/**
+ * @swagger
+ * /v1/artisans:
+ *   get:
+ *     summary: Get all approved artisans
+ *     description: Retrieves a list of all artisans with approved account verification status..
+ *     tags:
+ *       - General
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all artisans.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All artisans
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No artisan found.
+ *       '500':
+ *         description: Error retrieving artisans.
+ */
+router.get('/artisans', getArtisans);
 
 
 /**

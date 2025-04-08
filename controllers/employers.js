@@ -103,6 +103,30 @@ exports.registerEmployer = async (req, res) => {
 };
 
 
+exports.getArtisans = async (req, res) => {
+  try {
+    const artisans = await artisanModel.find({ accountVerification: 'Verified' } && { isVerified: true });
+
+    if (artisans.length === 0) {
+      return res.status(404).json({
+        message: 'No verified artisans found'
+      });
+    };
+
+    return res.status(200).json({
+      message: 'Verified artisans retrieved successfully',
+      total: artisans.length,
+      data: artisans
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      message: 'Error retrieving artisans'
+    });
+  }
+};
+
+
 exports.login = async (req, res) => {
   try {
     const { email, phoneNumber, password } = req.body;
@@ -287,20 +311,12 @@ exports.updateCoverPhoto = async (req, res) => {
   try {
     const { id } = req.user;
     const file = req.file;
-    let user = await artisanModel.findById(id);
+    const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
     if (!user) {
-      user = await employerModel.findById(id);
-
-      if (!user) {
-        user = await adminModel.findById(id);
-
-        if (!user) {
-          return res.status(404).json({
-            message: 'User not found'
-          })
-        }
-      }
+      return res.status(404).json({
+        message: 'User not found'
+      })
     };
 
     const data = {
