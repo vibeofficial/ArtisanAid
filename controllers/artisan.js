@@ -127,13 +127,10 @@ exports.verifyAccount = async (req, res) => {
     };
 
     jwt.verify(token, jwtSecret, async (error, payload) => {
-      let user;
-
       if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
           const { id } = jwt.decode(token);
-
-          user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
+          const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
           if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -159,7 +156,7 @@ exports.verifyAccount = async (req, res) => {
             message: 'Session expired. A new verification link has been sent to your email address'
           });
         } else {
-          user = await artisanModel.findById(payload.id) || await employerModel.findById(payload.id) || await adminModel.findById(payload.id);
+          const user = await artisanModel.findById(payload.id) || await employerModel.findById(payload.id) || await adminModel.findById(payload.id);
 
           if (!user) {
             return res.status(404).json({ message: 'User not found' });
