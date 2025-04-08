@@ -68,12 +68,10 @@ exports.registerArtisan = async (req, res) => {
     };
 
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
-    const profilePicResult = await cloudinary.uploader.upload(profile.path);
-    fs.unlinkSync(profile.path);
+    const profilePicResult = await cloudinary.uploader.upload(profile);
 
-    const cover = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
-    const coverPhotoResult = await cloudinary.uploader.upload(cover.path);
-    fs.unlinkSync(cover.path);
+    const cover = 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
+    const coverPhotoResult = await cloudinary.uploader.upload(cover);
 
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
