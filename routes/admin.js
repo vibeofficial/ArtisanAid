@@ -11,6 +11,8 @@ const router = require('express').Router();
  *     description: Creates a new admin account with full name, phone number, email, and password.
  *     tags:
  *       - Admin
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -229,14 +231,12 @@ router.get('/artisans', getArtisans);
 
 /**
  * @swagger
- * /v1/artisans:
+ * /v1/employers:
  *   get:
  *     summary: Get all verified employers
  *     description: Retrieves a list of all employers that are verified
  *     tags:
  *       - Admin
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       '200':
  *         description: Successfully fetched all employers.

@@ -24,13 +24,53 @@ exports.registerAdmin = async (req, res) => {
       });
     };
 
-    const emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
+    let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
       return res.status(400).json({
-        message: `Admin with ${email.toLowerCase()} already exists`
+        message: `User with: ${email.toLowerCase()} already exist as an admin`
       })
+    } else if (emailExists) {
+      return res.status(400).json({
+        message: `User with: ${email.toLowerCase()} already exist as an employer`
+      });
+    } else if (!emailExists) {
+      emailExists = await artisanModel.findOne({ email: email?.toLowerCase() });
+
+      if (emailExists) {
+        return res.status(400).json({
+          message: `User with: ${email.toLowerCase()} already exist as an artisan`
+        });
+      }
     };
+
+    let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
+
+    if (phonenUmberExists) {
+      return res.status(400).json({
+        message: `User with this phone number already exist as an employer`
+      });
+    } else if (!phonenUmberExists) {
+      phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
+
+      if (phonenUmberExists) {
+        return res.status(400).json({
+          message: `User with this phone number already exist as an artisan`
+        });
+      }
+    } else if (phonenUmberExists) {
+      return res.status(400).json({
+        message: `User with this phone number already exist as an admin`
+      })
+    }
+
+    const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const profilePicResult = await cloudinary.uploader.upload(profile.path);
+    fs.unlinkSync(profile.path);
+
+    const cover = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const coverPhotoResult = await cloudinary.uploader.upload(cover.path);
+    fs.unlinkSync(cover.path);
 
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
@@ -40,8 +80,27 @@ exports.registerAdmin = async (req, res) => {
       phoneNumber,
       email,
       password: hashedPassword,
+      profilePic: {
+        public_id: profilePicResult.public_id,
+        image_url: profilePicResult.secure_url
+      },
+      coverPhoto: {
+        public_id: coverPhotoResult.public_id,
+        image_url: coverPhotoResult.secure_url
+      }
     });
 
+    const token = jwt.sign({ id: admin._id }, jwtSecret, { expiresIn: '5mins' });
+    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+    const html = verifyMail(link, admin.fullname);
+
+    const mailDetails = {
+      email: admin.email,
+      subject: 'ACCOUNT VERIFICATION',
+      html
+    };
+
+    await mail_sender(mailDetails);
     await admin.save();
 
     res.status(201).json({
@@ -49,7 +108,7 @@ exports.registerAdmin = async (req, res) => {
       data: admin
     })
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     res.status(500).json({ message: 'Error registering admin' });
   }
 };

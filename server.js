@@ -9,12 +9,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const userRouter = require('./routes/artisan');
+const artisanRouter = require('./routes/artisan');
 const planRouter = require('./routes/plan');
 const subscriptionRouter = require('./routes/subscription');
-const contactRouter = require('./routes/contact');
+const contactUsRouter = require('./routes/contactUs');
 const employerRouter = require('./routes/employer');
 const adminRouter = require('./routes/admin');
+const verificationRouter = require('./routes/verification');
 
 app.use(express.json());
 app.use(cors());
@@ -66,12 +67,13 @@ const options = {
 const openapiSpecification = swaggerJsdoc(options);
 app.use("/documentation", swagger_UI.serve, swagger_UI.setup(openapiSpecification));
 
-app.use('/v1', userRouter);
+app.use('/v1', artisanRouter);
 app.use('/v1', planRouter);
 app.use('/v1', subscriptionRouter);
-app.use('/v1', contactRouter);
+app.use('/v1', contactUsRouter);
 app.use('/v1', employerRouter);
 app.use('/v1', adminRouter);
+app.use('/v1', verificationRouter);
 
 
 app.listen(PORT, () => {

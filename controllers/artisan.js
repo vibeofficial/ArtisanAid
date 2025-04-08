@@ -65,7 +65,15 @@ exports.registerArtisan = async (req, res) => {
       return res.status(404).json({
         message: `User with: ${businessName} name already exists`
       })
-    }
+    };
+
+    const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const profilePicResult = await cloudinary.uploader.upload(profile.path);
+    fs.unlinkSync(profile.path);
+
+    const cover = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const coverPhotoResult = await cloudinary.uploader.upload(cover.path);
+    fs.unlinkSync(cover.path);
 
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
@@ -78,6 +86,14 @@ exports.registerArtisan = async (req, res) => {
       category,
       password: hashedPassword,
       expiresIn: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3),
+      profilePic: {
+        public_id: profilePicResult.public_id,
+        image_url: profilePicResult.secure_url
+      },
+      coverPhoto: {
+        public_id: coverPhotoResult.public_id,
+        image_url: coverPhotoResult.secure_url
+      }
     });
 
     const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
@@ -340,6 +356,7 @@ exports.updateProfilePic = async (req, res) => {
   try {
     const { id } = req.user;
     const file = req.file;
+
     let user = await artisanModel.findById(id);
 
     if (!user) {
@@ -361,7 +378,7 @@ exports.updateProfilePic = async (req, res) => {
     };
 
     if (file && file.path) {
-      await cloudinary.uploader.destroy(user.profilePic.public_id);
+      // await cloudinary.uploader.destroy(user.profilePic.public_id);
       const profilePicResult = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(file.path);
 
@@ -450,6 +467,40 @@ exports.updateLocation = async (req, res) => {
 
     res.status(500).json({
       message: 'Error updating address'
+    })
+  }
+};
+
+
+exports.updateBio = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { bio } = req.body;
+    const artisan = await artisanModel.findById(id);
+
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
+
+    const data = {
+      bio: artisan.bio
+    };
+
+    data.bio = {
+      bio
+    };
+
+    const updatedBio = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
+
+    res.status(200).json({
+      message: 'Bio updated successfully'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error updating bio'
     })
   }
 };

@@ -9,6 +9,7 @@ const { verifyMail } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 const jwtSecret = process.env.JWT_SECRET;
 
+
 exports.registerEmployer = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, confirmPassword } = req.body;
@@ -54,6 +55,14 @@ exports.registerEmployer = async (req, res) => {
       }
     };
 
+    const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const profilePicResult = await cloudinary.uploader.upload(profile.path);
+    fs.unlinkSync(profile.path);
+
+    const cover = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const coverPhotoResult = await cloudinary.uploader.upload(cover.path);
+    fs.unlinkSync(cover.path);
+
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
@@ -62,6 +71,14 @@ exports.registerEmployer = async (req, res) => {
       email,
       phoneNumber,
       password: hashedPassword,
+      profilePic: {
+        public_id: profilePicResult.public_id,
+        image_url: profilePicResult.secure_url
+      },
+      coverPhoto: {
+        public_id: coverPhotoResult.public_id,
+        image_url: coverPhotoResult.secure_url
+      }
     });
 
     const token = jwt.sign({ id: employer._id }, jwtSecret, { expiresIn: '5mins' });
@@ -328,6 +345,40 @@ exports.updateCoverPhoto = async (req, res) => {
 
     res.status(500).json({
       message: 'Error updating cover photo'
+    })
+  }
+};
+
+
+exports.updateSocialLink = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { socialLink } = req.body;
+    const artisan = await artisanModel.findById(id);
+
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
+
+    const data = {
+      socialMediaLink: artisan.socialMediaLink
+    };
+
+    data.socialMediaLink = {
+      socialLink
+    };
+
+    const updatedSocialLink = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
+
+    res.status(200).json({
+      message: 'Social link updated successfully'
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'Error updating social link'
     })
   }
 };

@@ -1,7 +1,8 @@
-const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink } = require('../controllers/artisan');
-const uploads = require('../middlewares/multer');
+const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
+const { authenticate } = require('../middlewares/authentication');
 
 const router = require('express').Router();
+const uploads = require('../middlewares/multerImages');
 
 
 /**
@@ -212,7 +213,7 @@ router.post('/resend/email', resendVerifyLink);
  *         description: Error processing password reset request.
  */
 
-router.post('/forgot/password',  forgotPassword);
+router.post('/forgot/password', forgotPassword);
 
 
 
@@ -289,7 +290,7 @@ router.post('/forgot/password',  forgotPassword);
  *                   type: string
  *                   example: "Error resetting password"
  */
-router.post('/reset/password/:token',  resetPassword);
+router.post('/reset/password/:token', resetPassword);
 
 
 /**
@@ -376,8 +377,6 @@ router.put('/change/password', changePassword);
  *     description: Allows a user to update their profile details, including uploading a new profile picture.
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -443,7 +442,7 @@ router.put('/change/password', changePassword);
  *                   type: string
  *                   example: 'Error updating profile'
  */
-router.put('/update/profile', uploads.single('profilePic'), updateProfilePic);
+router.put('/update/profile', authenticate, uploads.single('profilePic'), updateProfilePic);
 
 
 /**
@@ -516,7 +515,70 @@ router.put('/update/profile', uploads.single('profilePic'), updateProfilePic);
 router.put('/update/address', updateLocation);
 
 
-
+/**
+ * @swagger
+ * /v1/update/bio:
+ *   put:
+ *     summary: Update user bio
+ *     description: Allows an authenticated user to update their bio information.
+ *     tags:
+ *       - General
+ *     security:
+ *       - Bearer: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               bio:
+ *                 type: string
+ *                 example: "Passionate about craftsmanship and dedicated to excellent service."
+ *                 description: A short bio describing the user.
+ *     responses:
+ *       '200':
+ *         description: Bio updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Bio updated successfully"
+ *       '400':
+ *         description: Invalid session or session expired.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Session expired, please login to continue"
+ *       '404':
+ *         description: Account not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Account not found"
+ *       '500':
+ *         description: Error updating bio.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error updating bio"
+ */
+router.put('/update/bio', updateBio);
 
 
 module.exports = router;

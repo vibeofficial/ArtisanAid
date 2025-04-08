@@ -6,21 +6,27 @@ const verificationSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'users'
   },
+  artisanName: {
+    type: String,
+    require: true
+  },
   workCertificate: {
-    public_id: {type: String, require: true}, 
-    image_url: {type: String, require: true} 
+    public_id: { type: String, require: true },
+    image_url: { type: String, require: true }
   },
   guarantorName: {
     type: String,
-    require: true
+    require: true,
+    trim: true
   },
   guarantorPhoneNumber: {
     type: String,
-    require: true
+    require: true,
+    trim: true
   },
   status: {
     type: String,
-    enum: ['Unverified','Pending', 'Verified', 'Declined'],
+    enum: ['Unverified', 'Pending', 'Verified', 'Declined'],
     default: 'Unverified'
   }
 }, { timestamps: true });
