@@ -1,5 +1,5 @@
 const subscriptionModel = require('../models/subscription');
-const userModel = require('../models/artisan');
+const artisanModel = require('../models/artisan');
 const planModel = require('../models/plan');
 const generator = require('otp-generator');
 const ref = generator.generate(15, { lowerCaseAlphabets: true, upperCaseAlphabets: true, specialChars: false });
@@ -9,12 +9,13 @@ const axios = require('axios');
 
 exports.initializeSubscription = async (req, res) => {
   try {
-    const { userId, planId } = req.params;
-    const user = await userModel.findById(userId);
+    const { id } = req.user;
+    const { planId } = req.params;
+    const artisan = await artisanModel.findById(id);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
-        message: 'User not found'
+        message: 'Artisan not found'
       })
     };
 
@@ -30,7 +31,7 @@ exports.initializeSubscription = async (req, res) => {
       amount: plan.amount,
       currency: 'NGN',
       reference: ref,
-      customer: { email: user.email, name: user.businessName }
+      customer: { email: artisan.email, name: artisan.fullname }
     };
 
     const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentDetails, {
@@ -42,10 +43,10 @@ exports.initializeSubscription = async (req, res) => {
     const { data } = response?.data;
 
     const subscription = new subscriptionModel({
-      userId: user._id,
+      artisanId: artisan._id,
       planId: plan._id,
-      fullname: user.fullname,
-      businessName: user.businessName,
+      fullname: artisan.fullname,
+      businessName: artisan.businessName,
       plan: plan.planName,
       amount: `#${plan.amount}`,
       duration: plan.duration,
@@ -81,11 +82,11 @@ exports.verifySubscription = async (req, res) => {
       })
     };
 
-    const user = await userModel.findById(subscription.userId);
+    const artisan = await artisanModel.findById(subscription.artisanId);
 
-    if (!user) {
+    if (!artisan) {
       return res.status(404).json({
-        message: 'User not found'
+        message: 'Artisan not found'
       })
     };
 
@@ -113,10 +114,16 @@ exports.verifySubscription = async (req, res) => {
       subscription.expireDate = Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * month);
       await subscription.save();
 
-      user.subscription = 'Active';
-      user.subscriptionPlan = plan.planName;
-      await user.save();
+      artisan.subscription = 'Active';
+      artisan.subscriptionPlan = plan.planName;
 
+      if (artisan.subscriptionPlan === 'Premium') {
+        artisan.rating = 5
+      } else if (artisan.subscriptionPlan === 'Regular') {
+        artisan.rating = 3
+      };
+
+      await artisan.save();
       res.status(200).json({
         message: 'Transaction is successful'
       })

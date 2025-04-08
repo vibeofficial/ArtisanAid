@@ -62,7 +62,7 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: `User with this phone number already exist as an admin`
       })
-    }
+    };
 
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
     const profilePicResult = await cloudinary.uploader.upload(profile);

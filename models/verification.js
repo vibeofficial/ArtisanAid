@@ -26,8 +26,8 @@ const verificationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Unverified', 'Pending', 'Verified', 'Declined'],
-    default: 'Unverified'
+    enum: ['Pending', 'Verified', 'Declined'],
+    default: 'Pending'
   }
 }, { timestamps: true });
 

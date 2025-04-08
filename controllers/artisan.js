@@ -11,7 +11,7 @@ const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerArtisan = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, password, businessName, confirmPassword } = req.body;
+    const { fullname, email, phoneNumber, password, businessName, confirmPassword, category } = req.body;
     const full_name = fullname.split(' ');
     const nameFormat = full_name?.map((e) => {
       return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
@@ -28,9 +28,13 @@ exports.registerArtisan = async (req, res) => {
       });
     };
 
-    let emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+    let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
+      return res.status(400).json({
+        message: `User with: ${email.toLowerCase()} already exist as an admin`
+      })
+    } else if (emailExists) {
       return res.status(400).json({
         message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
@@ -42,22 +46,27 @@ exports.registerArtisan = async (req, res) => {
           message: `User with: ${email.toLowerCase()} already exist as an artisan`
         });
       }
-    }
-    let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
-
-    if (phonenUmberExists) {
-      return res.status(400).json({
-        message: `User with this phone number already exist as an employer`
-      });
-    } else if (!phonenUmberExists) {
-      phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
-
-      if (phonenUmberExists) {
-        return res.status(400).json({
-          message: `User with this phone number already exist as an artisan`
-        });
-      }
     };
+
+    let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
+   
+       if (phonenUmberExists) {
+         return res.status(400).json({
+           message: `User with this phone number already exist as an employer`
+         });
+       } else if (!phonenUmberExists) {
+         phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
+   
+         if (phonenUmberExists) {
+           return res.status(400).json({
+             message: `User with this phone number already exist as an artisan`
+           });
+         }
+       } else if (phonenUmberExists) {
+         return res.status(400).json({
+           message: `User with this phone number already exist as an admin`
+         })
+       };
 
     const businessNameExists = await artisanModel.findOne({ businessName: businessName });
 

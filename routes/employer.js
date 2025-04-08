@@ -1,7 +1,7 @@
 const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employers');
 
 const router = require('express').Router();
-const uploads = require('../middlewares/multerImages');
+const uploads = require('../middlewares/multer');
 
 
 /**

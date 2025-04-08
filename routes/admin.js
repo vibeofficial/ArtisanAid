@@ -1,7 +1,7 @@
 const { getAdmins, restrictAccount, unrestrictAccount, getVerifiedArtisans, getEmployers, getUser, deleteAccount, registerAdmin, getUnVerifiedArtisans, getProcessingArtisans, getDeclinedArtisans } = require('../controllers/admin');
 
 const router = require('express').Router();
-const uploads = require('../middlewares/multerImages');
+const uploads = require('../middlewares/multer');
 
 
 /**

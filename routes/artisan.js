@@ -2,7 +2,7 @@ const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePas
 const { authenticate } = require('../middlewares/authentication');
 
 const router = require('express').Router();
-const uploads = require('../middlewares/multerImages');
+const uploads = require('../middlewares/multer');
 
 
 /**
