@@ -65,11 +65,11 @@ exports.registerAdmin = async (req, res) => {
     }
 
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
-    const profilePicResult = await cloudinary.uploader.upload(profile.path);
+    const profilePicResult = await cloudinary.uploader.upload(profile);
     fs.unlinkSync(profile.path);
 
     const cover = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
-    const coverPhotoResult = await cloudinary.uploader.upload(cover.path);
+    const coverPhotoResult = await cloudinary.uploader.upload(cover);
     fs.unlinkSync(cover.path);
 
     const saltedRound = await bcrypt.genSalt(10);
