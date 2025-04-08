@@ -57,6 +57,14 @@ const artisanSchema = new mongoose.Schema({
     enum: ['Unverified', 'Pending', 'Verified', 'Declined'],
     default: 'Unverified'
   },
+  bio: {
+    type: String,
+    trim: true
+  },
+  socialMediaLink: {
+    type: String,
+    trim: true
+  },
   rating: {
     type: Number,
     default: 0

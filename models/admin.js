@@ -3,30 +3,33 @@ const mongoose = require('mongoose');
 const adminSchema = new mongoose.Schema({
   fullname: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   phoneNumber: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    trim: true
   },
   email: {
     type: String,
     required: true,
     lowercase: true,
-    unique: true
+    unique: true,
+    trim: true
   },
   password: {
     type: String,
     required: true,
   },
   profilePic: {
-    public_id: { type: String },
-    image_url: { type: String }
+    public_id: { type: String, trim: true },
+    image_url: { type: String, trim: true }
   },
   coverPhoto: {
-    public_id: { type: String },
-    image_url: { type: String }
+    public_id: { type: String, trim: true },
+    image_url: { type: String, trim: true }
   },
   role: {
     type: String,

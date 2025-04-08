@@ -1,5 +1,5 @@
 const { mail_reciever } = require('../middlewares/nodemailer');
-const contactModel = require('../models/contact');
+const contactUsModel = require('../models/contactUs');
 
 
 exports.createMessage = async (req, res) => {
@@ -16,7 +16,7 @@ exports.createMessage = async (req, res) => {
       message
     };
 
-    const contactMessage = new contactModel({
+    const contactMessage = new contactUsModel({
       fullname: nameFormat,
       email,
       message

@@ -1,4 +1,4 @@
-const { createMessage } = require('../controllers/contact');
+const { createMessage } = require('../controllers/contactUs');
 
 const router = require('express').Router();
 

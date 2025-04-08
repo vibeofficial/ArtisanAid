@@ -18,7 +18,7 @@ const employerSchema = new mongoose.Schema({
     require: true,
     trim: true
   },
-  address: {
+  location: {
     number: { type: String, trim: true },
     street: { type: String, trim: true },
     lga: { type: String, trim: true },

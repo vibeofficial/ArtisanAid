@@ -1,7 +1,7 @@
-const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto } = require('../controllers/employers');
+const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink } = require('../controllers/employers');
 
 const router = require('express').Router();
-const uploads = require('../middlewares/multer');
+const uploads = require('../middlewares/multerImages');
 
 
 /**
@@ -198,7 +198,7 @@ router.get('/logout', logout);
  *     summary: Get all recommended artisans
  *     description: Retrieves a list of all recommended artisans with approved account verification status.
  *     tags:
- *       - Artisans
+ *       - General
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -243,7 +243,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *     summary: Get all users in a specific category
  *     description: Retrieves all users artisan the specified category and approved account verificatoon status.
  *     tags:
- *       - Artisans
+ *       - General
  *     parameters:
  *       - in: query
  *         name: category
@@ -293,7 +293,7 @@ router.get('/artisans/category', getArtisansByCategory);
  *     summary: Get all users in a specific local government area (LGA)
  *     description: Retrieves all artisans in the specified LGA and approved account verification status.
  *     tags:
- *       - Artisans
+ *       - General
  *     parameters:
  *       - in: query
  *         name: lga
@@ -344,7 +344,7 @@ router.get('/artisans/lga', getArtisansByLocalGovt);
  *     summary: Update user cover and cover picture
  *     description: Allows a user to update their cover details, including uploading a new cover picture.
  *     tags:
- *       - Artisans
+ *       - General
  *     security:
  *       - Bearer: []
  *     requestBody:
@@ -413,6 +413,62 @@ router.get('/artisans/lga', getArtisansByLocalGovt);
  *                   example: 'Error updating cover'
  */
 router.put('/update/cover', uploads.single('coverPhoto'), updateCoverPhoto);
+
+
+/**
+ * @swagger
+ * /v1/update/social:
+ *   put:
+ *     summary: Update artisan social media link
+ *     description: Allows an authenticated artisan to update their social media link.
+ *     tags:
+ *       - General
+ *     security:
+ *       - Bearer: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               socialLink:
+ *                 type: string
+ *                 example: "https://linkedin.com/in/artisan-profile"
+ *                 description: The social media link of the artisan.
+ *     responses:
+ *       '200':
+ *         description: Social link updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Social link updated successfully"
+ *       '404':
+ *         description: Account not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Account not found"
+ *       '500':
+ *         description: Error updating social link.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Error updating social link"
+ */
+router.put('/update/social', updateSocialLink);
 
 
 module.exports = router;
