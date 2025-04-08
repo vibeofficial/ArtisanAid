@@ -89,7 +89,7 @@ exports.registerAdmin = async (req, res) => {
         image_url: coverPhotoResult.secure_url
       }
     });
-
+    
     const token = jwt.sign({ id: admin._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
     const html = verifyMail(link, admin.fullname);
