@@ -134,11 +134,11 @@ exports.verifyAccount = async (req, res) => {
 
           if (!user) {
             return res.status(404).json({ message: 'User not found' });
-          }
-
+          };
+        
           if (user.isVerified) {
             return res.status(400).json({ message: 'Account has already been verified' });
-          }
+          };
 
           const newToken = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
           const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${newToken}`;
@@ -151,37 +151,35 @@ exports.verifyAccount = async (req, res) => {
           };
 
           await mail_sender(mailDetails);
-
           return res.status(200).json({
             message: 'Session expired. A new verification link has been sent to your email address'
           });
-        } else {
-          const user = await artisanModel.findById(payload.id) || await employerModel.findById(payload.id) || await adminModel.findById(payload.id);
-
-          if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-          }
-
-          if (user.isVerified) {
-            return res.status(400).json({ message: 'Account has already been verified' });
-          }
-
-          user.isVerified = true;
-          await user.save();
-          
-          res.status(200).json({
-            message: 'Account verified successfully'
-          })
         }
+      } else {
+        const user = await artisanModel.findById(payload.id) || await employerModel.findById(payload.id) || await adminModel.findById(payload.id);
+
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        };
+
+        if (user.isVerified) {
+          return res.status(400).json({ message: 'Account has already been verified' });
+        };
+
+        user.isVerified = true;
+        await user.save();
+
+        res.status(200).json({
+          message: 'Account verified successfully'
+        })
       }
     });
-  } catch (error) {
-    console.error('Verification Error:', error.message);
-
-    return res.status(500).json({
-      message: 'Error verifying account'
-    });
-  }
+} catch (error) {
+  console.error('Verification Error:', error.message);
+  return res.status(500).json({
+    message: 'Error verifying account'
+  });
+}
 };
 
 
