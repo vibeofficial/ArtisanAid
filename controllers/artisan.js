@@ -11,7 +11,7 @@ const jwtSecret = process.env.JWT_SECRET;
 
 exports.registerArtisan = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, password, businessName, confirmPassword } = req.body;
+    const { fullname, email, phoneNumber, password, businessName, confirmPassword, category } = req.body;
     const full_name = fullname.split(' ');
     const nameFormat = full_name?.map((e) => {
       return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
@@ -28,9 +28,13 @@ exports.registerArtisan = async (req, res) => {
       });
     };
 
-    let emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+    let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
+      return res.status(400).json({
+        message: `User with: ${email.toLowerCase()} already exist as an admin`
+      })
+    } else if (emailExists) {
       return res.status(400).json({
         message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
@@ -42,22 +46,27 @@ exports.registerArtisan = async (req, res) => {
           message: `User with: ${email.toLowerCase()} already exist as an artisan`
         });
       }
-    }
-    let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
-
-    if (phonenUmberExists) {
-      return res.status(400).json({
-        message: `User with this phone number already exist as an employer`
-      });
-    } else if (!phonenUmberExists) {
-      phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
-
-      if (phonenUmberExists) {
-        return res.status(400).json({
-          message: `User with this phone number already exist as an artisan`
-        });
-      }
     };
+
+    let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
+   
+       if (phonenUmberExists) {
+         return res.status(400).json({
+           message: `User with this phone number already exist as an employer`
+         });
+       } else if (!phonenUmberExists) {
+         phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
+   
+         if (phonenUmberExists) {
+           return res.status(400).json({
+             message: `User with this phone number already exist as an artisan`
+           });
+         }
+       } else if (phonenUmberExists) {
+         return res.status(400).json({
+           message: `User with this phone number already exist as an admin`
+         })
+       };
 
     const businessNameExists = await artisanModel.findOne({ businessName: businessName });
 
@@ -135,7 +144,7 @@ exports.verifyAccount = async (req, res) => {
           if (!user) {
             return res.status(404).json({ message: 'User not found' });
           };
-        
+
           if (user.isVerified) {
             return res.status(400).json({ message: 'Account has already been verified' });
           };
@@ -174,12 +183,12 @@ exports.verifyAccount = async (req, res) => {
         })
       }
     });
-} catch (error) {
-  console.error('Verification Error:', error.message);
-  return res.status(500).json({
-    message: 'Error verifying account'
-  });
-}
+  } catch (error) {
+    console.error('Verification Error:', error.message);
+    return res.status(500).json({
+      message: 'Error verifying account'
+    });
+  }
 };
 
 
@@ -211,7 +220,6 @@ exports.resendVerifyLink = async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-
     return res.status(500).json({
       message: 'Error sending mail'
     });
@@ -225,7 +233,7 @@ exports.forgotPassword = async (req, res) => {
 
     if (!email) {
       return res.status(400).json({ message: 'Email is required' });
-    }
+    };
 
     const user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
 
@@ -246,7 +254,7 @@ exports.forgotPassword = async (req, res) => {
     await mail_sender(mailDetails);
 
     return res.status(200).json({
-      message: 'Reset password link has been sent to your email address'
+      message: `Link to reset password has been sent to ${user.email}`
     });
 
   } catch (error) {
@@ -264,15 +272,11 @@ exports.resetPassword = async (req, res) => {
     const { newPassword, confirmPassword } = req.body;
 
     if (!token) {
-      return res.status(400).json({ message: 'Token not found' });
-    };
-
-    if (!newPassword || !confirmPassword) {
-      return res.status(400).json({ message: 'Both password fields are required' });
+      return res.status(404).json({ message: 'Token not found' });
     };
 
     if (newPassword !== confirmPassword) {
-      return res.status(400).json({ message: 'Passwords do not match' });
+      return res.status(400).json({ message: 'Password do not match' });
     };
 
     const { id } = await jwt.verify(token, jwtSecret);
@@ -280,7 +284,7 @@ exports.resetPassword = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
-    }
+    };
 
     const saltRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, saltRound);
@@ -291,7 +295,7 @@ exports.resetPassword = async (req, res) => {
       message: 'Password changed successfully'
     });
   } catch (error) {
-    console.error('Reset Password Error:', error.message);
+    console.error(error.message);
     return res.status(500).json({ message: 'Error resetting password' });
   }
 };
@@ -314,7 +318,7 @@ exports.changePassword = async (req, res) => {
 
     if (!correctPassword) {
       return res.status(400).json({
-        message: 'Incorrect current password'
+        message: 'Incorrect password'
       });
     }
 
@@ -340,7 +344,7 @@ exports.changePassword = async (req, res) => {
       return res.status(400).json({
         message: 'Session expired, please login to continue'
       });
-    }
+    };
 
     res.status(500).json({
       message: 'Error changing password'
@@ -354,20 +358,12 @@ exports.updateProfilePic = async (req, res) => {
     const { id } = req.user;
     const file = req.file;
 
-    let user = await artisanModel.findById(id);
+    const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
     if (!user) {
-      user = await employerModel.findById(id);
-
-      if (!user) {
-        user = await adminModel.findById(id);
-
-        if (!user) {
-          return res.status(404).json({
-            message: 'User not found'
-          })
-        }
-      }
+      return res.status(404).json({
+        message: 'User not found'
+      })
     };
 
     const data = {
@@ -375,7 +371,7 @@ exports.updateProfilePic = async (req, res) => {
     };
 
     if (file && file.path) {
-      // await cloudinary.uploader.destroy(user.profilePic.public_id);
+      await cloudinary.uploader.destroy(user.profilePic.public_id);
       const profilePicResult = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(file.path);
 

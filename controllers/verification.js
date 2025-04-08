@@ -10,8 +10,8 @@ exports.initializeVerification = async (req, res) => {
     const artisan = await artisanModel.findById(id);
     const { guarantorName, guarantorPhoneNumber } = req.body;
     const file = req.file;
-    console.log(file);
-    
+    const certificateResult = await cloudinary.uploader.upload(file.path);
+    fs.unlinkSync(file.path);
 
     if (!artisan) {
       return res.status(404).json({
@@ -40,8 +40,6 @@ exports.initializeVerification = async (req, res) => {
       return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
     }).join(' ');
 
-    const certificateResult = await cloudinary.uploader.upload(file.path);
-
     const verification = new verificationModel({
       guarantorName: nameFormat,
       guarantorPhoneNumber,
@@ -52,9 +50,11 @@ exports.initializeVerification = async (req, res) => {
         image_url: certificateResult.secure_url
       }
     });
-console.log(verification);
 
-    // await verification.save();
+    artisan.accountVerification = verification.status;
+    await artisan.save();
+    await verification.save();
+
     res.status(201).json({
       message: 'Account verification initialized successfully',
       data: verification

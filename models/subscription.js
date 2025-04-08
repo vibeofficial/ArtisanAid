@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const subscriptionSchema = new mongoose.Schema({
-  userId: {
+  artisanId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'users',
     require: true
@@ -44,7 +44,7 @@ const subscriptionSchema = new mongoose.Schema({
     require: true,
     default: 'Processing'
   },
-  expireDate: {
+  expiresIn: {
     type: Number,
     require: true,
     default: 0

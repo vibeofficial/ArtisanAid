@@ -62,7 +62,7 @@ exports.registerAdmin = async (req, res) => {
       return res.status(400).json({
         message: `User with this phone number already exist as an admin`
       })
-    }
+    };
 
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
     const profilePicResult = await cloudinary.uploader.upload(profile);
@@ -87,7 +87,7 @@ exports.registerAdmin = async (req, res) => {
         image_url: coverPhotoResult.secure_url
       }
     });
-    
+
     const token = jwt.sign({ id: admin._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
     const html = verifyMail(link, admin.fullname);
@@ -114,7 +114,7 @@ exports.registerAdmin = async (req, res) => {
 
 exports.getAdmins = async (req, res) => {
   try {
-    const admins = await adminModel.find();
+    const admins = await adminModel.find({ isVerified: true });
 
     if (admins.length === 0) {
       return res.status(404).json({
@@ -146,9 +146,7 @@ exports.getAdmins = async (req, res) => {
 exports.restrictAccount = async (req, res) => {
   try {
     const { id } = req.params;
-
-    let user = await artisanModel.findById(id) ||
-      await employerModel.findById(id)
+    const user = await artisanModel.findById(id) || await employerModel.findById(id);
 
     if (!user) {
       return res.status(404).json({
@@ -170,7 +168,7 @@ exports.restrictAccount = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Restrict Error:', error.message);
+    console.error(error.message);
     return res.status(500).json({
       message: 'Error restricting account'
     });
@@ -181,18 +179,15 @@ exports.restrictAccount = async (req, res) => {
 exports.unrestrictAccount = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Try to find user in artisan, employer, or admin model
-    let user = await artisanModel.findById(id) ||
-      await employerModel.findById(id)
+    const user = await artisanModel.findById(id) || await employerModel.findById(id);
 
     if (!user) {
       return res.status(404).json({
         message: 'User not found'
       });
-    }
+    };
 
-    if (!user.isRestricted) {
+    if (user.isRestricted !== true) {
       return res.status(400).json({
         message: 'This account is not currently restricted'
       });
@@ -206,7 +201,7 @@ exports.unrestrictAccount = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Unrestrict Error:', error.message);
+    console.error(error.message);
     return res.status(500).json({
       message: 'Error unrestricting account'
     });
@@ -214,15 +209,15 @@ exports.unrestrictAccount = async (req, res) => {
 };
 
 
-exports.getArtisans = async (req, res) => {
+exports.getVerifiedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Verified' });
+    const artisans = await artisanModel.find({ accountVerification: 'Verified' } && { isVerified: true });
 
-    if (!artisans || artisans.length === 0) {
+    if (artisans.length === 0) {
       return res.status(404).json({
         message: 'No verified artisans found'
       });
-    }
+    };
 
     return res.status(200).json({
       message: 'Verified artisans retrieved successfully',
@@ -230,7 +225,79 @@ exports.getArtisans = async (req, res) => {
       data: artisans
     });
   } catch (error) {
-    console.error('Get Artisans Error:', error.message);
+    console.error(error.message);
+    return res.status(500).json({
+      message: 'Error retrieving artisans'
+    });
+  }
+};
+
+
+exports.getUnVerifiedArtisans = async (req, res) => {
+  try {
+    const artisans = await artisanModel.find({ accountVerification: 'Unverified' } && { isVerified: true });
+
+    if (artisans.length === 0) {
+      return res.status(404).json({
+        message: 'No verified artisans found'
+      });
+    };
+
+    return res.status(200).json({
+      message: 'Verified artisans retrieved successfully',
+      total: artisans.length,
+      data: artisans
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      message: 'Error retrieving artisans'
+    });
+  }
+};
+
+
+exports.getProcessingArtisans = async (req, res) => {
+  try {
+    const artisans = await artisanModel.find({ accountVerification: 'Pending' } && { isVerified: true });
+
+    if (artisans.length === 0) {
+      return res.status(404).json({
+        message: 'No verified artisans found'
+      });
+    };
+
+    return res.status(200).json({
+      message: 'Verified artisans retrieved successfully',
+      total: artisans.length,
+      data: artisans
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      message: 'Error retrieving artisans'
+    });
+  }
+};
+
+
+exports.getDeclinedArtisans = async (req, res) => {
+  try {
+    const artisans = await artisanModel.find({ accountVerification: 'Declined' } && { isVerified: true });
+
+    if (artisans.length === 0) {
+      return res.status(404).json({
+        message: 'No verified artisans found'
+      });
+    };
+
+    return res.status(200).json({
+      message: 'Verified artisans retrieved successfully',
+      total: artisans.length,
+      data: artisans
+    });
+  } catch (error) {
+    console.error(error.message);
     return res.status(500).json({
       message: 'Error retrieving artisans'
     });
