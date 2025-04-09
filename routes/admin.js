@@ -1,5 +1,5 @@
 const { getAdmins, restrictAccount, unrestrictAccount, getVerifiedArtisans, getEmployers, getUser, deleteAccount, registerAdmin, getUnVerifiedArtisans, getProcessingArtisans, getDeclinedArtisans } = require('../controllers/admin');
-
+const {registerAdminValidation, adminRestrictAccount, adminUnrestrictAccount} = require('../middlewares/adminValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -88,7 +88,7 @@ const uploads = require('../middlewares/multer');
 router.post('/admin', uploads.fields([
   { name: 'profilePic', maxCount: 1 },
   { name: 'coverPhoto', maxCount: 1 }
-]), registerAdmin);
+]), registerAdminValidation,registerAdmin);
 
 
 /**
@@ -159,7 +159,7 @@ router.get('/admins', getAdmins);
  *       '500':
  *         description: Internal server error while restricting account.
  */
-router.get('/restrict/account/:id', restrictAccount);
+router.get('/restrict/account/:id',adminRestrictAccount, restrictAccount);
 
 
 /**
@@ -185,7 +185,7 @@ router.get('/restrict/account/:id', restrictAccount);
  *       '500':
  *         description: Internal server error while unrestricting account.
  */
-router.get('/unrestrict/account/:id', unrestrictAccount);
+router.get('/unrestrict/account/:id',adminUnrestrictAccount, unrestrictAccount);
 
 
 /**

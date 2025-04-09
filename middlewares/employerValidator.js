@@ -74,11 +74,11 @@ exports.loginEmployerValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
+  // if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
+  //   return res.status(403).json({
+  //     message: `Only ${allowedAdminEmail} is allowed for admin registration`,
+  //   });
+  // }
 
   next();
 };
@@ -101,11 +101,11 @@ exports.employerForgotPasswordValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
+  // if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
+  //   return res.status(403).json({
+  //     message: `Only ${allowedAdminEmail} is allowed for admin registration`,
+  //   });
+  // }
 
   next();
 };
@@ -170,11 +170,80 @@ exports.employersChangePasswordValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
+  // if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
+  //   return res.status(403).json({
+  //     message: `Only ${allowedAdminEmail} is allowed for admin registration`,
+  //   });
+  // }
+
+  next();
+};
+
+
+exports.validateCategory = (req, res, next) => {
+  const schema = Joi.object({
+    category: Joi.string().min(3).required().messages({
+      "any.required": "Category is required",
+      "string.empty": "Category cannot be empty",
+      "string.min": "Category must be at least 3 characters long"
+    })
+  });
+
+  const { error } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: "Validation Error",
+      errors: error.details.map(err => err.message)
     });
   }
 
   next();
 };
+
+exports.validateLGARequest = (req, res, next) => {
+  const schema = Joi.object({
+    lga: Joi.string().min(2).required().messages({
+      "any.required": "LGA is required",
+      "string.empty": "LGA cannot be empty",
+      "string.min": "LGA must be at least 2 characters"
+    }),
+    state: Joi.string().min(2).required().messages({
+      "any.required": "State is required",
+      "string.empty": "State cannot be empty",
+      "string.min": "State must be at least 2 characters"
+    })
+  });
+
+  const { error } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: "Validation Error",
+      errors: error.details.map(err => err.message)
+    });
+  }
+
+  next();
+};
+
+exports.updateSocialLinkValidator = (req, res, next) => {
+  const schema = Joi.object({
+    socialLink: Joi.string().uri().required().messages({
+      "any.required": "Social link is required",
+      "string.empty": "Social link cannot be empty",
+      "string.uri": "Social link must be a valid URL"
+    })
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      message: "Validation Error",
+      errors: error.message
+    });
+  }
+
+  next();
+};
+

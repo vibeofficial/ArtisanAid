@@ -117,7 +117,7 @@ exports.authorize = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(error.message);
-
+ 
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(400).json({
         message: 'Session expired, please login to continue'
