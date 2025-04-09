@@ -1,5 +1,6 @@
 const { getAdmins, restrictAccount, unrestrictAccount, getVerifiedArtisans, getEmployers, getUser, deleteAccount, registerAdmin, getUnVerifiedArtisans, getProcessingArtisans, getDeclinedArtisans } = require('../controllers/admin');
-const {registerAdminValidation, adminRestrictAccount, adminUnrestrictAccount} = require('../middlewares/adminValidator')
+const { registerAdminValidation } = require('../middlewares/adminValidator');
+const { authorize } = require('../middlewares/authentication');
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -88,7 +89,7 @@ const uploads = require('../middlewares/multer');
 router.post('/admin', uploads.fields([
   { name: 'profilePic', maxCount: 1 },
   { name: 'coverPhoto', maxCount: 1 }
-]), registerAdminValidation,registerAdmin);
+]), registerAdminValidation, registerAdmin);
 
 
 /**
@@ -133,7 +134,7 @@ router.post('/admin', uploads.fields([
  *       '500':
  *         description: Error retrieving admins.
  */
-router.get('/admins', getAdmins);
+router.get('/admins', authorize, getAdmins);
 
 
 /**
@@ -159,7 +160,7 @@ router.get('/admins', getAdmins);
  *       '500':
  *         description: Internal server error while restricting account.
  */
-router.get('/restrict/account/:id',adminRestrictAccount, restrictAccount);
+router.get('/restrict/account/:id', authorize, restrictAccount);
 
 
 /**
@@ -185,7 +186,7 @@ router.get('/restrict/account/:id',adminRestrictAccount, restrictAccount);
  *       '500':
  *         description: Internal server error while unrestricting account.
  */
-router.get('/unrestrict/account/:id',adminUnrestrictAccount, unrestrictAccount);
+router.get('/unrestrict/account/:id', authorize, unrestrictAccount);
 
 
 /**
@@ -230,7 +231,7 @@ router.get('/unrestrict/account/:id',adminUnrestrictAccount, unrestrictAccount);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/verified/artisans', getVerifiedArtisans);
+router.get('/verified/artisans', authorize, getVerifiedArtisans);
 
 
 /**
@@ -275,7 +276,7 @@ router.get('/verified/artisans', getVerifiedArtisans);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/verified/artisans', getUnVerifiedArtisans);
+router.get('/verified/artisans', authorize, getUnVerifiedArtisans);
 
 
 /**
@@ -320,7 +321,7 @@ router.get('/verified/artisans', getUnVerifiedArtisans);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/processing/artisans', getProcessingArtisans);
+router.get('/processing/artisans', authorize, getProcessingArtisans);
 
 
 /**
@@ -365,7 +366,7 @@ router.get('/processing/artisans', getProcessingArtisans);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/declined/artisans', getDeclinedArtisans);
+router.get('/declined/artisans', authorize, getDeclinedArtisans);
 
 
 /**
@@ -408,7 +409,7 @@ router.get('/declined/artisans', getDeclinedArtisans);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/employers', getEmployers);
+router.get('/employers', authorize, getEmployers);
 
 
 /**
@@ -521,7 +522,7 @@ router.get('/user/:id', getUser);
  *                   type: string
  *                   example: 'Error deleting account'
  */
-router.delete('/delete/:id', deleteAccount);
+router.delete('/delete/:id', authorize, deleteAccount);
 
 
 module.exports = router;
