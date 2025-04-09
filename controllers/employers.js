@@ -105,7 +105,7 @@ exports.registerEmployer = async (req, res) => {
 
 exports.getArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Verified' } && { isVerified: true });
+    const artisans = await artisanModel.find({ accountVerification: 'Verified', isVerified: true });
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -238,7 +238,7 @@ exports.logout = async (req, res) => {
 
 exports.getRecommendedArtisans = async (req, res) => {
   try {
-    const users = await artisanModel.find({ accountVerification: 'Verified' } && { isRecommended: true });
+    const users = await artisanModel.find({ accountVerification: 'Verified', isRecommended: true });
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -263,7 +263,9 @@ exports.getRecommendedArtisans = async (req, res) => {
 exports.getArtisansByCategory = async (req, res) => {
   try {
     const { category } = req.body;
-    const artisans = await artisanModel.find({ category: category } && { accountVerification: 'Verified' });
+    // console.log(category);
+
+    const artisans = await artisanModel.find({ category, accountVerification: 'Verified' });
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -289,7 +291,7 @@ exports.getArtisansByLocalGovt = async (req, res) => {
   try {
     const { lga } = req.body;
     const location = { lga, state }
-    const artisans = await artisanModel.find({ location: location } && { accountVerification: 'Verified' });
+    const artisans = await artisanModel.find({ location, accountVerification: 'Verified' });
 
     if (artisans.length === 0) {
       return res.status(404).json({
