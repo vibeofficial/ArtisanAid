@@ -1,5 +1,6 @@
 const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employers');
-const {registerEmployerValidation, loginEmployerValidation, validateCategory, validateLGARequest, updateSocialLinkValidator} = require('../middlewares/employerValidator')
+const { authenticate } = require('../middlewares/authentication');
+const { registerEmployerValidation, loginEmployerValidation, validateCategory, validateLGARequest, updateSocialLinkValidator } = require('../middlewares/employerValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -83,7 +84,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error registering employer"
  */
-router.post('/register/employer', registerEmployerValidation,registerEmployer);
+router.post('/register/employer', registerEmployerValidation, registerEmployer);
 
 
 /**
@@ -213,7 +214,7 @@ router.get('/artisans', getArtisans);
  *                   type: string
  *                   example: "Error logging user in"
  */
-router.post('/login', loginEmployerValidation,login);
+router.post('/login', loginEmployerValidation, login);
 
 
 
@@ -332,7 +333,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *         description: Error retrieving users in the category.
  */
 
-router.get('/artisans/category', validateCategory,getArtisansByCategory);
+router.get('/artisans/category', validateCategory, getArtisansByCategory);
 
 
 /**
@@ -383,7 +384,7 @@ router.get('/artisans/category', validateCategory,getArtisansByCategory);
  *       '500':
  *         description: Error retrieving artisans by local government.
  */
-router.get('/artisans/lga',validateLGARequest, getArtisansByLocalGovt);
+router.get('/artisans/lga', validateLGARequest, getArtisansByLocalGovt);
 
 
 /**
@@ -461,7 +462,7 @@ router.get('/artisans/lga',validateLGARequest, getArtisansByLocalGovt);
  *                   type: string
  *                   example: 'Error updating cover'
  */
-router.put('/update/cover', uploads.single('coverPhoto'), updateCoverPhoto);
+router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCoverPhoto);
 
 
 /**
@@ -517,7 +518,7 @@ router.put('/update/cover', uploads.single('coverPhoto'), updateCoverPhoto);
  *                   type: string
  *                   example: "Error updating social link"
  */
-router.put('/update/social',updateSocialLinkValidator, updateSocialLink);
+router.put('/update/social', authenticate, updateSocialLinkValidator, updateSocialLink);
 
 
 module.exports = router;

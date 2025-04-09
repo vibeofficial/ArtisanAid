@@ -1,6 +1,6 @@
 const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
 const { authenticate } = require('../middlewares/authentication');
-const {employerForgotPasswordValidation} = require('../middlewares/employerValidator')
+const { employerForgotPasswordValidation } = require('../middlewares/employerValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -213,7 +213,7 @@ router.post('/resend/email', resendVerifyLink);
  *         description: Error processing password reset request.
  */
 
-router.post('/forgot/password',employerForgotPasswordValidation, forgotPassword);
+router.post('/forgot/password', employerForgotPasswordValidation, forgotPassword);
 
 
 
@@ -364,7 +364,7 @@ router.post('/reset/password/:token', resetPassword);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', changePassword);
+router.put('/change/password', authenticate, changePassword);
 
 
 
@@ -512,7 +512,7 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address', updateLocation);
+router.put('/update/address', authenticate, updateLocation);
 
 
 /**
@@ -578,7 +578,7 @@ router.put('/update/address', updateLocation);
  *                   type: string
  *                   example: "Error updating bio"
  */
-router.put('/update/bio', updateBio);
+router.put('/update/bio', authenticate, updateBio);
 
 
 module.exports = router;
