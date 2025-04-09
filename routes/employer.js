@@ -1,5 +1,5 @@
 const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employers');
-
+const {registerEmployerValidation, loginEmployerValidation, validateCategory, validateLGARequest, updateSocialLinkValidator} = require('../middlewares/employerValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -83,7 +83,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error registering employer"
  */
-router.post('/register/employer', registerEmployer);
+router.post('/register/employer', registerEmployerValidation,registerEmployer);
 
 
 /**
@@ -213,7 +213,8 @@ router.get('/artisans', getArtisans);
  *                   type: string
  *                   example: "Error logging user in"
  */
-router.post('/login',login);
+router.post('/login', loginEmployerValidation,login);
+
 
 
 /**
@@ -330,7 +331,8 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *       '500':
  *         description: Error retrieving users in the category.
  */
-router.post('/artisans/category', getArtisansByCategory);
+
+router.get('/artisans/category', validateCategory,getArtisansByCategory);
 
 
 /**
@@ -381,7 +383,7 @@ router.post('/artisans/category', getArtisansByCategory);
  *       '500':
  *         description: Error retrieving artisans by local government.
  */
-router.get('/artisans/lga', getArtisansByLocalGovt);
+router.get('/artisans/lga',validateLGARequest, getArtisansByLocalGovt);
 
 
 /**
@@ -515,7 +517,7 @@ router.put('/update/cover', uploads.single('coverPhoto'), updateCoverPhoto);
  *                   type: string
  *                   example: "Error updating social link"
  */
-router.put('/update/social', updateSocialLink);
+router.put('/update/social',updateSocialLinkValidator, updateSocialLink);
 
 
 module.exports = router;

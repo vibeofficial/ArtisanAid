@@ -1,6 +1,6 @@
 const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
 const { authenticate } = require('../middlewares/authentication');
-
+const {employerForgotPasswordValidation} = require('../middlewares/employerValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -213,7 +213,7 @@ router.post('/resend/email', resendVerifyLink);
  *         description: Error processing password reset request.
  */
 
-router.post('/forgot/password', forgotPassword);
+router.post('/forgot/password',employerForgotPasswordValidation, forgotPassword);
 
 
 
