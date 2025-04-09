@@ -285,19 +285,21 @@ router.get('/recommended/artisans', getRecommendedArtisans);
 /**
  * @swagger
  * /v1/artisans/category:
- *   get:
+ *   post:
  *     summary: Get all users in a specific category
  *     description: Retrieves all users artisan the specified category and approved account verificatoon status.
  *     tags:
  *       - General
- *     parameters:
- *       - in: query
- *         name: category
- *         required: true
- *         schema:
- *           type: string
- *           example: "Plumbing"
- *         description: The category of the users.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 example: "Plumbing"
  *     responses:
  *       '200':
  *         description: Successfully fetched all users in the specified category.
@@ -329,6 +331,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *       '500':
  *         description: Error retrieving users in the category.
  */
+
 router.get('/artisans/category', validateCategory,getArtisansByCategory);
 
 
