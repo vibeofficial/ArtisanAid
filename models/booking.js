@@ -17,6 +17,14 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     require: true
   },
+  employerEmail: {
+    type: String,
+    require: true
+  },
+  employerPhoneNumber: {
+    type: String,
+    require: true
+  },
   location: {
     type: String,
     require: true,
@@ -26,6 +34,11 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     require: true,
     trim: true
+  },
+  status: {
+    type: String,
+    enum: ['Applied', 'Accepted', 'Rejected'],
+    default: 'Applied'
   }
 }, { timestamps: true });
 

@@ -1,4 +1,4 @@
-const { bookArtisan } = require('../controllers/booking');
+const { bookArtisan, acceptJob, rejectJob } = require('../controllers/booking');
 const { authenticate } = require('../middlewares/authentication');
 
 const router = require('express').Router();
@@ -68,6 +68,118 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error booking an artisan
  */
-router.post('/book/artisan', authenticate, bookArtisan);
+router.post('/book/artisan/:artisanId', authenticate, bookArtisan);
+
+
+/**
+ * @swagger
+ * /v1/accept/job/{bookingId}:
+ *   get:
+ *     summary: Artisan accepts a job booking
+ *     tags:
+ *       - Booking
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookingId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the booking to accept
+ *     responses:
+ *       200:
+ *         description: Job accepted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Job accepted successfully
+ *       404:
+ *         description: Artisan or Job booking not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Job booking not found
+ *       500:
+ *         description: Error accepting job offer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error accepting job offer
+ */
+router.get('/accept/job/:bookingId', authenticate, acceptJob);
+
+
+/**
+ * @swagger
+ * /v1/reject/job/{bookingId}:
+ *   post:
+ *     summary: Artisan reject a job booking
+ *     tags:
+ *       - Booking
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bookingId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the job booking to reject
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 example: "Unavailable at the moment"
+ *     responses:
+ *       200:
+ *         description: Job rejected successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Job rejected successfully
+ *       404:
+ *         description: Artisan or booking not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Artisan not found
+ *       500:
+ *         description: Error rejecting job offer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error rejecting job offer
+ */
+router.get('/reject/job/:bookingId', authenticate, rejectJob);
 
 module.exports = router;
