@@ -1,4 +1,4 @@
-const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employers');
+const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employer');
 const { authenticate } = require('../middlewares/authentication');
 const { registerEmployerValidation, loginEmployerValidation, validateCategory, validateLGARequest, updateSocialLinkValidator } = require('../middlewares/employerValidator')
 const router = require('express').Router();
