@@ -82,7 +82,7 @@ exports.acceptJob = async (req, res) => {
       })
     };
 
-    booking.status = 'Accepted';
+    booking.status = 'Confirmed';
 
     const employerHtml = verifyMail(booking.employerName);
 
@@ -139,7 +139,7 @@ exports.rejectJob = async (req, res) => {
       })
     };
 
-    booking.status = 'Rejected';
+    booking.status = 'Declined';
 
     const employerHtml = verifyMail(booking.employerName, reason);
 
