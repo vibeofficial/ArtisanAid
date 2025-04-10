@@ -90,6 +90,8 @@ exports.registerAdmin = async (req, res) => {
 
     const token = jwt.sign({ id: admin._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+    console.log(link);
+    
     const html = verifyMail(link, admin.fullname);
 
     const mailDetails = {
@@ -99,7 +101,7 @@ exports.registerAdmin = async (req, res) => {
     };
 
     await mail_sender(mailDetails);
-    await admin.save();
+    // await admin.save();
 
     res.status(201).json({
       message: 'Account registered successully',

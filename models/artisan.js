@@ -54,7 +54,7 @@ const artisanSchema = new mongoose.Schema({
   },
   accountVerification: {
     type: String,
-    enum: ['Unverified', 'Pending', 'Verified', 'Declined'],
+    enum: ['Unverified', 'In Progress', 'Verified', 'Declined'],
     default: 'Unverified'
   },
   bio: {

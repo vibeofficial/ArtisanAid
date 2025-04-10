@@ -45,10 +45,10 @@ exports.initializeSubscription = async (req, res) => {
     const subscription = new subscriptionModel({
       artisanId: artisan._id,
       planId: plan._id,
-      fullname: artisan.fullname,
+      artisanName: artisan.fullname,
       businessName: artisan.businessName,
-      plan: plan.planName,
-      amount: `#${plan.amount}`,
+      planName: plan.planName,
+      amount: `#${paymentDetails.amount}`,
       duration: plan.duration,
       reference: data.reference
     });
