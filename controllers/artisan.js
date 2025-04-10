@@ -166,6 +166,8 @@ exports.verifyAccount = async (req, res) => {
         }
       } else {
         const user = await artisanModel.findById(payload.id) || await employerModel.findById(payload.id) || await adminModel.findById(payload.id);
+        console.log(user);
+        
 
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
