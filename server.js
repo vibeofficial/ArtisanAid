@@ -52,12 +52,12 @@ const options = {
     security: [{ BearerAuth: [] }],
     servers: [
       {
-        url: "http://localhost:4867",
-        description: "Development Server"
-      },
-      {
         url: 'https://artisanaid.onrender.com',
         description: "Production Server"
+      },
+      {
+        url: "http://localhost:4867",
+        description: "Development Server"
       }
     ],
     
@@ -73,6 +73,7 @@ app.use('/v1', planRouter);
 app.use('/v1', subscriptionRouter);
 app.use('/v1', contactUsRouter);
 app.use('/v1', employerRouter);
+app.use('/v1', adminRouter);
 app.use('/v1', verificationRouter);
 app.use('/v1', bookingRouter);
 
