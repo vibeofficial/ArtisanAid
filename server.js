@@ -73,6 +73,7 @@ app.use('/v1', planRouter);
 app.use('/v1', subscriptionRouter);
 app.use('/v1', contactUsRouter);
 app.use('/v1', employerRouter);
+app.use('/v1', adminRouter);
 app.use('/v1', verificationRouter);
 app.use('/v1', bookingRouter);
 
