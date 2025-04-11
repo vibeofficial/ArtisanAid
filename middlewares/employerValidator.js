@@ -48,7 +48,7 @@ exports.registerEmployerValidation = (req, res, next) => {
 };
 
 
-exports.loginEmployerValidation = (req, res, next) => {
+exports.loginValidation = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().required().messages({
       "string.email": "Invalid email format",
@@ -84,7 +84,7 @@ exports.loginEmployerValidation = (req, res, next) => {
 };
 
 
-exports.employerForgotPasswordValidation = (req, res, next) => {
+exports.forgotPasswordValidation = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().required().messages({
       "string.email": "Invalid email format",
@@ -110,7 +110,7 @@ exports.employerForgotPasswordValidation = (req, res, next) => {
   next();
 };
 
-exports.employerResetPasswordValidation = (req, res, next) => {
+exports.resetPasswordValidation = (req, res, next) => {
   const schema = Joi.object({
     newPassword: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
@@ -143,7 +143,7 @@ exports.employerResetPasswordValidation = (req, res, next) => {
 
 
 
-exports.employersChangePasswordValidation = (req, res, next) => {
+exports.changePasswordValidation = (req, res, next) => {
   const schema = Joi.object({
     password: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
@@ -194,7 +194,7 @@ exports.validateCategory = (req, res, next) => {
   if (error) {
     return res.status(400).json({
       message: "Validation Error",
-      errors: error.details.map(err => err.message)
+      errors: error.message
     });
   }
 
@@ -220,7 +220,7 @@ exports.validateLGARequest = (req, res, next) => {
   if (error) {
     return res.status(400).json({
       message: "Validation Error",
-      errors: error.details.map(err => err.message)
+      errors: error.message
     });
   }
 

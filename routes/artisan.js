@@ -1,6 +1,7 @@
 const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
 const { authenticate } = require('../middlewares/authentication');
-const { employerForgotPasswordValidation } = require('../middlewares/employerValidator')
+const { forgotPasswordValidation,resetPasswordValidation,changePasswordValidation } = require('../middlewares/employerValidator')
+const {registerArtisanValidation,resendArtisanVerifyLink, artisanUpdateLocation,updateArtisanBio } = require('../middlewares/artisanValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -91,7 +92,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error registering user"
  */
-router.post('/register/artisan', registerArtisan);
+router.post('/register/artisan',registerArtisanValidation, registerArtisan);
 
 
 /**
@@ -174,7 +175,7 @@ router.get('/verify/account/:token', verifyAccount);
  *                   type: string
  *                   example: Error sending mail
  */
-router.post('/resend/email', resendVerifyLink);
+router.post('/resend/email',resendArtisanVerifyLink, resendVerifyLink);
 
 
 /**
@@ -213,7 +214,7 @@ router.post('/resend/email', resendVerifyLink);
  *         description: Error processing password reset request.
  */
 
-router.post('/forgot/password', employerForgotPasswordValidation, forgotPassword);
+router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
 
 
 
@@ -290,7 +291,7 @@ router.post('/forgot/password', employerForgotPasswordValidation, forgotPassword
  *                   type: string
  *                   example: "Error resetting password"
  */
-router.post('/reset/password/:token', resetPassword);
+router.post('/reset/password/:token',resetPasswordValidation, resetPassword);
 
 
 /**
@@ -364,7 +365,7 @@ router.post('/reset/password/:token', resetPassword);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', authenticate, changePassword);
+router.put('/change/password', changePasswordValidation,authenticate, changePassword);
 
 
 
@@ -512,7 +513,7 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address', authenticate, updateLocation);
+router.put('/update/address',artisanUpdateLocation, authenticate, updateLocation);
 
 
 /**
@@ -578,7 +579,7 @@ router.put('/update/address', authenticate, updateLocation);
  *                   type: string
  *                   example: "Error updating bio"
  */
-router.put('/update/bio', authenticate, updateBio);
+router.put('/update/bio',updateArtisanBio, authenticate, updateBio);
 
 
 module.exports = router;

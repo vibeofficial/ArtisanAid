@@ -1,5 +1,6 @@
 const { bookArtisan, acceptJob, rejectJob } = require('../controllers/booking');
 const { authenticate } = require('../middlewares/authentication');
+const {rejectJobBooking} = require('../middlewares/bookingValidator')
 
 const router = require('express').Router();
 
@@ -68,7 +69,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error booking an artisan
  */
-router.post('/book/artisan/:artisanId', authenticate, bookArtisan);
+router.post('/book/artisan/:artisanId',rejectJobBooking, authenticate, bookArtisan);
 
 
 /**
