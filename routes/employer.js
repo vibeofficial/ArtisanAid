@@ -333,7 +333,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *         description: Error retrieving users in the category.
  */
 
-router.get('/artisans/category', validateCategory, getArtisansByCategory);
+router.post('/artisans/category', validateCategory, getArtisansByCategory);
 
 
 /**
