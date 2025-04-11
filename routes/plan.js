@@ -1,8 +1,11 @@
 const { createPlan, getAllPlans, getPlan, updatePlan, deletePlan } = require('../controllers/plan');
 const { authorize, authenticate } = require('../middlewares/authentication');
+const { createPlanValidator, updatePlanValidator } = require('../middlewares/planValidator')
 
 const router = require('express').Router();
 
+
+router.post('/create/plan', createPlanValidator,authorize, createPlan);
 
 /**
  * @swagger
@@ -80,7 +83,9 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error creating plan
  */
-router.post('/create/plan', authorize, createPlan);
+router.post('/create/plan', createPlanValidator,authorize, createPlan);
+
+
 
 
 /**
@@ -209,6 +214,7 @@ router.get('/all/plan', authenticate, getAllPlans);
 router.get('/plan/:planId', authenticate, getPlan);
 
 
+
 /**
  * @swagger
  * /v1/update/plan/{planId}:
@@ -281,7 +287,8 @@ router.get('/plan/:planId', authenticate, getPlan);
  *                   type: string
  *                   example: Error updating plan
  */
-router.put('/update/plan/:planId', authorize, updatePlan);
+
+router.put('/update/plan/:planId',updatePlanValidator, authorize, updatePlan);
 
 
 /**

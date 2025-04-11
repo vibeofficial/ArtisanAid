@@ -1,6 +1,6 @@
 const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employer');
 const { authenticate } = require('../middlewares/authentication');
-const { registerEmployerValidation, loginEmployerValidation, validateCategory, validateLGARequest, updateSocialLinkValidator } = require('../middlewares/employerValidator')
+const { registerEmployerValidation, loginValidation, validateCategory, validateLGARequest, updateSocialLinkValidator } = require('../middlewares/employerValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -214,7 +214,7 @@ router.get('/artisans', getArtisans);
  *                   type: string
  *                   example: "Error logging user in"
  */
-router.post('/login', loginEmployerValidation, login);
+router.post('/login', loginValidation, login);
 
 
 

@@ -1,7 +1,7 @@
 const joi = require('joi');
 
 
-exports.registerValidation = async (req, res, next) => {
+exports.registerArtisanValidation = async (req, res, next) => {
   const schema = joi.object({
     fullname: joi.string().min(5).trim().required().pattern(/^[A-Za-z]/).messages({
         'string.empty': 'Fullname is required.',
@@ -46,3 +46,66 @@ exports.registerValidation = async (req, res, next) => {
 
   next();
 };
+exports.resendArtisanVerifyLink= async (req,res, next) =>{
+  const schema = joi.object({
+email: joi.string().email().trim().required().messages({
+  'string.empty': 'Email is required.',
+  'string.email': 'Please enter a valid email address.'
+})
+})
+const { error } = schema.validate(req.body, { abortEarly: true });
+
+if (error) {
+  return res.status(400).json({
+    message: error.details[0].message // Returning the first validation error message
+  });
+}
+next();
+}
+
+exports.artisanUpdateLocation = async (req, res, next)  =>{
+const schema = joi.object({
+  number: joi.string().required().messages({
+    'string.empty': 'Number is required'
+  }),
+  street: joi.string().required().messages({
+    'string.empty': 'Street is required'
+  }),
+  lga: joi.string().required().messages({
+    'string.empty': 'LGA is required'
+  }),
+  state: joi.string().required().messages({
+    'string.empty': 'State is required'
+  })
+});
+
+const { error } = schema.validate(req.body, { abortEarly: true });
+
+if (error) {
+  return res.status(400).json({
+    message: error.message // Returning the first validation error message
+  });
+}
+next();
+};
+
+
+exports.updateArtisanBio = (req, res, next) => {
+
+const schema = joi.object({
+  bio: joi.string().required().messages({
+    'string.empty': 'Bio is required',
+    'any.required': 'Bio field is required'
+  })
+});
+  const { error } = schema.validate(req.body, { abortEarly: true });
+
+  if (error) {
+    return res.status(400).json({
+      message: error.message
+    });
+  }
+
+  next();
+};
+

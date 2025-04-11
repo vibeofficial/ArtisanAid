@@ -1,8 +1,9 @@
 const { initializeVerification } = require('../controllers/verification');
 const { authenticate } = require('../middlewares/authentication');
-
+const{ verificationValidator } = require('../middlewares/vericationValidator')
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
+
 
 
 /**
@@ -83,6 +84,6 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error initializing verification"
  */
-router.post('/account/verification', authenticate, uploads.single('workCertificate'), initializeVerification);
+router.post('/account/verification',verificationValidator, authenticate, uploads.single('workCertificate'), initializeVerification);
 
 module.exports = router;
