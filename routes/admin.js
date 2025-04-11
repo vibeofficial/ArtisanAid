@@ -86,10 +86,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error registering admin"
  */
-router.post('/admin', uploads.fields([
-  { name: 'profilePic', maxCount: 1 },
-  { name: 'coverPhoto', maxCount: 1 }
-]), registerAdminValidation, registerAdmin);
+router.post('/admin', registerAdminValidation, uploads.fields([{ name: 'profilePic', maxCount: 1 }, { name: 'coverPhoto', maxCount: 1 }]), registerAdmin);
 
 
 /**

@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
+const artisanModel = require('./artisan');
 
 const subscriptionSchema = new mongoose.Schema({
   artisanId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'users',
-    require: true
   },
   planId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'plans',
   },
-  fullname: {
+  artisanName: {
     type: String,
     require: true
   },
@@ -18,7 +18,7 @@ const subscriptionSchema = new mongoose.Schema({
     type: String,
     require: true
   },
-  plan: {
+  planName: {
     type: String,
     require: true
   },

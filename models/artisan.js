@@ -28,7 +28,6 @@ const artisanSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    lowercase: true
   },
   password: {
     type: String,
@@ -54,7 +53,7 @@ const artisanSchema = new mongoose.Schema({
   },
   accountVerification: {
     type: String,
-    enum: ['Unverified', 'Pending', 'Verified', 'Declined'],
+    enum: ['Unverified', 'In Progress', 'Verified', 'Declined'],
     default: 'Unverified'
   },
   bio: {

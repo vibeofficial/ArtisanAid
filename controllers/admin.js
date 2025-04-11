@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
-const { verifyMail, reset } = require('../helper/emailTemplate');
+const { verifyMail } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -90,7 +90,7 @@ exports.registerAdmin = async (req, res) => {
 
     const token = jwt.sign({ id: admin._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
-    const html = verifyMail(link, admin.fullname);
+    const html = verifyMail(link);
 
     const mailDetails = {
       email: admin.email,
@@ -99,7 +99,7 @@ exports.registerAdmin = async (req, res) => {
     };
 
     await mail_sender(mailDetails);
-    await admin.save();
+    // await admin.save();
 
     res.status(201).json({
       message: 'Account registered successully',

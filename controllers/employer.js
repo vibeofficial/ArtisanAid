@@ -263,7 +263,7 @@ exports.getRecommendedArtisans = async (req, res) => {
 exports.getArtisansByCategory = async (req, res) => {
   try {
     const { category } = req.body;
-    const artisans = await artisanModel.find({ category: category?.toLowerCase(), accountVerification: 'Verified' });
+    const artisans = await artisanModel.find({ category, accountVerification: 'Verified' });
 
     if (artisans.length === 0) {
       return res.status(404).json({
