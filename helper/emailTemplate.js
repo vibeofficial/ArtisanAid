@@ -103,8 +103,8 @@
 
 
 exports.verifyMail = (link) => {
-  const bg = 'https://res.cloudinary.com/djhz8vda0/image/upload/v1744292357/Frame1_p8ipss.png';
-  const social = 'https://res.cloudinary.com/djhz8vda0/image/upload/v1744292366/social_madlyu.png';
+  const bg = 'https://res.cloudinary.com/djhz8vda0/image/upload/v1744460034/Frame1_zjsvjo.png';
+  const social = 'https://res.cloudinary.com/djhz8vda0/image/upload/v1744460015/social_qhnxbz.png';
 
   return `
   <!DOCTYPE html>
