@@ -65,7 +65,7 @@ exports.registerEmployer = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
     const employer = new employerModel({
-      fullName: nameFormat,
+      fullname: nameFormat,
       email,
       phoneNumber,
       password: hashedPassword,
