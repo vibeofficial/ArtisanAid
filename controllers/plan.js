@@ -3,7 +3,7 @@ const planModel = require('../models/plan');
 
 exports.createPlan = async (req, res) => {
   try {
-    const { planName, amount, description, duration } = req.body;
+    const { planName, amount, description } = req.body;
     const existingPlan = await planModel.findOne({ planName: planName });
 
     if (existingPlan) {
@@ -12,23 +12,12 @@ exports.createPlan = async (req, res) => {
       })
     };
 
-    let plan;
-
-    if (duration > 1) {
-      plan = new planModel({
-        planName,
-        amount: amount * duration,
-        description,
-        duration: `${duration} Months`
-      })
-    } else {
-      plan = new planModel({
-        planName,
-        amount,
-        description,
-        duration: `${duration} Month`
-      })
-    };
+    const plan = new planModel({
+      planName,
+      amount,
+      description,
+      duration: 'Monthly'
+    })
 
     await plan.save();
 

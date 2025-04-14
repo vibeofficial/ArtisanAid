@@ -24,7 +24,6 @@ router.post('/create/plan', createPlanValidator,authorize, createPlan);
  *               - planName
  *               - amount
  *               - description
- *               - duration
  *             properties:
  *               planName:
  *                 type: string
@@ -35,9 +34,6 @@ router.post('/create/plan', createPlanValidator,authorize, createPlan);
  *               description:
  *                 type: string
  *                 example: Full access to platform features
- *               duration:
- *                 type: integer
- *                 example: 3
  *     responses:
  *       201:
  *         description: Plan created successfully
@@ -59,8 +55,6 @@ router.post('/create/plan', createPlanValidator,authorize, createPlan);
  *                     amount:
  *                       type: number
  *                     description:
- *                       type: string
- *                     duration:
  *                       type: string
  *       400:
  *         description: Plan has been created already

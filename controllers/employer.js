@@ -58,9 +58,6 @@ exports.registerEmployer = async (req, res) => {
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
     const profilePicResult = await cloudinary.uploader.upload(profile);
 
-    const cover = 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
-    const coverPhotoResult = await cloudinary.uploader.upload(cover);
-
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
@@ -72,10 +69,6 @@ exports.registerEmployer = async (req, res) => {
       profilePic: {
         public_id: profilePicResult.public_id,
         image_url: profilePicResult.secure_url
-      },
-      coverPhoto: {
-        public_id: coverPhotoResult.public_id,
-        image_url: coverPhotoResult.secure_url
       }
     });
 
