@@ -183,4 +183,5 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  */
 router.get('/reject/job/:bookingId',rejectJobBooking, authenticate, rejectJob);
 
+
 module.exports = router;
