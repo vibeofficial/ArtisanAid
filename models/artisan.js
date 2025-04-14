@@ -51,7 +51,7 @@ const artisanSchema = new mongoose.Schema({
     lga: { type: String, trim: true },
     state: { type: String, trim: true }
   },
-  accountVerification: {
+  verificationStatus: {
     type: String,
     enum: ['Unverified', 'In Progress', 'Verified', 'Declined'],
     default: 'Unverified'
@@ -91,6 +91,10 @@ const artisanSchema = new mongoose.Schema({
     default: false
   },
   isRestricted: {
+    type: Boolean,
+    default: false
+  },
+  isReported: {
     type: Boolean,
     default: false
   },

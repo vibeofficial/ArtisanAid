@@ -65,7 +65,7 @@ const upload = require('../middlewares/multer');
  *                   type: string
  *                   example: Internal server error
  */
-router.post('/upload/job', authenticate, upload.single('jobImage'),createJobPost);
+router.post('/upload/job', authenticate, upload.single('jobImage'), createJobPost);
 
 
 /**
@@ -140,5 +140,6 @@ router.post('/upload/job', authenticate, upload.single('jobImage'),createJobPost
  *                   example: Session expired, please login to continue
  */
 router.get('/job/post', getAllJobPost);
+
 
 module.exports = router;

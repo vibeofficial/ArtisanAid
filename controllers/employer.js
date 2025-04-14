@@ -91,7 +91,9 @@ exports.registerEmployer = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: 'Error registering employer' });
+    res.status(500).json({
+      message: error.message
+    });
   }
 };
 
@@ -114,7 +116,7 @@ exports.getArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error retrieving artisans'
+      message: error.message
     });
   }
 };
@@ -189,7 +191,7 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.error('Login Error:', error.message);
     return res.status(500).json({
-      message: 'Error logging in'
+      message: error.message
     });
   }
 };
@@ -223,7 +225,7 @@ exports.logout = async (req, res) => {
   } catch (error) {
     console.error('Logout Error:', error.message);
     return res.status(500).json({
-      message: 'Error logging user out'
+      message: error.message
     });
   }
 };
@@ -247,7 +249,7 @@ exports.getRecommendedArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error retrieving recommended artisans'
+      message: error.message
     });
   }
 };
@@ -272,7 +274,7 @@ exports.getArtisansByCategory = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).json({
-      message: "Error getting artisans in category",
+      message: error.message
     });
   }
 };
@@ -294,7 +296,7 @@ exports.getArtisansByLocalGovt = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).json({
-      message: "Error fetching artisans by local government",
+      message: error.message
     });
   }
 };
@@ -351,7 +353,7 @@ exports.updateCoverPhoto = async (req, res) => {
     };
 
     res.status(500).json({
-      message: 'Error updating cover photo'
+      message: error.message
     })
   }
 };
@@ -385,7 +387,7 @@ exports.updateSocialLink = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error updating social link'
+      message: error.message
     })
   }
 };

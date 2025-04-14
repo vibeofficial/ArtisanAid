@@ -62,7 +62,20 @@ exports.initializeVerification = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error initializing verification'
+      message: error.message
+    })
+  }
+};
+
+
+exports.acceptVerification = async (req, res) => {
+  try {
+    const {id} = req.user;
+    
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message
     })
   }
 };
