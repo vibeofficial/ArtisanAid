@@ -17,7 +17,6 @@ exports.createJobPost = async (req, res) => {
     };
 
     const file = req.file;
-    console.log(file);
     
     const jobPostResult = await cloudinary.uploader.upload(file.path);
     fs.unlinkSync(file.path);
@@ -31,6 +30,8 @@ exports.createJobPost = async (req, res) => {
     });
 
     await jobPost.save();
+    artisan.jobPostId = jobPost._id;
+    await artisan.save();
     res.status(201).json({
       message: 'Job Post created successfully'
     })

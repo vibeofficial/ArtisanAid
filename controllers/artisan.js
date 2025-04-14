@@ -9,6 +9,7 @@ const { verifyMail, resetPassword } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 const jwtSecret = process.env.JWT_SECRET;
 
+
 exports.registerArtisan = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, businessName, confirmPassword, category } = req.body;
