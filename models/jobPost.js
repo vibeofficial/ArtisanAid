@@ -5,20 +5,12 @@ const jobPostSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'artisans'
   },
-  amount: {
-    type: Number,
-    require: true
-  },
-  description: {
-    type: String,
-    require: true
-  },
-  duration: {
-    type: String,
-    require: true
+  jobImage: {
+    public_id: { type: String, require: true },
+    image_url: { type: String, require: true }
   }
 });
 
-const jpbPostModel = mongoose.model('jpbPosts', jobPostSchema);
+const jobPostModel = mongoose.model('jobPosts', jobPostSchema);
 
-module.exports = jpbPostModel;
+module.exports = jobPostModel;

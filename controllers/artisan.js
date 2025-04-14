@@ -105,7 +105,7 @@ exports.registerArtisan = async (req, res) => {
 
     const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
-    const html = verifyMail(link, artisan.fullname);
+    const html = verifyMail(link);
 
     const mailDetails = {
       email: artisan.email,
@@ -151,7 +151,7 @@ exports.verifyAccount = async (req, res) => {
 
           const newToken = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
           const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${newToken}`;
-          const html = verifyMail(link, user.fullname);
+          const html = verifyMail(link);
 
           const mailDetails = {
             email: user.email,
@@ -166,8 +166,6 @@ exports.verifyAccount = async (req, res) => {
         }
       } else {
         const user = await artisanModel.findById(payload.id) || await employerModel.findById(payload.id) || await adminModel.findById(payload.id);
-        console.log(user);
-
 
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
@@ -207,7 +205,7 @@ exports.resendVerifyLink = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
-    const html = verifyMail(link, user.fullname);
+    const html = verifyMail(link);
 
     const mailDetails = {
       email: user.email,
