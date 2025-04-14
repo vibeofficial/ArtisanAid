@@ -1,6 +1,6 @@
 const { bookArtisan, acceptJob, rejectJob } = require('../controllers/booking');
 const { authenticate } = require('../middlewares/authentication');
-const {rejectJobBooking} = require('../middlewares/bookingValidator')
+const {rejectJobBooking, bookAnnArtisan} = require('../middlewares/bookingValidator')
 
 const router = require('express').Router();
 
@@ -12,13 +12,8 @@ const router = require('express').Router();
  *     summary: Book an artisan
  *     tags:
  *       - Booking
- *     parameters:
- *       - name: artisanId
- *         in: path
- *         description: The ID of the artisan the employer wants to book
- *         required: true
- *         schema:
- *           type: string
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -26,9 +21,14 @@ const router = require('express').Router();
  *           schema:
  *             type: object
  *             required:
+ *               - artisanId
  *               - location
  *               - serviceDescription
  *             properties:
+ *               artisanId:
+ *                 type: string
+ *                 description: ID of the artisan to be booked
+ *                 example: "65b7d1e8e6c1234567f91ab2"
  *               location:
  *                 type: string
  *                 description: Location where the service is needed
@@ -69,7 +69,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error booking an artisan
  */
-router.post('/book/artisan/:artisanId',rejectJobBooking, authenticate, bookArtisan);
+router.post('/book/artisan/:artisanId',bookAnnArtisan, authenticate, bookArtisan);
 
 
 /**
@@ -134,7 +134,7 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: artisanId
+ *         name: bookingId
  *         required: true
  *         schema:
  *           type: string
@@ -181,6 +181,6 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *                   type: string
  *                   example: Error rejecting job offer
  */
-router.get('/reject/job/:artisanId', authenticate, rejectJob);
+router.get('/reject/job/:bookingId',rejectJobBooking, authenticate, rejectJob);
 
 module.exports = router;
