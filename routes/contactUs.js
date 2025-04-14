@@ -5,7 +5,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /contact/us:
+ * /v1/contact/us:
  *   post:
  *     summary: Send a contact/feedback message
  *     description: Allows users to send a message via the contact form. The message is saved and emailed to the designated recipient.
