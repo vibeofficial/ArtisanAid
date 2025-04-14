@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
-const { verifyMail, reset } = require('../helper/emailTemplate');
+const { verifyMail, resetPassword } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -49,24 +49,24 @@ exports.registerArtisan = async (req, res) => {
     };
 
     let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
-   
-       if (phonenUmberExists) {
-         return res.status(400).json({
-           message: `User with this phone number already exist as an employer`
-         });
-       } else if (!phonenUmberExists) {
-         phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
-   
-         if (phonenUmberExists) {
-           return res.status(400).json({
-             message: `User with this phone number already exist as an artisan`
-           });
-         }
-       } else if (phonenUmberExists) {
-         return res.status(400).json({
-           message: `User with this phone number already exist as an admin`
-         })
-       };
+
+    if (phonenUmberExists) {
+      return res.status(400).json({
+        message: `User with this phone number already exist as an employer`
+      });
+    } else if (!phonenUmberExists) {
+      phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
+
+      if (phonenUmberExists) {
+        return res.status(400).json({
+          message: `User with this phone number already exist as an artisan`
+        });
+      }
+    } else if (phonenUmberExists) {
+      return res.status(400).json({
+        message: `User with this phone number already exist as an admin`
+      })
+    };
 
     const businessNameExists = await artisanModel.findOne({ businessName: businessName });
 
@@ -167,7 +167,7 @@ exports.verifyAccount = async (req, res) => {
       } else {
         const user = await artisanModel.findById(payload.id) || await employerModel.findById(payload.id) || await adminModel.findById(payload.id);
         console.log(user);
-        
+
 
         if (!user) {
           return res.status(404).json({ message: 'User not found' });
@@ -245,7 +245,7 @@ exports.forgotPassword = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`;//hosted url
-    const html = reset(link, user.fullname);
+    const html = resetPassword(link);
 
     const mailDetails = {
       email: user.email,
