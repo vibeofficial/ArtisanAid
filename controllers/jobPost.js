@@ -16,6 +16,14 @@ exports.createJobPost = async (req, res) => {
       })
     };
 
+    const jobPostExists = await jobPost.findOne({artisanId: artisan._id});
+
+    if (jobPostExists) {
+      return res.status(400).json({
+        message: 'Artisan can only create one job post'
+      })
+    }
+
     const file = req.file;
     
     const jobPostResult = await cloudinary.uploader.upload(file.path);

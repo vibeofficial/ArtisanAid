@@ -227,7 +227,7 @@ exports.getVerifiedArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message:error.message
+      message: error.message
     });
   }
 };
@@ -275,7 +275,7 @@ exports.getProcessingArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message:error.message
+      message: error.message
     });
   }
 };
@@ -299,7 +299,7 @@ exports.getDeclinedArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message:error.message
+      message: error.message
     });
   }
 };
@@ -323,7 +323,7 @@ exports.getEmployers = async (req, res) => {
   } catch (error) {
     console.error('Get Artisans Error:', error.message);
     return res.status(500).json({
-      message: 'Error retrieving employers'
+      message: error.message
     });
   }
 };
