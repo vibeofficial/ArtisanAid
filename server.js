@@ -17,6 +17,7 @@ const employerRouter = require('./routes/employer');
 const adminRouter = require('./routes/admin');
 const verificationRouter = require('./routes/verification');
 const bookingRouter = require('./routes/booking');
+const jobPostRouter = require('./routes/jobPost');
 
 app.use(express.json());
 app.use(cors());
@@ -76,6 +77,7 @@ app.use('/v1', employerRouter);
 app.use('/v1', adminRouter);
 app.use('/v1', verificationRouter);
 app.use('/v1', bookingRouter);
+app.use('/v1', jobPostRouter);
 
 
 app.listen(PORT, () => {

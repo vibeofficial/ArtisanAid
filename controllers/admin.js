@@ -137,7 +137,7 @@ exports.getAdmins = async (req, res) => {
     };
 
     res.status(500).json({
-      message: 'Error getting all admin'
+      message: error.message
     })
   }
 };
@@ -170,7 +170,7 @@ exports.restrictAccount = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error restricting account'
+      message: error.message
     });
   }
 };
@@ -203,7 +203,7 @@ exports.unrestrictAccount = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error unrestricting account'
+      message: error.message
     });
   }
 };
@@ -227,7 +227,7 @@ exports.getVerifiedArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error retrieving artisans'
+      message:error.message
     });
   }
 };
@@ -251,7 +251,7 @@ exports.getUnVerifiedArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error retrieving artisans'
+      message: error.message
     });
   }
 };
@@ -275,7 +275,7 @@ exports.getProcessingArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error retrieving artisans'
+      message:error.message
     });
   }
 };
@@ -299,7 +299,7 @@ exports.getDeclinedArtisans = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error retrieving artisans'
+      message:error.message
     });
   }
 };
@@ -347,7 +347,7 @@ exports.getUser = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error retrieving user',
+      message: error.message
     });
   }
 };
@@ -399,7 +399,7 @@ exports.deleteAccount = async (req, res) => {
     };
 
     res.status(500).json({
-      message: 'Error deleting account'
+      message: error.message
     })
   }
 };
