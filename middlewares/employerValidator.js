@@ -38,11 +38,11 @@ exports.registerEmployerValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
+  // if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
+  //   return res.status(403).json({
+  //     message: `Only ${allowedAdminEmail} is allowed for admin registration`,
+  //   });
+  // }
 
   next();
 };
@@ -50,11 +50,11 @@ exports.registerEmployerValidation = (req, res, next) => {
 
 exports.loginValidation = (req, res, next) => {
   const schema = Joi.object({
-    email: Joi.string().email().required().messages({
+    email: Joi.string().email().optional().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
-      phoneNumber: Joi.string().pattern(/^\d{11,11}$/).required().messages({
+      phoneNumber: Joi.string().pattern(/^\d{11,11}$/).optional().messages({
           "any.required": "Phone number is required",
           "string.pattern.base": "Phone number must be 11 digits"
         }),
@@ -132,11 +132,11 @@ exports.resetPasswordValidation = (req, res, next) => {
     });
   }
 
-  if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
-    return res.status(403).json({
-      message: `Only ${allowedAdminEmail} is allowed for admin registration`,
-    });
-  }
+  // if (req.body.role === "Admin" && req.body.email.toLowerCase() !== allowedAdminEmail) {
+  //   return res.status(403).json({
+  //     message: `Only ${allowedAdminEmail} is allowed for admin registration`,
+  //   });
+  // }
 
   next();
 };

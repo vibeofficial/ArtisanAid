@@ -40,7 +40,7 @@ exports.registerArtisanValidation = async (req, res, next) => {
 
   if (error) {
     return res.status(400).json({
-      message: error.details[0].message // Returning the first validation error message
+      message: error.message // Returning the first validation error message
     });
   }
 
@@ -57,7 +57,7 @@ const { error } = schema.validate(req.body, { abortEarly: true });
 
 if (error) {
   return res.status(400).json({
-    message: error.details[0].message // Returning the first validation error message
+    message: error.message // Returning the first validation error message
   });
 }
 next();
