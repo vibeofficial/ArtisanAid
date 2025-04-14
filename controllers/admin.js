@@ -99,7 +99,7 @@ exports.registerAdmin = async (req, res) => {
     };
 
     await mail_sender(mailDetails);
-    // await admin.save();
+    await admin.save();
 
     res.status(201).json({
       message: 'Account registered successully',
