@@ -12,8 +12,13 @@ const router = require('express').Router();
  *     summary: Book an artisan
  *     tags:
  *       - Booking
- *     security:
- *       - bearerAuth: []
+ *     parameters:
+ *       - name: artisanId
+ *         in: path
+ *         description: The ID of the artisan the employer wants to book
+ *         required: true
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -21,14 +26,9 @@ const router = require('express').Router();
  *           schema:
  *             type: object
  *             required:
- *               - artisanId
  *               - location
  *               - serviceDescription
  *             properties:
- *               artisanId:
- *                 type: string
- *                 description: ID of the artisan to be booked
- *                 example: "65b7d1e8e6c1234567f91ab2"
  *               location:
  *                 type: string
  *                 description: Location where the service is needed
@@ -134,7 +134,7 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: bookingId
+ *         name: artisanId
  *         required: true
  *         schema:
  *           type: string
@@ -181,6 +181,6 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *                   type: string
  *                   example: Error rejecting job offer
  */
-router.get('/reject/job/:bookingId', authenticate, rejectJob);
+router.get('/reject/job/:artisanId', authenticate, rejectJob);
 
 module.exports = router;
