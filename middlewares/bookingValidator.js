@@ -1,6 +1,6 @@
 const joi = require ('joi')
 
-exports.bookAnArtisan = (req,res,next) =>{
+exports.bookAnnArtisan = (req,res,next) =>{
   const schema = joi.object({
   location: joi.string().min(3).required().messages({
       'string.empty': 'Location is required',
