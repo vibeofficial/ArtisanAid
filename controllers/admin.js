@@ -211,7 +211,7 @@ exports.unrestrictAccount = async (req, res) => {
 
 exports.getVerifiedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Verified' } && { isVerified: true });
+    const artisans = await artisanModel.find({ accountVerification: 'Verified' } && { isVerified: true }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -235,7 +235,7 @@ exports.getVerifiedArtisans = async (req, res) => {
 
 exports.getUnVerifiedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Unverified' } && { isVerified: true });
+    const artisans = await artisanModel.find({ accountVerification: 'Unverified' } && { isVerified: true }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -259,7 +259,7 @@ exports.getUnVerifiedArtisans = async (req, res) => {
 
 exports.getProcessingArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Pending' } && { isVerified: true });
+    const artisans = await artisanModel.find({ accountVerification: 'Pending' } && { isVerified: true }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -283,7 +283,7 @@ exports.getProcessingArtisans = async (req, res) => {
 
 exports.getDeclinedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Declined' } && { isVerified: true });
+    const artisans = await artisanModel.find({ accountVerification: 'Declined' } && { isVerified: true }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -332,7 +332,7 @@ exports.getEmployers = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await employerModel.findById(id) || await artisanModel.findById(id) || await adminModel.findById(id);
+    const user = await employerModel.findById(id) || await artisanModel.findById(id) || await adminModel.findById(id).populate('jobPostId', 'jobImage');
 
     if (!user) {
       return res.status(404).json({

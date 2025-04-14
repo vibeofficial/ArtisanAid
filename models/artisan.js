@@ -101,6 +101,10 @@ const artisanSchema = new mongoose.Schema({
   expiresIn: {
     type: Number,
     required: true
+  },
+  jobPostId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'jobPosts'
   }
 }, { timestamps: true });
 
