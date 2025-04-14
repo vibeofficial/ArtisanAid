@@ -32,10 +32,6 @@ const employerSchema = new mongoose.Schema({
     public_id: { type: String, trim: true },
     image_url: { type: String, trim: true }
   },
-  coverPhoto: {
-    public_id: { type: String, trim: true },
-    image_url: { type: String, trim: true }
-  },
   role: {
     type: String,
     default: 'Employer'

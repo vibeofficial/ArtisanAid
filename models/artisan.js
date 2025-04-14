@@ -75,7 +75,7 @@ const artisanSchema = new mongoose.Schema({
   },
   subscriptionPlan: {
     type: String,
-    enum: ['Demo', 'Regular', 'Premium'],
+    enum: ['Demo', 'Basic Plan', 'Premium Plan'],
     default: 'Demo'
   },
   isLoggedIn: {
