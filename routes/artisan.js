@@ -1,4 +1,4 @@
-const { registerAdminValidation, resendVerifyLinkValidation, forgotPasswordValidation, resetPasswordValidation, changePasswordValidation, updateLocationValidation, updateBioValidation } = require('../middlewares/validator');
+const { registerAdminValidation, resendVerifyLinkValidation, forgotPasswordValidation, resetPasswordValidation, changePasswordValidation, updateLocationValidation, updateBioValidation, registerArtisanValidation } = require('../middlewares/validator');
 const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
 const { authenticate } = require('../middlewares/authentication');
 
@@ -10,41 +10,49 @@ const uploads = require('../middlewares/multer');
  * @swagger
  * /v1/register/artisan:
  *   post:
- *     summary: Register a new artisan
- *     description: Registers a new artisan, checking for duplicate emails, phone numbers, and business names. Sends a verification email upon successful registration.
  *     tags:
  *       - Artisan
+ *     summary: Register a new artisan
+ *     description: This endpoint registers a new artisan and sends a verification email.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - fullname
+ *               - email
+ *               - phoneNumber
+ *               - password
+ *               - confirmPassword
+ *               - businessName
+ *               - category
  *             properties:
  *               fullname:
  *                 type: string
- *                 example: 'John Doe'
+ *                 example: John Doe
  *               email:
  *                 type: string
- *                 example: 'johndoe@sample.com'
+ *                 example: johndoe@sample.com
  *               phoneNumber:
  *                 type: string
- *                 example: '08012345678'
+ *                 example: 08012345678
  *               password:
  *                 type: string
- *                 example: 'password123'
+ *                 example: Password123!
  *               confirmPassword:
  *                 type: string
- *                 example: 'password123'
+ *                 example: Password123!
  *               businessName:
  *                 type: string
- *                 example: 'John Doe Plumbing'
+ *                 example: Doe Ventures
  *               category:
  *                 type: string
- *                 example: 'Plumber'
+ *                 example: Electrician
  *     responses:
  *       201:
- *         description: Account registered successfully and verification email sent
+ *         description: Artisan registered successfully
  *         content:
  *           application/json:
  *             schema:
@@ -52,33 +60,48 @@ const uploads = require('../middlewares/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'Account Registered Successfully'
+ *                   example: Account Registered Successfully
  *                 data:
  *                   type: object
  *                   properties:
  *                     _id:
  *                       type: string
- *                       example: '609d1b1e1d1b3c001f1a1c1b'
+ *                       example: 661f5cbe5c1670b9b3d44444
  *                     fullname:
  *                       type: string
- *                       example: 'John Doe'
+ *                       example: John Doe
  *                     email:
  *                       type: string
- *                       example: 'johndoe@sample.com'
- *                     businessName:
- *                       type: string
- *                       example: 'John Doe Plumbing'
+ *                       example: johndoe@sample.com
  *                     phoneNumber:
  *                       type: string
- *                       example: '08012345678'
+ *                       example: 08012345678
+ *                     businessName:
+ *                       type: string
+ *                       example: Doe Ventures
  *                     category:
  *                       type: string
- *                       example: 'Plumber'
- *                     subscriptionEndDate:
- *                       type: string
- *                       example: '2025-07-14T12:00:00Z'
+ *                       example: Plumbing
+ *                     profilePic:
+ *                       type: object
+ *                       properties:
+ *                         public_id:
+ *                           type: string
+ *                           example: some-public-id
+ *                         image_url:
+ *                           type: string
+ *                           example: https://cloudinary.com/profile.jpg
+ *                     coverPhoto:
+ *                       type: object
+ *                       properties:
+ *                         public_id:
+ *                           type: string
+ *                           example: some-cover-id
+ *                         image_url:
+ *                           type: string
+ *                           example: https://cloudinary.com/cover.jpg
  *       400:
- *         description: Duplicate email, phone number, or business name found
+ *         description: Validation or conflict error
  *         content:
  *           application/json:
  *             schema:
@@ -86,9 +109,9 @@ const uploads = require('../middlewares/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'User with: johndoe@sample.com already exists as an artisan'
+ *                   example: User with this phone number already exist as an artisan
  *       500:
- *         description: Error registering artisan
+ *         description: Internal Server Error
  *         content:
  *           application/json:
  *             schema:
@@ -96,9 +119,9 @@ const uploads = require('../middlewares/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'Error registering artisan'
+ *                   example: Error registering artisan
  */
-router.post('/register/artisan', registerAdminValidation, registerArtisan);
+router.post('/register/artisan', registerArtisanValidation, registerArtisan);
 
 
 /**
