@@ -1,4 +1,5 @@
 const { createMessage } = require('../controllers/contactUs');
+const { contactUsMessageValidation } = require('../middlewares/validator');
 
 const router = require('express').Router();
 
@@ -56,7 +57,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: "Error creating Contact Us message"
  */
-router.post('/contact/us', createMessage);
+router.post('/contact/us', contactUsMessageValidation, createMessage);
 
 
 module.exports = router;

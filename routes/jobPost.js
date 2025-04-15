@@ -1,5 +1,5 @@
 const { createJobPost, getAllJobPost } = require('../controllers/jobPost');
-const { authenticate,checkSubscription } = require('../middlewares/authentication');
+const { authenticate, checkSubscription } = require('../middlewares/authentication');
 
 const router = require('express').Router();
 const upload = require('../middlewares/multer');
@@ -65,7 +65,7 @@ const upload = require('../middlewares/multer');
  *                   type: string
  *                   example: Internal server error
  */
-router.post('/upload/job', authenticate,checkSubscription, upload.single('jobImage'), createJobPost);
+router.post('/upload/job', authenticate, checkSubscription, upload.single('jobImage'), createJobPost);
 
 
 /**
@@ -139,7 +139,7 @@ router.post('/upload/job', authenticate,checkSubscription, upload.single('jobIma
  *                   type: string
  *                   example: Session expired, please login to continue
  */
-router.get('/job/post',checkSubscription, getAllJobPost);
+router.get('/job/post', getAllJobPost);
 
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const { bookArtisan, acceptJob, rejectJob } = require('../controllers/booking');
-const { authenticate, checkSubscription } = require('../middlewares/authentication');
-const {rejectJobBooking, bookAnnArtisan} = require('../middlewares/bookingValidator')
+const { authenticate } = require('../middlewares/authentication');
+const { rejectJobBookingValidation, bookArtisanValidation } = require('../middlewares/validator');
 
 const router = require('express').Router();
 
@@ -69,7 +69,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error booking an artisan
  */
-router.post('/book/artisan/:artisanId',checkSubscription,bookAnnArtisan, authenticate, bookArtisan);
+router.post('/book/artisan/:artisanId', bookArtisanValidation, authenticate, bookArtisan);
 
 
 /**
@@ -120,7 +120,7 @@ router.post('/book/artisan/:artisanId',checkSubscription,bookAnnArtisan, authent
  *                   type: string
  *                   example: Error accepting job offer
  */
-router.get('/accept/job/:bookingId',checkSubscription, authenticate, acceptJob);
+router.get('/accept/job/:bookingId', authenticate, acceptJob);
 
 
 /**
@@ -181,7 +181,7 @@ router.get('/accept/job/:bookingId',checkSubscription, authenticate, acceptJob);
  *                   type: string
  *                   example: Error rejecting job offer
  */
-router.get('/reject/job/:bookingId',checkSubscription, rejectJobBooking, authenticate, rejectJob);
+router.get('/reject/job/:bookingId', rejectJobBookingValidation, authenticate, rejectJob);
 
 
 module.exports = router;

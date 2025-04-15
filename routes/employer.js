@@ -1,6 +1,7 @@
 const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employer');
 const { authenticate } = require('../middlewares/authentication');
-const { registerEmployerValidation, loginValidation, validateCategory, validateLGARequest, updateSocialLinkValidator } = require('../middlewares/employerValidator')
+const { registerEmployerValidation, loginValidation, categoryValidation, lgaValidation, updateSocialLinkValidation } = require('../middlewares/validator');
+
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -333,7 +334,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *         description: Error retrieving users in the category.
  */
 
-router.post('/artisans/category', validateCategory, getArtisansByCategory);
+router.post('/artisans/category', categoryValidation, getArtisansByCategory);
 
 
 /**
@@ -384,7 +385,7 @@ router.post('/artisans/category', validateCategory, getArtisansByCategory);
  *       '500':
  *         description: Error retrieving artisans by local government.
  */
-router.get('/artisans/lga', validateLGARequest, getArtisansByLocalGovt);
+router.get('/artisans/lga', lgaValidation, getArtisansByLocalGovt);
 
 
 /**
@@ -518,7 +519,7 @@ router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCo
  *                   type: string
  *                   example: "Error updating social link"
  */
-router.put('/update/social', authenticate, updateSocialLinkValidator, updateSocialLink);
+router.put('/update/social', authenticate, updateSocialLinkValidation, updateSocialLink);
 
 
 module.exports = router;

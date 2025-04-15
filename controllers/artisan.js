@@ -11,94 +11,82 @@ const jwtSecret = process.env.JWT_SECRET;
 
 
 
-
 exports.registerArtisan = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, businessName, confirmPassword, category } = req.body;
-
-    // Format fullname
     const full_name = fullname.split(' ');
-    const nameFormat = full_name.map(e => e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()).join(' ');
+    const nameFormat = full_name?.map((e) => {
+      return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
+    }).join(' ');
 
-    // Format business name
     const business_name = businessName.split(' ');
-    const bNameFormat = business_name.map(e => e.charAt(0).toUpperCase() + e.slice(1).toLowerCase()).join(' ');
+    const bNameFormat = business_name?.map((e) => {
+      return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
+    }).join(' ');
 
-    // Password check
     if (password !== confirmPassword) {
       return res.status(400).json({
         message: 'Password does not match'
       });
-    }
+    };
 
-    // Email check
     let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
       return res.status(400).json({
-        message: `User with: ${email.toLowerCase()} already exists as an admin`
-      });
-    }
-
-    emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
-    if (emailExists) {
+        message: `User with: ${email.toLowerCase()} already exist as an admin`
+      })
+    } else if (emailExists) {
       return res.status(400).json({
-        message: `User with: ${email.toLowerCase()} already exists as an employer`
+        message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
-    }
+    } else if (!emailExists) {
+      emailExists = await artisanModel.findOne({ email: email?.toLowerCase() });
 
-    emailExists = await artisanModel.findOne({ email: email?.toLowerCase() });
-    if (emailExists) {
+      if (emailExists) {
+        return res.status(400).json({
+          message: `User with: ${email.toLowerCase()} already exist as an artisan`
+        });
+      }
+    };
+
+    let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
+
+    if (phonenUmberExists) {
       return res.status(400).json({
-        message: `User with: ${email.toLowerCase()} already exists as an artisan`
+        message: `User with this phone number already exist as an employer`
       });
-    }
+    } else if (!phonenUmberExists) {
+      phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
 
-    // Phone number check
-    let phoneNumberExists = await employerModel.findOne({ phoneNumber });
-    if (phoneNumberExists) {
+      if (phonenUmberExists) {
+        return res.status(400).json({
+          message: `User with this phone number already exist as an artisan`
+        });
+      }
+    } else if (phonenUmberExists) {
       return res.status(400).json({
-        message: `User with this phone number already exists as an employer`
-      });
-    }
+        message: `User with this phone number already exist as an admin`
+      })
+    };
 
-    phoneNumberExists = await artisanModel.findOne({ phoneNumber });
-    if (phoneNumberExists) {
-      return res.status(400).json({
-        message: `User with this phone number already exists as an artisan`
-      });
-    }
+    const businessNameExists = await artisanModel.findOne({ businessName: businessName });
 
-    phoneNumberExists = await adminModel.findOne({ phoneNumber });
-    if (phoneNumberExists) {
-      return res.status(400).json({
-        message: `User with this phone number already exists as an admin`
-      });
-    }
-
-    // Business name check
-    const businessNameExists = await artisanModel.findOne({ businessName: bNameFormat });
     if (businessNameExists) {
-      return res.status(400).json({
-        message: `User with business name "${bNameFormat}" already exists`
-      });
-    }
+      return res.status(404).json({
+        message: `User with: ${businessName} name already exists`
+      })
+    };
 
-    // Upload default images
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
     const profilePicResult = await cloudinary.uploader.upload(profile);
 
     const cover = 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
     const coverPhotoResult = await cloudinary.uploader.upload(cover);
 
-    // Password hashing
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
-    // Calculate subscription end date (3 months from now)
-    const trialEndDate = new Date(Date.now() + 3 * 30.44 * 24 * 60 * 60 * 1000); // ~3 months
-
-    // Create artisan
     const artisan = new artisanModel({
       fullname: nameFormat,
       email,
@@ -106,7 +94,7 @@ exports.registerArtisan = async (req, res) => {
       phoneNumber,
       category,
       password: hashedPassword,
-      subscriptionEndDate: trialEndDate,
+      expiresIn: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3),
       profilePic: {
         public_id: profilePicResult.public_id,
         image_url: profilePicResult.secure_url
@@ -117,12 +105,10 @@ exports.registerArtisan = async (req, res) => {
       }
     });
 
-    // Generate verification token
-    const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5m' });
+    const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
     const html = verifyMail(link);
 
-    // Send verification email
     const mailDetails = {
       email: artisan.email,
       subject: 'ACCOUNT VERIFICATION',
@@ -141,125 +127,6 @@ exports.registerArtisan = async (req, res) => {
     res.status(500).json({ message: 'Error registering artisan' });
   }
 };
-
-
-
-// exports.registerArtisan = async (req, res) => {
-//   try {
-//     const { fullname, email, phoneNumber, password, businessName, confirmPassword, category } = req.body;
-//     const full_name = fullname.split(' ');
-//     const nameFormat = full_name?.map((e) => {
-//       return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
-//     }).join(' ');
-
-//     const business_name = businessName.split(' ');
-//     const bNameFormat = business_name?.map((e) => {
-//       return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase()
-//     }).join(' ');
-
-//     if (password !== confirmPassword) {
-//       return res.status(400).json({
-//         message: 'Password does not match'
-//       });
-//     };
-
-//     let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
-
-//     if (emailExists) {
-//       return res.status(400).json({
-//         message: `User with: ${email.toLowerCase()} already exist as an admin`
-//       })
-//     } else if (emailExists) {
-//       return res.status(400).json({
-//         message: `User with: ${email.toLowerCase()} already exist as an employer`
-//       });
-//     } else if (!emailExists) {
-//       emailExists = await artisanModel.findOne({ email: email?.toLowerCase() });
-
-//       if (emailExists) {
-//         return res.status(400).json({
-//           message: `User with: ${email.toLowerCase()} already exist as an artisan`
-//         });
-//       }
-//     };
-
-//     let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
-
-//     if (phonenUmberExists) {
-//       return res.status(400).json({
-//         message: `User with this phone number already exist as an employer`
-//       });
-//     } else if (!phonenUmberExists) {
-//       phonenUmberExists = await artisanModel.findOne({ phoneNumber: phoneNumber });
-
-//       if (phonenUmberExists) {
-//         return res.status(400).json({
-//           message: `User with this phone number already exist as an artisan`
-//         });
-//       }
-//     } else if (phonenUmberExists) {
-//       return res.status(400).json({
-//         message: `User with this phone number already exist as an admin`
-//       })
-//     };
-
-//     const businessNameExists = await artisanModel.findOne({ businessName: businessName });
-
-//     if (businessNameExists) {
-//       return res.status(404).json({
-//         message: `User with: ${businessName} name already exists`
-//       })
-//     };
-
-//     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
-//     const profilePicResult = await cloudinary.uploader.upload(profile);
-
-//     const cover = 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
-//     const coverPhotoResult = await cloudinary.uploader.upload(cover);
-
-//     const saltedRound = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password, saltedRound);
-
-//     const artisan = new artisanModel({
-//       fullname: nameFormat,
-//       email,
-//       businessName: bNameFormat,
-//       phoneNumber,
-//       category,
-//       password: hashedPassword,
-//       expiresIn: Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * 3),
-//       profilePic: {
-//         public_id: profilePicResult.public_id,
-//         image_url: profilePicResult.secure_url
-//       },
-//       coverPhoto: {
-//         public_id: coverPhotoResult.public_id,
-//         image_url: coverPhotoResult.secure_url
-//       }
-//     });
-
-//     const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
-//     const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
-//     const html = verifyMail(link);
-
-//     const mailDetails = {
-//       email: artisan.email,
-//       subject: 'ACCOUNT VERIFICATION',
-//       html
-//     };
-
-//     await mail_sender(mailDetails);
-//     await artisan.save();
-
-//     res.status(201).json({
-//       message: 'Account Registered Successfully',
-//       data: artisan
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: 'Error registering artisan' });
-//   }
-// };
 
 
 exports.verifyAccount = async (req, res) => {

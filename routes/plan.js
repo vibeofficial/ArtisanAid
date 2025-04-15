@@ -1,6 +1,6 @@
 const { createPlan, getAllPlans, getPlan, updatePlan, deletePlan } = require('../controllers/plan');
 const { authorize, authenticate } = require('../middlewares/authentication');
-const { createPlanValidator, updatePlanValidator } = require('../middlewares/planValidator')
+const { createPlanValidation, updatePlanValidation } = require('../middlewares/validator');
 
 const router = require('express').Router();
 
@@ -77,7 +77,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error creating plan
  */
-router.post('/create/plan', createPlanValidator,authorize, createPlan);
+router.post('/create/plan', createPlanValidation, authorize, createPlan);
 
 
 
@@ -282,7 +282,7 @@ router.get('/plan/:planId', authenticate, getPlan);
  *                   example: Error updating plan
  */
 
-router.put('/update/plan/:planId',updatePlanValidator, authorize, updatePlan);
+router.put('/update/plan/:planId', updatePlanValidation, authorize, updatePlan);
 
 
 /**
