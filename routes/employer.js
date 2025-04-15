@@ -85,7 +85,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error registering employer"
  */
-router.post('/register/employer', registerEmployerValidation, registerEmployer);
+router.post('/register/employer', registerEmployerValidation, uploads.single('profilePic'), registerEmployer);
 
 
 /**

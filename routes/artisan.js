@@ -121,7 +121,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: Error registering artisan
  */
-router.post('/register/artisan', registerArtisanValidation, registerArtisan);
+router.post('/register/artisan', registerArtisanValidation, uploads.fields([{ name: 'profilePic', maxCount: 1 }, { name: 'coverPhoto', maxCount: 1 }]), registerArtisan);
 
 
 /**
