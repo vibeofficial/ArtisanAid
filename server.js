@@ -53,17 +53,7 @@ const options = {
         }
       }
     }, 
-    security: [{ BearerAuth: [] }],
-    servers: [
-      {
-        url: 'https://artisanaid.onrender.com',
-        description: "Production Server"
-      },
-      {
-        url: "http://localhost:4867",
-        description: "Development Server"
-      }
-    ],
+    security: [{ BearerAuth: [] }]
     
   },
   apis: ["./routes/*.js"] // Ensure this points to the correct path
