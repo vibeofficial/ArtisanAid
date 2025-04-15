@@ -1,5 +1,5 @@
 const { registerAdminValidation } = require('../middlewares/validator');
-const { getAdmins, restrictAccount, unrestrictAccount, getVerifiedArtisans, getEmployers, getUser, deleteAccount, registerAdmin, getUnVerifiedArtisans, getProcessingArtisans, getDeclinedArtisans } = require('../controllers/admin');
+const { getAdmins, restrictAccount, unrestrictAccount, getEmployers, getUser, deleteAccount, registerAdmin, getUnVerifiedArtisans, getPendingArtisans, getDeclinedArtisans, getApprovedArtisans, getReportedArtisan } = require('../controllers/admin');
 const { authorize } = require('../middlewares/authentication');
 
 const router = require('express').Router();
@@ -137,36 +137,77 @@ router.get('/admins', authorize, getAdmins);
 
 /**
  * @swagger
- * /v1/restrict/account/{id}:
- *   get:
- *     summary: Restrict a user account
- *     description: Restrict the account of a user, preventing them from using the platform.
+ * /v1/restrict/account/{artisanId}:
+ *   post:
+ *     summary: Restrict an artisan's account
+ *     description: Allows an admin to restrict an artisan's account and sends a restriction reason via email.
  *     tags:
  *       - Admin
  *     parameters:
- *       - name: id
+ *       - name: artisanId
  *         in: path
- *         description: The ID of the user whose account will be restricted.
  *         required: true
+ *         description: ID of the artisan to restrict
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 example: Your account has been restricted due to suspicious activity.
  *     responses:
- *       '200':
- *         description: Account is restricted successfully.
- *       '404':
- *         description: Account not found or account is already restricted.
- *       '500':
- *         description: Internal server error while restricting account.
+ *       200:
+ *         description: Account restricted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Account restricted successfully
+ *       400:
+ *         description: Account already restricted or invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Admin or Artisan not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
-router.get('/restrict/account/:id', authorize, restrictAccount);
+router.post('/restrict/account/:artisanId', authorize, restrictAccount);
 
 
 /**
  * @swagger
- * /v1/unrestrict/account/{id}:
+ * /v1/unrestrict/account/{artisanId}:
  *   get:
- *     summary: Unrestrict a user account
- *     description: Removes restrictions from a user account, allowing them full access to the platform.
+ *     summary: Unrestrict an artisan account
+ *     description: Removes restrictions from an artisan account, allowing them full access to the platform.
  *     tags:
  *       - Admin
  *     parameters:
@@ -184,52 +225,7 @@ router.get('/restrict/account/:id', authorize, restrictAccount);
  *       '500':
  *         description: Internal server error while unrestricting account.
  */
-router.get('/unrestrict/account/:id', authorize, unrestrictAccount);
-
-
-/**
- * @swagger
- * /v1/verified/artisans:
- *   get:
- *     summary: Get all verified artisans
- *     description: Retrieves a list of all artisans with verified account verification status..
- *     tags:
- *       - Admin
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully fetched all artisans.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: All artisans
- *                 total:
- *                   type: integer
- *                   example: 5
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       email:
- *                         type: string
- *                       fullname:
- *                         type: string
- *                       role:
- *                         type: string
- *       '404':
- *         description: No artisan found.
- *       '500':
- *         description: Error retrieving artisans.
- */
-router.get('/verified/artisans', authorize, getVerifiedArtisans);
+router.get('/unrestrict/account/:artisanId', authorize, unrestrictAccount);
 
 
 /**
@@ -274,12 +270,12 @@ router.get('/verified/artisans', authorize, getVerifiedArtisans);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/verified/artisans', authorize, getUnVerifiedArtisans);
+router.get('/unverified/artisans', authorize, getUnVerifiedArtisans);
 
 
 /**
  * @swagger
- * /v1/processing/artisans:
+ * /v1/pending/artisans:
  *   get:
  *     summary: Get all pending artisans
  *     description: Retrieves a list of all artisans with pending account verification status..
@@ -319,7 +315,52 @@ router.get('/verified/artisans', authorize, getUnVerifiedArtisans);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/processing/artisans', authorize, getProcessingArtisans);
+router.get('/pending/artisans', authorize, getPendingArtisans);
+
+
+/**
+ * @swagger
+ * /v1/pending/artisans:
+ *   get:
+ *     summary: Get all pending artisans
+ *     description: Retrieves a list of all artisans with pending account verification status..
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successfully fetched all artisans.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All artisans
+ *                 total:
+ *                   type: integer
+ *                   example: 5
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       fullname:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       '404':
+ *         description: No artisan found.
+ *       '500':
+ *         description: Error retrieving artisans.
+ */
+router.get('/pending/artisans', authorize, getApprovedArtisans);
 
 
 /**
@@ -458,6 +499,42 @@ router.get('/employers', authorize, getEmployers);
  *         description: Error retrieving the user.
  */
 router.get('/user/:id', getUser);
+
+
+/**
+ * @swagger
+ * /v1/reported/artisans:
+ *   get:
+ *     summary: Get all reported artisans
+ *     tags:
+ *       - Admin
+ *     responses:
+ *       200:
+ *         description: List of all reported artisans
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Reported artisans below
+ *               data:
+ *                 - _id: 6629f8a6e13ab1b012345678
+ *                   fullname: John Doe
+ *                   email: johndoe@sample.com
+ *                   isReported: true
+ *                   verificationStatus: verified
+ *       404:
+ *         description: No artisan reported
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: No artisan reported
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Something went wrong
+ */
+router.get('/reported/artisans', authorize, getReportedArtisan);
 
 
 /**

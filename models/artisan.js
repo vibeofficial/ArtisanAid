@@ -53,7 +53,7 @@ const artisanSchema = new mongoose.Schema({
   },
   verificationStatus: {
     type: String,
-    enum: ['Unverified', 'In Progress', 'Verified', 'Declined'],
+    enum: ['Unverified', 'Pending', 'Approved', 'Declined'],
     default: 'Unverified'
   },
   bio: {
@@ -109,6 +109,10 @@ const artisanSchema = new mongoose.Schema({
   jobPostId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'jobPosts'
+  },
+  verificationId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'verifications'
   }
 }, { timestamps: true });
 

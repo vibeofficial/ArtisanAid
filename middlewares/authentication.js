@@ -25,43 +25,29 @@ exports.authenticate = async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, jwtSecret);
     const { id } = decodedToken;
-    let user = await artisanModel.findById(id);
+    let user = await artisanModel.findById(id) || await employerModel.findById(id);
 
-    if (!user) {
-      user = await employerModel.findById(id);
-
-      if (!user) {
-        user = await adminModel.findById(id);
-
-        if (!user) {
-          return res.status(404).json({
-            message: 'Authentication failed: User not found'
-          })
-        }
-      }
-    };
-
-    if (user.isLoggedIn !== decodedToken.isLoggedIn) {
-      return res.status(401).json({
-        message: 'Authentication failed: Account is not logged in'
-      })
-    };
-
-    req.user = user;
-    next();
-  } catch (error) {
-    console.log(error.message);
-
-    if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(400).json({
-        message: 'Session expired, please login to continue'
-      })
-    };
-
-    res.status(500).json({
-      message: 'Error authenticating user'
+  if (user.isLoggedIn !== decodedToken.isLoggedIn) {
+    return res.status(401).json({
+      message: 'Authentication failed: Account is not logged in'
     })
-  }
+  };
+
+  req.user = decodedToken;
+  next();
+} catch (error) {
+  console.log(error.message);
+
+  if (error instanceof jwt.JsonWebTokenError) {
+    return res.status(400).json({
+      message: 'Session expired, please login to continue'
+    })
+  };
+
+  res.status(500).json({
+    message: error.message
+  })
+}
 };
 
 
@@ -85,39 +71,31 @@ exports.authorize = async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, jwtSecret);
     const { id } = decodedToken;
-    let user = await artisanModel.findById(id);
+    const admin = await adminModel.findById(id);
 
-    if (!user) {
-      user = await employerModel.findById(id);
-
-      if (!user) {
-        user = await adminModel.findById(id);
-
-        if (!user) {
-          return res.status(404).json({
-            message: 'Authentication failed: User not found'
-          })
-        }
-      }
+    if (!admin) {
+      return res.status(404).json({
+        message: 'Authentication failed: User not found'
+      })
     };
 
-    if (user.isLoggedIn !== decodedToken.isLoggedIn) {
+    if (admin.isLoggedIn !== decodedToken.isLoggedIn) {
       return res.status(401).json({
         message: 'Authentication failed: Account is not logged in'
       })
     };
 
-    if (user.role !== 'Admin') {
+    if (admin.role !== 'Admin') {
       return res.status(401).json({
         message: 'Authorization failed: Contact admin'
       })
     };
 
-    req.user = user;
+    req.user = decodedToken;
     next();
   } catch (error) {
     console.log(error.message);
- 
+
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(400).json({
         message: 'Session expired, please login to continue'
@@ -125,31 +103,7 @@ exports.authorize = async (req, res, next) => {
     };
 
     res.status(500).json({
-      message: 'Error authorizating User'
+      message: error.message
     })
   }
 };
-
-
-exports.checkSubscription = (req, res, next) => {
-  const user = req.user;
-
-  // Make sure user exists and has a subscriptionEndDate
-  if (!user || !user.subscriptionEndDate) {
-    return res.status(403).json({
-      message: 'You must subscribe to access this feature.'
-    });
-  }
-
-  const now = new Date();
-  const endDate = new Date(user.subscriptionEndDate);
-
-  if (now > endDate) {
-    return res.status(403).json({
-      message: 'Your subscription has expired. Please renew your plan to continue.'
-    });
-  }
-
-  next(); // Subscription is valid
-};
-

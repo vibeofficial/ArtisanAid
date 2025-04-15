@@ -26,8 +26,8 @@ const verificationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['In Progress', 'Verified', 'Declined'],
-    default: 'In Progress'
+    enum: ['Pending', 'Approved', 'Declined'],
+    default: 'Pending'
   }
 }, { timestamps: true });
 

@@ -38,6 +38,7 @@ exports.createJobPost = async (req, res) => {
     });
 
     await jobPost.save();
+    
     artisan.jobPostId = jobPost._id;
     await artisan.save();
     res.status(201).json({

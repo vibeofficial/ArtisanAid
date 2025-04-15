@@ -143,108 +143,18 @@ exports.getAdmins = async (req, res) => {
 };
 
 
-exports.restrictAccount = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await artisanModel.findById(id) || await employerModel.findById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: 'User not found'
-      });
-    };
-
-    if (user.isRestricted === true) {
-      return res.status(400).json({
-        message: 'This account is already restricted'
-      });
-    };
-
-    user.isRestricted = true;
-    await user.save();
-
-    return res.status(200).json({
-      message: 'Account restricted successfully'
-    });
-
-  } catch (error) {
-    console.error(error.message);
-    return res.status(500).json({
-      message: error.message
-    });
-  }
-};
-
-
-exports.unrestrictAccount = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await artisanModel.findById(id) || await employerModel.findById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: 'User not found'
-      });
-    };
-
-    if (user.isRestricted !== true) {
-      return res.status(400).json({
-        message: 'This account is not currently restricted'
-      });
-    }
-
-    user.isRestricted = false;
-    await user.save();
-
-    return res.status(200).json({
-      message: 'Account unrestricted successfully'
-    });
-
-  } catch (error) {
-    console.error(error.message);
-    return res.status(500).json({
-      message: error.message
-    });
-  }
-};
-
-
-exports.getVerifiedArtisans = async (req, res) => {
-  try {
-    const artisans = await artisanModel.find({ accountVerification: 'Verified' } && { isVerified: true }).populate('jobPostId', 'jobImage');
-
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No verified artisans found'
-      });
-    };
-
-    return res.status(200).json({
-      message: 'Verified artisans retrieved successfully',
-      total: artisans.length,
-      data: artisans
-    });
-  } catch (error) {
-    console.error(error.message);
-    return res.status(500).json({
-      message: error.message
-    });
-  }
-};
-
-
 exports.getUnVerifiedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Unverified' } && { isVerified: true }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Unverified' });
 
     if (artisans.length === 0) {
       return res.status(404).json({
-        message: 'No verified artisans found'
+        message: 'No unerified artisans found'
       });
     };
 
     return res.status(200).json({
-      message: 'Verified artisans retrieved successfully',
+      message: 'Unverified artisans retrieved successfully',
       total: artisans.length,
       data: artisans
     });
@@ -257,18 +167,42 @@ exports.getUnVerifiedArtisans = async (req, res) => {
 };
 
 
-exports.getProcessingArtisans = async (req, res) => {
+exports.getPendingArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Pending' } && { isVerified: true }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Pending' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
 
     if (artisans.length === 0) {
       return res.status(404).json({
-        message: 'No verified artisans found'
+        message: 'No pending artisan found'
       });
     };
 
     return res.status(200).json({
-      message: 'Verified artisans retrieved successfully',
+      message: 'Pending artisans retrieved successfully',
+      total: artisans.length,
+      data: artisans
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+
+exports.getApprovedArtisans = async (req, res) => {
+  try {
+    const artisans = await artisanModel.find({ verificationStatus: 'Approved' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
+
+    if (artisans.length === 0) {
+      return res.status(404).json({
+        message: 'No approved artisan found'
+      });
+    };
+
+    return res.status(200).json({
+      message: 'Approved artisans retrieved successfully',
       total: artisans.length,
       data: artisans
     });
@@ -283,16 +217,16 @@ exports.getProcessingArtisans = async (req, res) => {
 
 exports.getDeclinedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Declined' } && { isVerified: true }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Declined' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
 
     if (artisans.length === 0) {
       return res.status(404).json({
-        message: 'No verified artisans found'
+        message: 'No declined artisans found'
       });
     };
 
     return res.status(200).json({
-      message: 'Verified artisans retrieved successfully',
+      message: 'Declined artisans retrieved successfully',
       total: artisans.length,
       data: artisans
     });
@@ -353,19 +287,125 @@ exports.getUser = async (req, res) => {
 };
 
 
+exports.getReportedArtisan = async (req, res) => {
+  try {
+    const artisans = await artisanModel.find({ isReported: true });
+
+    if (artisans.length === 0) {
+      return res.status(404).json({
+        message: 'No artisan reported'
+      })
+    };
+
+    res.status(200).json({
+      message: 'Reported artisans below',
+      data: artisans
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+
+exports.restrictAccount = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { artisanId } = req.params;
+    const { reason } = req.body;
+
+    const admin = await adminModel.findById(id);
+
+    if (!admin) {
+      return res.status(404).json({
+        message: 'Admin not found'
+      });
+    }
+
+    const artisan = await artisanModel.findById(artisanId);
+
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Artisan not found'
+      });
+    };
+
+    if (artisan.isRestricted === true) {
+      return res.status(400).json({
+        message: 'This account is already restricted'
+      });
+    };
+
+    const mailDetails = {
+      email: artisan.email,
+      subject: 'ACCOUNT RESTRICTION',
+      html: reason
+    };
+
+    await mail_sender(mailDetails);
+    artisan.isRestricted = true;
+    await artisan.save();
+
+    return res.status(200).json({
+      message: 'Account restricted successfully'
+    });
+
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+
+exports.unrestrictAccount = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { artisanId } = req.params;
+
+    const admin = await adminModel.findById(id);
+
+    if (!admin) {
+      return res.status(404).json({
+        message: 'Admin not found'
+      });
+    }
+
+    const artisan = await artisanModel.findById(artisanId);
+
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Artisan not found'
+      });
+    };
+
+    artisan.isRestricted = false;
+    await artisan.save();
+
+    return res.status(200).json({
+      message: 'Account unrestricted successfully'
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+
 exports.deleteAccount = async (req, res) => {
   try {
     const { id } = req.params;
-    let user = await artisanModel.findById(id);
+    let user = await artisanModel.findById(id) || await employerModel.findById(id);
 
     if (!user) {
-      user = await employerModel.findById(id);
-
-      if (!user) {
-        return res.status(404).json({
-          message: 'User not found'
-        })
-      }
+      return res.status(404).json({
+        message: 'User not found'
+      })
     };
 
     if (user.role === 'Artisan') {

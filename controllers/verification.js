@@ -51,9 +51,11 @@ exports.initializeVerification = async (req, res) => {
       }
     });
 
+    await verification.save();
+
+    artisan.verificationId = verification._id;
     artisan.accountVerification = verification.status;
     await artisan.save();
-    await verification.save();
 
     res.status(201).json({
       message: 'Account verification initialized successfully',
@@ -71,7 +73,7 @@ exports.initializeVerification = async (req, res) => {
 exports.acceptVerification = async (req, res) => {
   try {
     const {id} = req.user;
-    
+
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
