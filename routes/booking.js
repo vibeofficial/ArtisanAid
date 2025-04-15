@@ -237,6 +237,7 @@ router.get('/pending/job', getPendingBookings);
  *                   employerId:
  *                     _id: 661b175afcd362d3f33be320
  *                     fullname: John Doe
+ *                     phoneNumber: "08012345678"
  *       404:
  *         description: No booking yet
  *         content:
