@@ -1,6 +1,7 @@
+const { registerAdminValidation } = require('../middlewares/validator');
 const { getAdmins, restrictAccount, unrestrictAccount, getVerifiedArtisans, getEmployers, getUser, deleteAccount, registerAdmin, getUnVerifiedArtisans, getProcessingArtisans, getDeclinedArtisans } = require('../controllers/admin');
-const { registerAdminValidation } = require('../middlewares/adminValidator');
 const { authorize } = require('../middlewares/authentication');
+
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 

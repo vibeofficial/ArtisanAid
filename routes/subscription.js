@@ -214,7 +214,9 @@ router.get('/verify/payment', verifySubscription);
  *                   type: string
  *                   example: 'Error renewing subscription'
  */
-router.post('/subscription/renew/:planId', renewSubscription )
+router.post('/subscription/renew/:planId', renewSubscription );
+
+
 /**
  * @swagger
  * /v1/subscription/upgrade/{newPlanId}:
@@ -289,5 +291,6 @@ router.post('/subscription/renew/:planId', renewSubscription )
  *                   example: 'Error upgrading subscription'
  */
 router.post('/subscription/upgrade/:planId', upgradeSubscription)
+
 
 module.exports = router;

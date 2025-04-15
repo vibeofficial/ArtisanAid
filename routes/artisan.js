@@ -1,7 +1,7 @@
+const { registerAdminValidation, resendVerifyLinkValidation, forgotPasswordValidation, resetPasswordValidation, changePasswordValidation, updateLocationValidation, updateBioValidation } = require('../middlewares/validator');
 const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
-const { authenticate, checkSubscription } = require('../middlewares/authentication');
-const { forgotPasswordValidation,resetPasswordValidation,changePasswordValidation } = require('../middlewares/employerValidator')
-const {registerArtisanValidation,resendArtisanVerifyLink, artisanUpdateLocation,updateArtisanBio } = require('../middlewares/artisanValidator')
+const { authenticate } = require('../middlewares/authentication');
+
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
 
@@ -26,7 +26,7 @@ const uploads = require('../middlewares/multer');
  *                 example: 'John Doe'
  *               email:
  *                 type: string
- *                 example: 'johndoe@example.com'
+ *                 example: 'johndoe@sample.com'
  *               phoneNumber:
  *                 type: string
  *                 example: '08012345678'
@@ -64,7 +64,7 @@ const uploads = require('../middlewares/multer');
  *                       example: 'John Doe'
  *                     email:
  *                       type: string
- *                       example: 'johndoe@example.com'
+ *                       example: 'johndoe@sample.com'
  *                     businessName:
  *                       type: string
  *                       example: 'John Doe Plumbing'
@@ -86,7 +86,7 @@ const uploads = require('../middlewares/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'User with: johndoe@example.com already exists as an artisan'
+ *                   example: 'User with: johndoe@sample.com already exists as an artisan'
  *       500:
  *         description: Error registering artisan
  *         content:
@@ -98,7 +98,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: 'Error registering artisan'
  */
-router.post('/register/artisan',registerArtisanValidation,checkSubscription, registerArtisan);
+router.post('/register/artisan', registerAdminValidation, registerArtisan);
 
 
 /**
@@ -181,7 +181,7 @@ router.get('/verify/account/:token', verifyAccount);
  *                   type: string
  *                   example: Error sending mail
  */
-router.post('/resend/email',resendArtisanVerifyLink, resendVerifyLink);
+router.post('/resend/email', resendVerifyLinkValidation, resendVerifyLink);
 
 
 /**
@@ -297,7 +297,7 @@ router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
  *                   type: string
  *                   example: "Error resetting password"
  */
-router.post('/reset/password/:token',resetPasswordValidation, resetPassword);
+router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
 
 
 /**
@@ -371,7 +371,7 @@ router.post('/reset/password/:token',resetPasswordValidation, resetPassword);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', changePasswordValidation,authenticate, changePassword);
+router.put('/change/password', changePasswordValidation, authenticate, changePassword);
 
 
 
@@ -449,7 +449,7 @@ router.put('/change/password', changePasswordValidation,authenticate, changePass
  *                   type: string
  *                   example: 'Error updating profile'
  */
-router.put('/update/profile', authenticate, checkSubscription,uploads.single('profilePic'), updateProfilePic);
+router.put('/update/profile', authenticate, uploads.single('profilePic'), updateProfilePic);
 
 
 /**
@@ -519,7 +519,7 @@ router.put('/update/profile', authenticate, checkSubscription,uploads.single('pr
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address', artisanUpdateLocation, checkSubscription, authenticate, updateLocation);
+router.put('/update/address', updateLocationValidation, authenticate, updateLocation);
 
 
 /**
@@ -585,7 +585,7 @@ router.put('/update/address', artisanUpdateLocation, checkSubscription, authenti
  *                   type: string
  *                   example: "Error updating bio"
  */
-router.put('/update/bio',checkSubscription,updateArtisanBio, authenticate, updateBio);
+router.put('/update/bio', updateBioValidation, authenticate, updateBio);
 
 
 module.exports = router;
