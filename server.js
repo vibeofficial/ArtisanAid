@@ -1,5 +1,7 @@
 require('dotenv').config();
 require('./configs/database')
+require('./cronJobs/subscriptionChecker'); 
+
 
 const express = require('express');
 const PORT = process.env.PORT

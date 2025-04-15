@@ -47,7 +47,7 @@ exports.authenticate = async (req, res, next) => {
       })
     };
 
-    req.user = decodedToken;
+    req.user = user;
     next();
   } catch (error) {
     console.log(error.message);
@@ -113,7 +113,7 @@ exports.authorize = async (req, res, next) => {
       })
     };
 
-    req.user = decodedToken;
+    req.user = user;
     next();
   } catch (error) {
     console.log(error.message);
@@ -129,3 +129,27 @@ exports.authorize = async (req, res, next) => {
     })
   }
 };
+
+
+exports.checkSubscription = (req, res, next) => {
+  const user = req.user;
+
+  // Make sure user exists and has a subscriptionEndDate
+  if (!user || !user.subscriptionEndDate) {
+    return res.status(403).json({
+      message: 'You must subscribe to access this feature.'
+    });
+  }
+
+  const now = new Date();
+  const endDate = new Date(user.subscriptionEndDate);
+
+  if (now > endDate) {
+    return res.status(403).json({
+      message: 'Your subscription has expired. Please renew your plan to continue.'
+    });
+  }
+
+  next(); // Subscription is valid
+};
+
