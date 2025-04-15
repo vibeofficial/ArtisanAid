@@ -5,7 +5,7 @@ const { createPlanValidator, updatePlanValidator } = require('../middlewares/pla
 const router = require('express').Router();
 
 
-router.post('/create/plan', createPlanValidator,authorize, createPlan);
+// router.post('/create/plan', createPlanValidator,authorize, createPlan);
 
 /**
  * @swagger

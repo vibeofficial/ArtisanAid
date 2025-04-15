@@ -1,5 +1,5 @@
 const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
-const { authenticate } = require('../middlewares/authentication');
+const { authenticate, checkSubscription } = require('../middlewares/authentication');
 const { forgotPasswordValidation,resetPasswordValidation,changePasswordValidation } = require('../middlewares/employerValidator')
 const {registerArtisanValidation,resendArtisanVerifyLink, artisanUpdateLocation,updateArtisanBio } = require('../middlewares/artisanValidator')
 const router = require('express').Router();
@@ -10,10 +10,10 @@ const uploads = require('../middlewares/multer');
  * @swagger
  * /v1/register/artisan:
  *   post:
- *     summary: Register a new user
- *     description: This endpoint registers a new user, ensuring email and phone number uniqueness and sending a verification email.
+ *     summary: Register a new artisan
+ *     description: Registers a new artisan, checking for duplicate emails, phone numbers, and business names. Sends a verification email upon successful registration.
  *     tags:
- *       - Artisans
+ *       - Artisan
  *     requestBody:
  *       required: true
  *       content:
@@ -23,31 +23,28 @@ const uploads = require('../middlewares/multer');
  *             properties:
  *               fullname:
  *                 type: string
- *                 example: "John Doe"
+ *                 example: 'John Doe'
  *               email:
  *                 type: string
- *                 format: email
- *                 example: "johndoe@sample.com"
- *               businessName:
- *                 type: string
- *                 example: "Doe Enterprises"
+ *                 example: 'johndoe@example.com'
  *               phoneNumber:
  *                 type: string
- *                 example: "08012345678"
- *               category:
- *                 type: string
- *                 example: Technician
+ *                 example: '08012345678'
  *               password:
  *                 type: string
- *                 format: password
- *                 example: "@strongpassword123"
+ *                 example: 'password123'
  *               confirmPassword:
  *                 type: string
- *                 format: password
- *                 example: "@strongpassword123"
+ *                 example: 'password123'
+ *               businessName:
+ *                 type: string
+ *                 example: 'John Doe Plumbing'
+ *               category:
+ *                 type: string
+ *                 example: 'Plumber'
  *     responses:
- *       '201':
- *         description: User registered successfully.
+ *       201:
+ *         description: Account registered successfully and verification email sent
  *         content:
  *           application/json:
  *             schema:
@@ -55,24 +52,33 @@ const uploads = require('../middlewares/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Account Registered Successfully"
+ *                   example: 'Account Registered Successfully'
  *                 data:
  *                   type: object
  *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: '609d1b1e1d1b3c001f1a1c1b'
  *                     fullname:
  *                       type: string
- *                       example: "John Doe"
+ *                       example: 'John Doe'
  *                     email:
  *                       type: string
- *                       example: "johndoe@sample.com"
+ *                       example: 'johndoe@example.com'
+ *                     businessName:
+ *                       type: string
+ *                       example: 'John Doe Plumbing'
  *                     phoneNumber:
  *                       type: string
- *                       example: "08012345678"
- *                     role:
+ *                       example: '08012345678'
+ *                     category:
  *                       type: string
- *                       example: "Artisan"
- *       '400':
- *         description: Bad Request - Validation error
+ *                       example: 'Plumber'
+ *                     subscriptionEndDate:
+ *                       type: string
+ *                       example: '2025-07-14T12:00:00Z'
+ *       400:
+ *         description: Duplicate email, phone number, or business name found
  *         content:
  *           application/json:
  *             schema:
@@ -80,9 +86,9 @@ const uploads = require('../middlewares/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Password does not match"
- *       '500':
- *         description: Internal Server Error
+ *                   example: 'User with: johndoe@example.com already exists as an artisan'
+ *       500:
+ *         description: Error registering artisan
  *         content:
  *           application/json:
  *             schema:
@@ -90,9 +96,9 @@ const uploads = require('../middlewares/multer');
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Error registering user"
+ *                   example: 'Error registering artisan'
  */
-router.post('/register/artisan',registerArtisanValidation, registerArtisan);
+router.post('/register/artisan',registerArtisanValidation,checkSubscription, registerArtisan);
 
 
 /**
@@ -443,7 +449,7 @@ router.put('/change/password', changePasswordValidation,authenticate, changePass
  *                   type: string
  *                   example: 'Error updating profile'
  */
-router.put('/update/profile', authenticate, uploads.single('profilePic'), updateProfilePic);
+router.put('/update/profile', authenticate, checkSubscription,uploads.single('profilePic'), updateProfilePic);
 
 
 /**
@@ -513,7 +519,7 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address',artisanUpdateLocation, authenticate, updateLocation);
+router.put('/update/address', artisanUpdateLocation, checkSubscription, authenticate, updateLocation);
 
 
 /**
@@ -579,7 +585,7 @@ router.put('/update/address',artisanUpdateLocation, authenticate, updateLocation
  *                   type: string
  *                   example: "Error updating bio"
  */
-router.put('/update/bio',updateArtisanBio, authenticate, updateBio);
+router.put('/update/bio',checkSubscription,updateArtisanBio, authenticate, updateBio);
 
 
 module.exports = router;
