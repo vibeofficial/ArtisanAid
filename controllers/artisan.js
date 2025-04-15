@@ -124,7 +124,7 @@ exports.registerArtisan = async (req, res) => {
     });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ message: 'Error registering artisan' });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -180,15 +180,13 @@ exports.verifyAccount = async (req, res) => {
         user.isVerified = true;
         await user.save();
 
-        res.status(200).json({
-          message: 'Account verified successfully'
-        })
+        res.redirect(200, 'https://artisian-aid.vercel.app/verifyemail');
       }
     });
   } catch (error) {
     console.error('Verification Error:', error.message);
     return res.status(500).json({
-      message: 'Error verifying account'
+      message: error.message
     });
   }
 };

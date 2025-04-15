@@ -52,7 +52,7 @@ exports.registerArtisanValidation = async (req, res, next) => {
       'string.empty': 'Email is required.',
       'string.email': 'Please enter a valid email address.'
     }),
-    businessName: joi.string().min(3).trim().optional().messages({
+    businessName: joi.string().min(3).trim().required().messages({
       'string.min': 'Business name must be at least 3 characters long.'
     }),
     phoneNumber: joi.string().min(11).max(11).required().pattern(/^[0-9]+$/).messages({
@@ -64,7 +64,7 @@ exports.registerArtisanValidation = async (req, res, next) => {
     category: joi.string().min(3).trim().required().pattern(/^[A-Za-z]/).messages({
       'string.empty': 'Category is required.',
       'string.min': 'Category must be at least 5 characters long.',
-      'string.pattern.base': 'Category must contain only numbers'
+      'string.pattern.base': 'Category must contain only letters'
     }),
     password: joi.string().required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{9,}$/).messages({
       'string.empty': 'Password is required.',
@@ -89,28 +89,28 @@ exports.registerArtisanValidation = async (req, res, next) => {
 
 
 exports.registerEmployerValidation = (req, res, next) => {
-  const schema = Joi.object({
-    fullname: Joi.string().min(3).trim().pattern(/^[A-Za-z ]+$/).required().messages({
+  const schema = joi.object({
+    fullname: joi.string().min(3).trim().pattern(/^[A-Za-z ]+$/).required().messages({
       "any.required": "Full name is required",
       "string.empty": "Full name cannot be empty",
       "string.pattern.base": "Full name should only contain alphabets",
       "string.min": "Full name should not be less than 3 letters"
     }),
-    email: Joi.string().trim().email().required().messages({
+    email: joi.string().trim().email().required().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
-    phoneNumber: Joi.string().trim().pattern(/^\d{11,11}$/).required().messages({
+    phoneNumber: joi.string().trim().pattern(/^\d{11,11}$/).required().messages({
       "any.required": "Phone number is required",
       "string.pattern.base": "Phone number must be 11 digits"
     }),
     //    address,
-    password: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
+    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
       "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
     }),
-    confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
+    confirmPassword: joi.string().valid(joi.ref("password")).required().messages({
       "any.required": "Confirm password is required",
       "any.only": "Passwords do not match"
     })
@@ -267,16 +267,16 @@ exports.contactUsMessageValidation = async (req, resizeBy, next) => {
 
 
 exports.loginValidation = (req, res, next) => {
-  const schema = Joi.object({
-    email: Joi.string().email().optional().messages({
+  const schema = joi.object({
+    email: joi.string().email().optional().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
-    phoneNumber: Joi.string().pattern(/^\d{11,11}$/).optional().messages({
+    phoneNumber: joi.string().pattern(/^\d{11,11}$/).optional().messages({
       "any.required": "Phone number is required",
       "string.pattern.base": "Phone number must be 11 digits"
     }),
-    password: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
+    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
       "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
@@ -297,8 +297,8 @@ exports.loginValidation = (req, res, next) => {
 
 
 exports.forgotPasswordValidation = (req, res, next) => {
-  const schema = Joi.object({
-    email: Joi.string().email().required().messages({
+  const schema = joi.object({
+    email: joi.string().email().required().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     })
@@ -317,13 +317,13 @@ exports.forgotPasswordValidation = (req, res, next) => {
 };
 
 exports.resetPasswordValidation = (req, res, next) => {
-  const schema = Joi.object({
-    newPassword: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
+  const schema = joi.object({
+    newPassword: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
       "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
     }),
-    confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
+    confirmPassword: joi.string().valid(joi.ref("password")).required().messages({
       "any.required": "Confirm password is required",
       "any.only": "Passwords do not match"
     })
@@ -344,18 +344,18 @@ exports.resetPasswordValidation = (req, res, next) => {
 
 
 exports.changePasswordValidation = (req, res, next) => {
-  const schema = Joi.object({
-    password: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
+  const schema = joi.object({
+    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
       "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
     }),
-    newPassword: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
+    newPassword: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
       "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
     }),
-    confirmPassword: Joi.string().valid(Joi.ref("newPassword")).required().messages({
+    confirmPassword: joi.string().valid(joi.ref("newPassword")).required().messages({
       "any.required": "Confirm password is required",
       "any.only": "Passwords do not match"
     })
@@ -375,8 +375,8 @@ exports.changePasswordValidation = (req, res, next) => {
 
 
 exports.categoryValidation = (req, res, next) => {
-  const schema = Joi.object({
-    category: Joi.string().min(3).required().messages({
+  const schema = joi.object({
+    category: joi.string().min(3).required().messages({
       "any.required": "Category is required",
       "string.empty": "Category cannot be empty",
       "string.min": "Category must be at least 3 characters long"
@@ -396,13 +396,13 @@ exports.categoryValidation = (req, res, next) => {
 };
 
 exports.lgaValidation = (req, res, next) => {
-  const schema = Joi.object({
-    lga: Joi.string().min(2).required().messages({
+  const schema = joi.object({
+    lga: joi.string().min(2).required().messages({
       "any.required": "LGA is required",
       "string.empty": "LGA cannot be empty",
       "string.min": "LGA must be at least 2 characters"
     }),
-    state: Joi.string().min(2).required().messages({
+    state: joi.string().min(2).required().messages({
       "any.required": "State is required",
       "string.empty": "State cannot be empty",
       "string.min": "State must be at least 2 characters"
@@ -422,8 +422,8 @@ exports.lgaValidation = (req, res, next) => {
 };
 
 exports.updateSocialLinkValidation = (req, res, next) => {
-  const schema = Joi.object({
-    socialLink: Joi.string().uri().required().messages({
+  const schema = joi.object({
+    socialLink: joi.string().uri().required().messages({
       "any.required": "Social link is required",
       "string.empty": "Social link cannot be empty",
       "string.uri": "Social link must be a valid URL"
