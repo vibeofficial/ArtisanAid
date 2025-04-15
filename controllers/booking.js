@@ -9,7 +9,7 @@ exports.bookArtisan = async (req, res) => {
   try {
     const { id } = req.user;
     const { artisanId } = req.params;
-    const { location, serviceDescription } = req.body;
+    const { location, serviceTitle, serviceDescription } = req.body;
 
     const employer = await employerModel.findById(id);
 
@@ -29,13 +29,11 @@ exports.bookArtisan = async (req, res) => {
 
     const booking = new bookingModel({
       artisanId: artisan._id,
-      artisanName: artisan.fullname,
       employerId: employer._id,
-      employerName: employer.fullname,
-      employerEmail: employer.email,
-      employerPhoneNumber: employer.phoneNumber,
       location,
-      serviceDescription
+      serviceTitle,
+      serviceDescription,
+      date: new Date().toDateString()
     });
 
     const html = verifyMail(link, artisan.fullname);
@@ -55,7 +53,76 @@ exports.bookArtisan = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error booking an artisan'
+      message: error.message
+    })
+  }
+};
+
+
+exports.getPendingBookings = async (req, res) => {
+  try {
+    const bookings = await bookingModel.find({ status: 'Pending' }).populate('employerId', 'fullname');
+
+    if (bookings.length === 0) {
+      return res.status(404).json({
+        message: 'No booking yet'
+      })
+    };
+
+    res.status(200).json({
+      message: 'All Pending bookings',
+      data: bookings
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message
+    })
+  }
+};
+
+
+exports.getConfirmedBookings = async (req, res) => {
+  try {
+    const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId', 'fullname');
+
+    if (bookings.length === 0) {
+      return res.status(404).json({
+        message: 'No booking yet'
+      })
+    };
+
+    res.status(200).json({
+      message: 'All Pending bookings',
+      data: bookings
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message
+    })
+  }
+};
+
+
+exports.getRejectedBookings = async (req, res) => {
+  try {
+    const bookings = await bookingModel.find({ status: 'Rejected' }).populate('employerId', 'fullname');
+
+    if (bookings.length === 0) {
+      return res.status(404).json({
+        message: 'No booking yet'
+      })
+    };
+
+    res.status(200).json({
+      message: 'All Pending bookings',
+      data: bookings
+    })
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message
     })
   }
 };
@@ -83,26 +150,6 @@ exports.acceptJob = async (req, res) => {
     };
 
     booking.status = 'Confirmed';
-
-    const employerHtml = verifyMail(booking.employerName);
-
-    const employerMailDetails = {
-      email: booking.employerEmail,
-      subject: 'JOB ACCEPTED',
-      employerHtml
-    };
-
-    await mail_sender(employerMailDetails);
-
-    const artisanHtml = verifyMail(booking.artisanName);
-
-    const artisanMailDetails = {
-      email: artisan.email,
-      subject: 'JOB ACCEPTED',
-      artisanHtml
-    };
-
-    await mail_sender(artisanMailDetails);
     await booking.save();
 
     res.status(200).json({
@@ -111,7 +158,7 @@ exports.acceptJob = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error accepting job offer'
+      message: error.message
     })
   }
 };
@@ -139,27 +186,22 @@ exports.rejectJob = async (req, res) => {
       })
     };
 
-    booking.status = 'Declined';
+    const employer = await employerModel.findById(booking.employerId);
 
-    const employerHtml = verifyMail(booking.employerName, reason);
-
-    const employerMailDetails = {
-      email: booking.employerEmail,
-      subject: 'JOB REJECTED',
-      employerHtml
+    if (!employer) {
+      return res.status(404).json({
+        message: 'Employer not found'
+      })
     };
 
-    await mail_sender(employerMailDetails);
-
-    const artisanHtml = verifyMail(booking.artisanName);
-
-    const artisanMailDetails = {
-      email: artisan.email,
-      subject: 'JOB REJECTED',
-      artisanHtml
+    const mailDetails = {
+      email: employer.email,
+      subject: 'JOB REJECTION',
+      html: reason
     };
 
-    await mail_sender(artisanMailDetails);
+    await mail_sender(mailDetails);
+    booking.status = 'Rejected';
     await booking.save();
 
     res.status(200).json({
@@ -168,7 +210,7 @@ exports.rejectJob = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error rejecting job offer'
+      message: error.message
     })
   }
 };

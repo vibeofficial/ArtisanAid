@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 exports.createJobPost = async (req, res) => {
   try {
     const { id } = req.user;
+    const { description } = req.body;
     const artisan = await artisanModel.findById(id);
 
     if (!artisan) {
@@ -16,7 +17,7 @@ exports.createJobPost = async (req, res) => {
       })
     };
 
-    const jobPostExists = await jobPost.findOne({artisanId: artisan._id});
+    const jobPostExists = await jobPost.findOne({ artisanId: artisan._id });
 
     if (jobPostExists) {
       return res.status(400).json({
@@ -25,7 +26,7 @@ exports.createJobPost = async (req, res) => {
     }
 
     const file = req.file;
-    
+
     const jobPostResult = await cloudinary.uploader.upload(file.path);
     fs.unlinkSync(file.path);
 
@@ -34,11 +35,12 @@ exports.createJobPost = async (req, res) => {
       jobImage: {
         public_id: jobPostResult.public_id,
         image_url: jobPostResult.secure_url
-      }
+      },
+      description
     });
 
     await jobPost.save();
-    
+
     artisan.jobPostId = jobPost._id;
     await artisan.save();
     res.status(201).json({
@@ -67,7 +69,7 @@ exports.getAllJobPost = async (req, res) => {
     if (jobPost.length === 0) {
       return res.status(404).json({
         message: 'No artisan found'
-      }) 
+      })
     };
 
     res.status(200).json({
