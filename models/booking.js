@@ -9,23 +9,12 @@ const bookingSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'artisans'
   },
-  artisanName: {
-    type: String,
-    require: true
-  },
-  employerName: {
-    type: String,
-    require: true
-  },
-  employerEmail: {
-    type: String,
-    require: true
-  },
-  employerPhoneNumber: {
-    type: String,
-    require: true
-  },
   location: {
+    type: String,
+    require: true,
+    trim: true
+  },
+  serviceTitle: {
     type: String,
     require: true,
     trim: true
@@ -35,9 +24,13 @@ const bookingSchema = new mongoose.Schema({
     require: true,
     trim: true
   },
+  date: {
+    type: String,
+    require: true
+  },
   status: {
     type: String,
-    enum: ['Pending', 'Confirmed', 'Declined'],
+    enum: ['Pending', 'Confirmed', 'Rejected'],
     default: 'Pending'
   }
 }, { timestamps: true });

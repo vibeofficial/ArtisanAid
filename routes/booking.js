@@ -1,4 +1,4 @@
-const { bookArtisan, acceptJob, rejectJob } = require('../controllers/booking');
+const { bookArtisan, acceptJob, rejectJob, getPendingBookings, getConfirmedBookings, getRejectedBookings } = require('../controllers/booking');
 const { authenticate } = require('../middlewares/authentication');
 const { rejectJobBookingValidation, bookArtisanValidation } = require('../middlewares/validator');
 
@@ -79,8 +79,6 @@ router.post('/book/artisan/:artisanId', bookArtisanValidation, authenticate, boo
  *     summary: Artisan accepts a job booking
  *     tags:
  *       - Booking
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: bookingId
@@ -130,8 +128,6 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *     summary: Artisan reject a job booking
  *     tags:
  *       - Booking
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: bookingId
@@ -182,6 +178,116 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *                   example: Error rejecting job offer
  */
 router.get('/reject/job/:bookingId', rejectJobBookingValidation, authenticate, rejectJob);
+
+
+/**
+ * @swagger
+ * /v1/pending/job:
+ *   get:
+ *     summary: Get all pending bookings
+ *     tags:
+ *       - Booking
+ *     description: Retrieve a list of all bookings with a status of 'Pending'.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all pending bookings
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: All Pending bookings
+ *               data:
+ *                 - _id: "661c2108f13f58cd7b2067e9"
+ *                   status: "Pending"
+ *                   employerId:
+ *                     fullname: "John Doe"
+ *       404:
+ *         description: No pending bookings found
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: No booking yet
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Something went wrong
+ */
+router.get('/pending/job', getPendingBookings);
+
+
+/**
+ * @swagger
+ * /v1/confimed/job:
+ *   get:
+ *     tags:
+ *       - Booking
+ *     summary: Get all confirmed bookings
+ *     description: Retrieve a list of all bookings that have been confirmed.
+ *     responses:
+ *       200:
+ *         description: A list of all confirmed bookings.
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: All Pending bookings
+ *               data:
+ *                 - _id: 661b184a245f3a2f4c64c51b
+ *                   status: Confirmed
+ *                   employerId:
+ *                     _id: 661b175afcd362d3f33be320
+ *                     fullname: John Doe
+ *       404:
+ *         description: No booking yet
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: No booking yet
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: An unexpected error occurred
+ */
+router.get('/confimed/job', getConfirmedBookings);
+
+
+/**
+ * @swagger
+ * /v1/rejected/job:
+ *   get:
+ *     tags:
+ *       - Booking
+ *     summary: Get all rejected bookings
+ *     description: Retrieve all job bookings that have been rejected
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all rejected bookings
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: All Pending bookings
+ *               data:
+ *                 - _id: 661babcde1234567890
+ *                   status: Rejected
+ *                   employerId:
+ *                     _id: 660aa1234bcdef7890
+ *                     fullname: John Doe
+ *       404:
+ *         description: No booking yet
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: No booking yet
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Error message from the server
+ */
+router.get('/rejected/job', getRejectedBookings);
 
 
 module.exports = router;
