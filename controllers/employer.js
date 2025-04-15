@@ -73,7 +73,7 @@ exports.registerEmployer = async (req, res) => {
     });
 
     const token = jwt.sign({ id: employer._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+    const link = `https://artisian-aid.vercel.app/verifyemail/${token}`;
     const html = verifyMail(link);
 
     const mailDetails = {
@@ -100,7 +100,7 @@ exports.registerEmployer = async (req, res) => {
 
 exports.getArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ accountVerification: 'Verified', subscription: 'Active' }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -233,7 +233,7 @@ exports.logout = async (req, res) => {
 
 exports.getRecommendedArtisans = async (req, res) => {
   try {
-    const users = await artisanModel.find({ accountVerification: 'Verified', isRecommended: true, subscription: 'Active' }).populate('jobPostId', 'jobImage');
+    const users = await artisanModel.find({ isRecommended: true, verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -258,7 +258,7 @@ exports.getRecommendedArtisans = async (req, res) => {
 exports.getArtisansByCategory = async (req, res) => {
   try {
     const { category } = req.body;
-    const artisans = await artisanModel.find({ category, accountVerification: 'Verified', subscription: 'Active' }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ category, verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -284,7 +284,7 @@ exports.getArtisansByLocalGovt = async (req, res) => {
   try {
     const { lga } = req.body;
     const location = { lga, state }
-    const artisans = await artisanModel.find({ location, accountVerification: 'Verified', subscription: 'Active' }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ location, verificationStatus: 'Verified', subscription: 'Active' || 'Demo' }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
