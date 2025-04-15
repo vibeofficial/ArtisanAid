@@ -84,7 +84,7 @@ exports.getPendingBookings = async (req, res) => {
 
 exports.getConfirmedBookings = async (req, res) => {
   try {
-    const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId', 'fullname');
+    const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId', 'fullname phoneNumber');
 
     if (bookings.length === 0) {
       return res.status(404).json({
