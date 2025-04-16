@@ -278,8 +278,7 @@ exports.loginValidation = (req, res, next) => {
     }),
     password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
-      "string.empty": "Password cannot be empty",
-      "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
+      "string.empty": "Input your password"
     })
   });
 
