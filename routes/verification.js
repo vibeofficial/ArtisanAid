@@ -86,4 +86,5 @@ const uploads = require('../middlewares/multer');
  */
 router.post('/account/verification', authenticate, uploads.single('workCertificate'), verificationValidation, initializeVerification);
 
+
 module.exports = router;

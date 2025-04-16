@@ -9,6 +9,7 @@ exports.initializeVerification = async (req, res) => {
     const { id } = req.user;
     const artisan = await artisanModel.findById(id);
     const { guarantorName, guarantorPhoneNumber } = req.body;
+
     const file = req.file;
     const certificateResult = await cloudinary.uploader.upload(file.path);
     fs.unlinkSync(file.path);
@@ -16,22 +17,6 @@ exports.initializeVerification = async (req, res) => {
     if (!artisan) {
       return res.status(404).json({
         message: 'Artisan account not found'
-      })
-    };
-
-    const exsistingGuarantorName = await verificationModel.findOne({ guarantorName: guarantorName });
-
-    if (exsistingGuarantorName) {
-      return res.status(400).json({
-        message: 'Name has already being used to verify another account'
-      })
-    };
-
-    const exsistingGuarantorPhoneNUmber = await verificationModel.findOne({ guarantorPhoneNumber: guarantorPhoneNumber });
-
-    if (exsistingGuarantorPhoneNUmber) {
-      return res.status(400).json({
-        message: 'Phone number has already being used to verify another account'
       })
     };
 
