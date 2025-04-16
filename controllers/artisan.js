@@ -29,7 +29,6 @@ exports.registerArtisan = async (req, res) => {
         message: 'Password does not match'
       });
     };
-
     let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
@@ -37,6 +36,8 @@ exports.registerArtisan = async (req, res) => {
         message: `User with: ${email.toLowerCase()} already exist as an admin`
       })
     } else if (emailExists) {
+      emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+
       return res.status(400).json({
         message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
@@ -65,6 +66,8 @@ exports.registerArtisan = async (req, res) => {
         });
       }
     } else if (phonenUmberExists) {
+      phonenUmberExists = await adminModel.findOne({ phoneNumber: phoneNumber });
+
       return res.status(400).json({
         message: `User with this phone number already exist as an admin`
       })

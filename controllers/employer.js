@@ -24,9 +24,15 @@ exports.registerEmployer = async (req, res) => {
       });
     };
 
-    let emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+    let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
+      return res.status(400).json({
+        message: `User with: ${email.toLowerCase()} already exist as an admin`
+      })
+    } else if (emailExists) {
+      emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+
       return res.status(400).json({
         message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
@@ -38,7 +44,8 @@ exports.registerEmployer = async (req, res) => {
           message: `User with: ${email.toLowerCase()} already exist as an artisan`
         });
       }
-    }
+    };
+
     let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
 
     if (phonenUmberExists) {
@@ -53,6 +60,12 @@ exports.registerEmployer = async (req, res) => {
           message: `User with this phone number already exist as an artisan`
         });
       }
+    } else if (phonenUmberExists) {
+      phonenUmberExists = await adminModel.findOne({ phoneNumber: phoneNumber });
+
+      return res.status(400).json({
+        message: `User with this phone number already exist as an admin`
+      })
     };
 
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
