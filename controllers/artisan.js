@@ -361,9 +361,9 @@ exports.changePassword = async (req, res) => {
 exports.updateProfilePic = async (req, res) => {
   try {
     const { id } = req.user;
-    const file = req.file;
+    const file = req.file;    
 
-    const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
+    const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);    
 
     if (!user) {
       return res.status(404).json({
@@ -376,7 +376,7 @@ exports.updateProfilePic = async (req, res) => {
     };
 
     if (file && file.path) {
-      await cloudinary.uploader.destroy(user.profilePic.public_id);
+      await cloudinary.uploader.destroy(data.profilePic.public_id);
       const profilePicResult = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(file.path);
 
@@ -393,7 +393,7 @@ exports.updateProfilePic = async (req, res) => {
         updatedProfilePic = await employerModel.findByIdAndUpdate(user._id, data, { new: true });
       } else if (user.role === 'Admin') {
         updatedProfilePic = await adminModel.findByIdAndUpdate(user._id, data, { new: true });
-      }
+      };
 
       res.status(200).json({
         message: 'Profile picture updated successfully',

@@ -415,8 +415,6 @@ router.put('/change/password', changePasswordValidation, authenticate, changePas
  *     description: Allows a user to update their profile details, including uploading a new profile picture.
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
