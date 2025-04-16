@@ -1,6 +1,6 @@
 const { reportArtisan, getAllReports } = require('../controllers/report');
 const { authenticate, authorize } = require('../middlewares/authentication');
-
+const {reportArtisanValidation} = require('../middlewares/validator')
 const router = require('express').Router();
 
 
@@ -66,7 +66,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Artisan not found
  */
-router.post('/report/artisan/:artisanId',authenticate, reportArtisan );
+router.post('/report/artisan/:artisanId',authenticate,reportArtisanValidation, reportArtisan );
 
 
 /**

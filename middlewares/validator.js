@@ -527,3 +527,22 @@ exports.updatePlanValidation = (req, res, next) => {
 
   next();
 };
+
+exports.reportArtisanValidation = (req, res, next) => {
+  const schema = joi.object({
+    reason: joi.string().min(10).max(1000).required().messages({
+        'string.base': 'Reason must be a text',
+        'string.empty': 'Reason is required',
+        'string.min': 'Reason must be at least 10 characters long',
+        'string.max': 'Reason cannot exceed 1000 characters',
+        'any.required': 'Reason is required'
+      })
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.message });
+  }
+
+  next();
+};
