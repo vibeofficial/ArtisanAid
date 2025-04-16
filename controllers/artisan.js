@@ -183,7 +183,9 @@ exports.verifyAccount = async (req, res) => {
         user.isVerified = true;
         await user.save();
 
-        res.redirect('https://artisian-aid.vercel.app/login');
+        res.status(200).json({
+          message: 'Email verified successfully'
+        });
       }
     });
   } catch (error) {
