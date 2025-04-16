@@ -109,7 +109,7 @@ exports.registerArtisan = async (req, res) => {
     });
 
     const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+    const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
     const html = verifyMail(link);
 
     const mailDetails = {
@@ -155,7 +155,7 @@ exports.verifyAccount = async (req, res) => {
           };
 
           const newToken = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
-          const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${newToken}`;
+          const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${newToken}`;
           const html = verifyMail(link);
 
           const mailDetails = {
@@ -209,7 +209,7 @@ exports.resendVerifyLink = async (req, res) => {
     };
 
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+    const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
     const html = verifyMail(link);
 
     const mailDetails = {
