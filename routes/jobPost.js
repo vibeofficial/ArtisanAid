@@ -19,6 +19,9 @@ const upload = require('../middlewares/multer');
  *           schema:
  *             type: object
  *             properties:
+ *               description:
+ *                 type: string
+ *                 description: Description of the artisan job
  *               jobImage:
  *                 type: string
  *                 format: binary
