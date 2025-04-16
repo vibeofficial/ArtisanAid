@@ -151,7 +151,7 @@ exports.resetPassword = (link) => {
                     <a href=""><img src="${linkedin}" alt="social media icons" style="width:19px; margin-bottom:5px; margin-right: 5px; margin-left: 5px;" /></a>
                     <a href=""><img src="${fb}" alt="social media icons" style="width:20px; margin-bottom:5px;" /></a>
                     <p style="font-size:12px; color:#98A2B3;">
-                      &copy;2025 ArtisanAid. All Rights Reserved.
+                      &#169;${new Date().getFullYear()} ArtisanAid. All Rights Reserved.
                     </p>
                   </td>
                 </tr>
