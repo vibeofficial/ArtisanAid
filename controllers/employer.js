@@ -127,7 +127,7 @@ exports.getArtisans = async (req, res) => {
       data: artisans
     });
   } catch (error) {
-    console.error(error.message);
+    console.log(error.message);
     return res.status(500).json({
       message: error.message
     });
@@ -295,7 +295,7 @@ exports.getArtisansByCategory = async (req, res) => {
 
 exports.getArtisansByLocalGovt = async (req, res) => {
   try {
-    const { lga } = req.body;
+    const { lga } = req.query;
     const location = { lga, state }
     const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: 'Active' || 'Free' }).populate('jobPostId', 'jobImage');
 
