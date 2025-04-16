@@ -20,9 +20,9 @@ const verificationRouter = require('./routes/verification');
 const bookingRouter = require('./routes/booking');
 const jobPostRouter = require('./routes/jobPost');
 const reportRouter = require('./routes/report');
-app.use(cors());
 
 app.use(express.json());
+app.use(cors());
 
 
 const swaggerJsdoc = require("swagger-jsdoc");
