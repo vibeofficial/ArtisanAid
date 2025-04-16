@@ -106,7 +106,7 @@ exports.registerArtisan = async (req, res) => {
     });
 
     const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `https://artisian-aid.vercel.app/verifyemail/${token}`;
+    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
     const html = verifyMail(link);
 
     const mailDetails = {
@@ -180,7 +180,7 @@ exports.verifyAccount = async (req, res) => {
         user.isVerified = true;
         await user.save();
 
-        res.redirect(200, 'https://artisian-aid.vercel.app/verifyemail');
+        res.redirect(200, 'https://artisian-aid.vercel.app/login');
       }
     });
   } catch (error) {

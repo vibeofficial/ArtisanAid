@@ -77,7 +77,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error creating plan
  */
-router.post('/create/plan', createPlanValidation, authorize, createPlan);
+router.post('/create/plan', createPlanValidation, createPlan);
 
 
 
