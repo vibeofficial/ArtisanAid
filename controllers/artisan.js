@@ -180,7 +180,7 @@ exports.verifyAccount = async (req, res) => {
         user.isVerified = true;
         await user.save();
 
-        res.redirect(200, 'https://artisian-aid.vercel.app/login');
+        res.redirect('https://artisian-aid.vercel.app/login');
       }
     });
   } catch (error) {
