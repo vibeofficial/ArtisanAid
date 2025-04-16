@@ -17,7 +17,7 @@ exports.createJobPost = async (req, res) => {
       })
     };
 
-    const jobPostExists = await jobPost.findOne({ artisanId: artisan._id });
+    const jobPostExists = await jobPostModel.findOne({ artisanId: artisan._id });
 
     if (jobPostExists) {
       return res.status(400).json({
