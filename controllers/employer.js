@@ -179,8 +179,6 @@ exports.login = async (req, res) => {
       };
 
       await mail_sender(mailDetails);
-      console.log('Verification email sent to:', user.email);
-
       return res.status(401).json({
         message: 'Your account is not verified. A verification link has been sent to your email.'
       });
@@ -198,6 +196,7 @@ exports.login = async (req, res) => {
 
     return res.status(200).json({
       message: 'Login successful',
+      role: user.role,
       token
     });
 
@@ -320,6 +319,8 @@ exports.updateCoverPhoto = async (req, res) => {
     const { id } = req.user;
     const file = req.file;
     const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
+    console.log(user);
+    
 
     if (!user) {
       return res.status(404).json({
@@ -332,11 +333,11 @@ exports.updateCoverPhoto = async (req, res) => {
     };
 
     if (file && file.path) {
-      await cloudinary.uploader.destroy(user.coverPhoto.public_id);
+      await cloudinary.uploader.destroy(data.coverPhoto.public_id);
       const coverPhotoResult = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(file.path);
 
-      data.profilePic = {
+      data.coverPhoto = {
         public_id: coverPhotoResult.public_id,
         image_url: coverPhotoResult.secure_url
       };

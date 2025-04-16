@@ -404,8 +404,6 @@ router.get('/artisans/lga', lgaValidation, getArtisansByLocalGovt);
  *     description: Allows a user to update their cover details, including uploading a new cover picture.
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
