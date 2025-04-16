@@ -31,7 +31,8 @@ exports.initializeSubscription = async (req, res) => {
       amount: plan.amount,
       currency: 'NGN',
       reference: ref,
-      customer: { email: artisan.email, name: artisan.fullname }
+      customer: { email: artisan.email, name: artisan.fullname },
+      redirect_url: ''
     };
 
     const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentDetails, {

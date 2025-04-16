@@ -12,6 +12,8 @@ const upload = require('../middlewares/multer');
  *     summary: Create a job post
  *     tags:
  *       - Job Post
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -19,6 +21,9 @@ const upload = require('../middlewares/multer');
  *           schema:
  *             type: object
  *             properties:
+ *               description:
+ *                 type: string
+ *                 description: Description of the artisan job
  *               jobImage:
  *                 type: string
  *                 format: binary
@@ -75,6 +80,8 @@ router.post('/upload/job', authenticate, upload.single('jobImage'), createJobPos
  *     summary: Get all job posts
  *     tags:
  *       - Job Post
+ *     security:
+ *       - Bearer: []
  *     description: Retrieve all job posts along with their respective artisan details.
  *     responses:
  *       200:

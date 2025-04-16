@@ -14,6 +14,8 @@ const uploads = require('../middlewares/multer');
  *     description: Creates a new employer account with full name, email, phone number, and password. Also checks for existing accounts in both employer and artisan collections.
  *     tags:
  *       - Employers
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -141,6 +143,8 @@ router.get('/artisans', getArtisans);
  *     description: Logs in a user with either email or phone number and validates the provided password.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -292,6 +296,8 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *     description: Retrieves all users artisan the specified category and approved account verificatoon status.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -345,6 +351,8 @@ router.post('/artisans/category', categoryValidation, getArtisansByCategory);
  *     description: Retrieves all artisans in the specified LGA and approved account verification status.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: query
  *         name: lga

@@ -79,6 +79,8 @@ router.post('/book/artisan/:artisanId', bookArtisanValidation, authenticate, boo
  *     summary: Artisan accepts a job booking
  *     tags:
  *       - Booking
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: bookingId
@@ -128,6 +130,8 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *     summary: Artisan reject a job booking
  *     tags:
  *       - Booking
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: bookingId
@@ -187,6 +191,8 @@ router.get('/reject/job/:bookingId', rejectJobBookingValidation, authenticate, r
  *     summary: Get all pending bookings
  *     tags:
  *       - Booking
+ *     security:
+ *       - Bearer: []
  *     description: Retrieve a list of all bookings with a status of 'Pending'.
  *     responses:
  *       200:
@@ -222,6 +228,8 @@ router.get('/pending/job', getPendingBookings);
  *   get:
  *     tags:
  *       - Booking
+ *     security:
+ *       - Bearer: []
  *     summary: Get all confirmed bookings
  *     description: Retrieve a list of all bookings that have been confirmed.
  *     responses:
@@ -260,6 +268,8 @@ router.get('/confimed/job', getConfirmedBookings);
  *   get:
  *     tags:
  *       - Booking
+ *     security:
+ *       - Bearer: []
  *     summary: Get all rejected bookings
  *     description: Retrieve all job bookings that have been rejected
  *     responses:

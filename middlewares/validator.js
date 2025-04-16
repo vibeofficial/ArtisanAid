@@ -408,7 +408,7 @@ exports.lgaValidation = (req, res, next) => {
     })
   });
 
-  const { error } = schema.validate(req.body);
+  const { error } = schema.validate(req.query);
 
   if (error) {
     return res.status(400).json({
@@ -441,7 +441,9 @@ exports.updateSocialLinkValidation = (req, res, next) => {
 };
 
 
-exports.verificationValidation = (req, res, next) => {
+exports.verificationValidation =async (req, res, next) => {
+
+  console.log(req)
   const schema = joi.object({
     guarantorName: joi.string().min(3).required().messages({
       'string.empty': 'Guarantor name is required',
@@ -458,9 +460,9 @@ exports.verificationValidation = (req, res, next) => {
       }),
     workCertificate: joi.string().optional()
   });
-
-  const { error } = schema.validate(req.body, { abortEarly: true });
-
+  console.log(req.body)
+  const { error } = await schema.validate(req.body, { abortEarly: true });
+  console.log(req.body)
   if (error) {
     return res.status(400).json({
       message: error.message

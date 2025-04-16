@@ -31,6 +31,8 @@ exports.registerAdmin = async (req, res) => {
         message: `User with: ${email.toLowerCase()} already exist as an admin`
       })
     } else if (emailExists) {
+      emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+
       return res.status(400).json({
         message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
@@ -59,6 +61,8 @@ exports.registerAdmin = async (req, res) => {
         });
       }
     } else if (phonenUmberExists) {
+      phonenUmberExists = await adminModel.findOne({ phoneNumber: phoneNumber });
+
       return res.status(400).json({
         message: `User with this phone number already exist as an admin`
       })
@@ -89,7 +93,8 @@ exports.registerAdmin = async (req, res) => {
     });
 
     const token = jwt.sign({ id: admin._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `https://artisian-aid.vercel.app/verifyemail/${token}`;
+    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+
     const html = verifyMail(link);
 
     const mailDetails = {

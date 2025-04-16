@@ -77,7 +77,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Error creating plan
  */
-router.post('/create/plan', createPlanValidation, authorize, createPlan);
+router.post('/create/plan', createPlanValidation, createPlan);
 
 
 
@@ -89,8 +89,6 @@ router.post('/create/plan', createPlanValidation, authorize, createPlan);
  *     summary: Retrieve all Plans
  *     tags:
  *       - Plans
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of all Plans
@@ -153,6 +151,8 @@ router.get('/all/plan', authenticate, getAllPlans);
  *     summary: Get a specific subscription plan
  *     tags:
  *       - Plans
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
@@ -216,6 +216,8 @@ router.get('/plan/:planId', authenticate, getPlan);
  *     summary: Update a subscription plan
  *     tags:
  *       - Plans
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
@@ -292,6 +294,8 @@ router.put('/update/plan/:planId', updatePlanValidation, authorize, updatePlan);
  *     summary: Delete a subscription plan
  *     tags:
  *       - Plans
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
@@ -332,5 +336,6 @@ router.put('/update/plan/:planId', updatePlanValidation, authorize, updatePlan);
  *                   example: Error deleting plan
  */
 router.delete('/delete/plan/:planId', authorize, deletePlan);
+
 
 module.exports = router;

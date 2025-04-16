@@ -143,6 +143,8 @@ router.get('/admins', authorize, getAdmins);
  *     description: Allows an admin to restrict an artisan's account and sends a restriction reason via email.
  *     tags:
  *       - Admin
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - name: artisanId
  *         in: path
@@ -210,6 +212,8 @@ router.post('/restrict/account/:artisanId', authorize, restrictAccount);
  *     description: Removes restrictions from an artisan account, allowing them full access to the platform.
  *     tags:
  *       - Admin
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - name: id
  *         in: path
@@ -416,6 +420,8 @@ router.get('/declined/artisans', authorize, getDeclinedArtisans);
  *     description: Retrieves a list of all employers that are verified
  *     tags:
  *       - Admin
+ *     security:
+ *       - Bearer: []
  *     responses:
  *       '200':
  *         description: Successfully fetched all employers.
@@ -459,6 +465,8 @@ router.get('/employers', authorize, getEmployers);
  *     description: Fetches a single user based on the provided user ID.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -508,6 +516,8 @@ router.get('/user/:id', getUser);
  *     summary: Get all reported artisans
  *     tags:
  *       - Admin
+ *     security:
+ *       - Bearer: []
  *     responses:
  *       200:
  *         description: List of all reported artisans

@@ -29,7 +29,6 @@ exports.registerArtisan = async (req, res) => {
         message: 'Password does not match'
       });
     };
-
     let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
@@ -37,6 +36,8 @@ exports.registerArtisan = async (req, res) => {
         message: `User with: ${email.toLowerCase()} already exist as an admin`
       })
     } else if (emailExists) {
+      emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+
       return res.status(400).json({
         message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
@@ -65,6 +66,8 @@ exports.registerArtisan = async (req, res) => {
         });
       }
     } else if (phonenUmberExists) {
+      phonenUmberExists = await adminModel.findOne({ phoneNumber: phoneNumber });
+
       return res.status(400).json({
         message: `User with this phone number already exist as an admin`
       })
@@ -106,7 +109,7 @@ exports.registerArtisan = async (req, res) => {
     });
 
     const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `https://artisian-aid.vercel.app/verifyemail/${token}`;
+    const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
     const html = verifyMail(link);
 
     const mailDetails = {
@@ -180,7 +183,9 @@ exports.verifyAccount = async (req, res) => {
         user.isVerified = true;
         await user.save();
 
-        res.redirect(200, 'https://artisian-aid.vercel.app/verifyemail');
+        res.status(200).json({
+          message: 'Email verified successfully'
+        });
       }
     });
   } catch (error) {

@@ -12,6 +12,8 @@ const router = require('express').Router();
  *     description: Allows users to send a message via the contact form. The message is saved and emailed to the designated recipient.
  *     tags:
  *       - Contact Us
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:

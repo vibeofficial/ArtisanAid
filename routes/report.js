@@ -11,6 +11,8 @@ const router = require('express').Router();
  *     summary: Report an artisan
  *     tags:
  *       - Report Artisan
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - name: ArtisanId
  *         in: path

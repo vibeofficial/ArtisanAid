@@ -24,9 +24,15 @@ exports.registerEmployer = async (req, res) => {
       });
     };
 
-    let emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+    let emailExists = await adminModel.findOne({ email: email?.toLowerCase() });
 
     if (emailExists) {
+      return res.status(400).json({
+        message: `User with: ${email.toLowerCase()} already exist as an admin`
+      })
+    } else if (emailExists) {
+      emailExists = await employerModel.findOne({ email: email?.toLowerCase() });
+
       return res.status(400).json({
         message: `User with: ${email.toLowerCase()} already exist as an employer`
       });
@@ -38,7 +44,8 @@ exports.registerEmployer = async (req, res) => {
           message: `User with: ${email.toLowerCase()} already exist as an artisan`
         });
       }
-    }
+    };
+
     let phonenUmberExists = await employerModel.findOne({ phoneNumber: phoneNumber });
 
     if (phonenUmberExists) {
@@ -53,6 +60,12 @@ exports.registerEmployer = async (req, res) => {
           message: `User with this phone number already exist as an artisan`
         });
       }
+    } else if (phonenUmberExists) {
+      phonenUmberExists = await adminModel.findOne({ phoneNumber: phoneNumber });
+
+      return res.status(400).json({
+        message: `User with this phone number already exist as an admin`
+      })
     };
 
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
@@ -73,7 +86,7 @@ exports.registerEmployer = async (req, res) => {
     });
 
     const token = jwt.sign({ id: employer._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `https://artisian-aid.vercel.app/verifyemail/${token}`;
+    const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
     const html = verifyMail(link);
 
     const mailDetails = {
@@ -100,7 +113,7 @@ exports.registerEmployer = async (req, res) => {
 
 exports.getArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Verified', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -233,7 +246,7 @@ exports.logout = async (req, res) => {
 
 exports.getRecommendedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -258,7 +271,7 @@ exports.getRecommendedArtisans = async (req, res) => {
 exports.getArtisansByCategory = async (req, res) => {
   try {
     const { category } = req.body;
-    const artisans = await artisanModel.find({ category, verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ category, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -282,9 +295,9 @@ exports.getArtisansByCategory = async (req, res) => {
 
 exports.getArtisansByLocalGovt = async (req, res) => {
   try {
-    const { lga } = req.body;
+    const { lga } = req.query;
     const location = { lga, state }
-    const artisans = await artisanModel.find({ location, verificationStatus: 'Verified', subscription: 'Active' || 'Demo' }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: 'Active' || 'Free' }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({

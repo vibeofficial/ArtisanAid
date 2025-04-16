@@ -14,6 +14,8 @@ const uploads = require('../middlewares/multer');
  *     description: Uploads work certificate and submits guarantor details for artisan verification.
  *     tags:
  *       - Verification
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -84,6 +86,7 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error initializing verification"
  */
-router.post('/account/verification', authenticate, uploads.single('workCertificate'),verificationValidation, initializeVerification);
+router.post('/account/verification', authenticate, uploads.single('workCertificate'), verificationValidation, initializeVerification);
+
 
 module.exports = router;
