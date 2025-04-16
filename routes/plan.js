@@ -151,6 +151,8 @@ router.get('/all/plan', authenticate, getAllPlans);
  *     summary: Get a specific subscription plan
  *     tags:
  *       - Plans
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
@@ -214,6 +216,8 @@ router.get('/plan/:planId', authenticate, getPlan);
  *     summary: Update a subscription plan
  *     tags:
  *       - Plans
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
@@ -290,6 +294,8 @@ router.put('/update/plan/:planId', updatePlanValidation, authorize, updatePlan);
  *     summary: Delete a subscription plan
  *     tags:
  *       - Plans
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
@@ -330,5 +336,6 @@ router.put('/update/plan/:planId', updatePlanValidation, authorize, updatePlan);
  *                   example: Error deleting plan
  */
 router.delete('/delete/plan/:planId', authorize, deletePlan);
+
 
 module.exports = router;

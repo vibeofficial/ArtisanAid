@@ -14,6 +14,8 @@ const uploads = require('../middlewares/multer');
  *     description: Uploads work certificate and submits guarantor details for artisan verification.
  *     tags:
  *       - Verification
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:

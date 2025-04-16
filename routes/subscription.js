@@ -73,6 +73,8 @@ router.get('/initialize/payment/:planId', authenticate, initializeSubscription);
  *     description: Verifies the status of a subscription payment using the transaction reference.
  *     tags:
  *       - Subscription
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: query
  *         name: reference

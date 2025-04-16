@@ -132,6 +132,8 @@ router.post('/register/artisan', registerArtisanValidation, uploads.fields([{ na
  *     description: Confirms the authenticity of a user's email address by validating the provided token.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: token
@@ -160,6 +162,8 @@ router.get('/verify/account/:token', verifyAccount);
  *     description: Resends the account verification link to the provided email address if the user exists.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -215,6 +219,8 @@ router.post('/resend/email', resendVerifyLinkValidation, resendVerifyLink);
  *     description: Allows users to request a password reset link by providing their email address.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -256,6 +262,8 @@ router.post('/forgot/password', forgotPasswordValidation, forgotPassword);
  *     description: Allows users to reset their password using a valid reset token. The new password must match the confirmation password.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     parameters:
  *       - name: token
  *         in: path
@@ -407,6 +415,8 @@ router.put('/change/password', changePasswordValidation, authenticate, changePas
  *     description: Allows a user to update their profile details, including uploading a new profile picture.
  *     tags:
  *       - General
+ *     security:
+ *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
