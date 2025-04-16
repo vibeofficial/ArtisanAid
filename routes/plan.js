@@ -89,8 +89,6 @@ router.post('/create/plan', createPlanValidation, createPlan);
  *     summary: Retrieve all Plans
  *     tags:
  *       - Plans
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of all Plans
