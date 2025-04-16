@@ -168,7 +168,6 @@ exports.rejectJob = async (req, res) => {
   try {
     const { id } = req.user;
     const { bookingId } = req.params;
-    const { reason } = req.body;
 
     const artisan = await artisanModel.findById(id);
 

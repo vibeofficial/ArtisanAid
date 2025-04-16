@@ -170,3 +170,8 @@ exports.resetPassword = (link) => {
     </html>
   `;
 };
+
+
+exports.jobReject = () => {
+
+};
