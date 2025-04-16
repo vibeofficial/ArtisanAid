@@ -8,8 +8,7 @@ const PORT = process.env.PORT
 const cors = require('cors');
 
 const app = express();
-app.use(express.json());
-app.use(cors());
+
 
 const artisanRouter = require('./routes/artisan');
 const planRouter = require('./routes/plan');
@@ -21,9 +20,9 @@ const verificationRouter = require('./routes/verification');
 const bookingRouter = require('./routes/booking');
 const jobPostRouter = require('./routes/jobPost');
 const reportRouter = require('./routes/report');
+app.use(cors());
 
 app.use(express.json());
-app.use(cors());
 
 
 const swaggerJsdoc = require("swagger-jsdoc");
