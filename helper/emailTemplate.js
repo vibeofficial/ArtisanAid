@@ -64,9 +64,9 @@ exports.verifyMail = (link) => {
                     <p style="font-size:13px; color:#5B5B5B; margin-bottom:6px;">
                       Connect with us #artisanaid
                     </p>
-                    <a href=""><img src="${twitter}" alt="social media icons" style="width:20px; margin-bottom:5px;" /></a>
-                    <a href=""><img src="${linkedin}" alt="social media icons" style="width:19px; margin-bottom:5px; margin-right: 5px; margin-left: 5px;" /></a>
-                    <a href=""><img src="${fb}" alt="social media icons" style="width:20px; margin-bottom:5px;" /></a>
+                    <a href=""><img src="${twitter}" alt="social media icons" style="width:20px; margin-bottom:5px; cursor: pointer;" /></a>
+                    <a href=""><img src="${linkedin}" alt="social media icons" style="width:19px; margin-bottom:5px; margin-right: 5px; margin-left: 5px; cursor: pointer;" /></a>
+                    <a href=""><img src="${fb}" alt="social media icons" style="width:20px; margin-bottom:5px; cursor: pointer;" /></a>
                     <p style="font-size:12px; color:#98A2B3;">
                       @${new Date().getFullYear()} ArtisanAid. All Rights Reserved.
                     </p>
