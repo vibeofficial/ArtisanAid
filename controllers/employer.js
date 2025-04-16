@@ -114,7 +114,7 @@ exports.getArtisans = async (req, res) => {
       data: artisans
     });
   } catch (error) {
-    console.error(error.message);
+    console.log(error.message);
     return res.status(500).json({
       message: error.message
     });

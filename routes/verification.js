@@ -84,6 +84,6 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error initializing verification"
  */
-router.post('/account/verification', verificationValidation, authenticate, uploads.single('workCertificate'), initializeVerification);
+router.post('/account/verification', authenticate, uploads.single('workCertificate'),verificationValidation, initializeVerification);
 
 module.exports = router;
