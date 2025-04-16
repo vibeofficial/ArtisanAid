@@ -233,9 +233,9 @@ exports.logout = async (req, res) => {
 
 exports.getRecommendedArtisans = async (req, res) => {
   try {
-    const users = await artisanModel.find({ isRecommended: true, verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Verified', subscription: { $in: ['Active', 'Demo'] } }).populate('jobPostId', 'jobImage');
 
-    if (users.length === 0) {
+    if (artisans.length === 0) {
       return res.status(404).json({
         message: 'No recommended artisan found'
       });
@@ -243,8 +243,8 @@ exports.getRecommendedArtisans = async (req, res) => {
 
     return res.status(200).json({
       message: 'Recommended artisans retrieved successfully',
-      total: users.length,
-      data: users
+      total: artisans.length,
+      data: artisans
     });
   } catch (error) {
     console.error(error.message);
