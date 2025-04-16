@@ -169,7 +169,7 @@ exports.login = async (req, res) => {
 
     if (user.isVerified !== true) {
       const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5m' });
-      const link = `${req.protocol}://${req.get('host')}/v1/verify/account/${token}`;
+      const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
       const html = verifyMail(link, user.fullname);
 
       const mailDetails = {
