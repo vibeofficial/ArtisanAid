@@ -70,13 +70,13 @@ const artisanSchema = new mongoose.Schema({
   },
   subscription: {
     type: String,
-    enum: ['Demo', 'Active', 'Expired'],
-    default: 'Demo'
+    enum: ['Free', 'Active', 'Expired'],
+    default: 'Free'
   },
   subscriptionPlan: {
     type: String,
-    enum: ['Demo', 'Basic Plan', 'Premium Plan'],
-    default: 'Demo'
+    enum: ['FREEMIUM PLAN', 'BASIC PLAN', 'PREMIUM PLAN'],
+    default: 'FREEMIUM PLAN'
   },
   isLoggedIn: {
     type: Boolean,

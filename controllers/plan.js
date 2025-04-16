@@ -28,7 +28,7 @@ exports.createPlan = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error creating plan'
+      message: error.message
     })
   }
 };
@@ -51,7 +51,7 @@ exports.getAllPlans = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error getting all plans'
+      message: error.message
     })
   }
 };
@@ -75,7 +75,7 @@ exports.getPlan = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error getting plan'
+      message: error.message
     })
   }
 };
@@ -109,7 +109,7 @@ exports.updatePlan = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error updating plan'
+      message:error.message
     })
   }
 };
@@ -134,7 +134,7 @@ exports.deletePlan = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: 'Error deleting plan'
+      message: error.message
     })
   }
 };
