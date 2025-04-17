@@ -1,4 +1,4 @@
-const { initializeVerification, acceptVerification } = require('../controllers/verification');
+const { initializeVerification, acceptVerification, rejectVerification } = require('../controllers/verification');
 const { authenticate, authorize } = require('../middlewares/authentication');
 const { verificationValidation } = require('../middlewares/validator');
 
@@ -86,12 +86,12 @@ const uploads = require('../middlewares/multer');
  *                   type: string
  *                   example: "Error initializing verification"
  */
-router.post('/account/verification', authenticate, uploads.single('workCertificate'), verificationValidation, initializeVerification);
+router.post('/account/verification/:id', authenticate, uploads.single('workCertificate'), verificationValidation, initializeVerification);
 
 
 /**
  * @swagger
- * /accept/verification:
+ * /accept/verification/{id}:
  *   get:
  *     summary: Approve artisan's verification request
  *     tags:
@@ -126,6 +126,49 @@ router.post('/account/verification', authenticate, uploads.single('workCertifica
  *               message: Internal server error
  */
 router.get('/accept/verification', authorize, acceptVerification);
+/**
+ * @swagger
+ * /v1/verification/reject/{id}:
+ *   get:
+ *     summary: Reject an artisan's verification request
+ *     tags: [Verification]
+ *     description: This route allows an admin to reject an artisan's account verification. It updates their status and sends a rejection email.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the verification document
+ *         schema:
+ *           type: string
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Verification has been rejected and email sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Account verification has been rejected
+ *       404:
+ *         description: Verification or artisan not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No verification initialized
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/reject/verification/:id', authorize, rejectVerification);
+
 
 
 module.exports = router;
