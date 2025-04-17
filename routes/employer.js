@@ -346,21 +346,24 @@ router.post('/artisans/category', categoryValidation, getArtisansByCategory);
 /**
  * @swagger
  * /v1/artisans/lga:
- *   get:
+ *   post:
  *     summary: Get all users in a specific local government area (LGA)
  *     description: Retrieves all artisans in the specified LGA and approved account verification status.
  *     tags:
  *       - General
  *     security:
  *       - Bearer: []
- *     parameters:
- *       - in: query
- *         name: lga
- *         required: true
- *         schema:
- *           type: string
- *           example: "Ikorodu"
- *         description: The local government area (LGA) of the artisans.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               lga:
+ *                 type: string
+ *                 example: "Ikorodu"
+ *                 description: The local government area (LGA) of the artisans.
  *     responses:
  *       '200':
  *         description: Successfully fetched all artisans in the specified LGA.
@@ -393,7 +396,7 @@ router.post('/artisans/category', categoryValidation, getArtisansByCategory);
  *       '500':
  *         description: Error retrieving artisans by local government.
  */
-router.get('/artisans/lga', lgaValidation, getArtisansByLocalGovt);
+router.post('/artisans/lga', lgaValidation, getArtisansByLocalGovt);
 
 
 /**

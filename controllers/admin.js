@@ -99,7 +99,7 @@ exports.registerAdmin = async (req, res) => {
 
     const mailDetails = {
       email: admin.email,
-      subject: 'ACCOUNT VERIFICATION',
+      subject: 'EMAIL VERIFICATION',
       html
     };
 

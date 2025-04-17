@@ -114,7 +114,7 @@ exports.registerArtisan = async (req, res) => {
 
     const mailDetails = {
       email: artisan.email,
-      subject: 'ACCOUNT VERIFICATION',
+      subject: 'EMAIL VERIFICATION',
       html
     };
 
@@ -160,7 +160,7 @@ exports.verifyAccount = async (req, res) => {
 
           const mailDetails = {
             email: user.email,
-            subject: 'RESEND: ACCOUNT VERIFICATION',
+            subject: 'RESEND: EMAIL VERIFICATION',
             html
           };
 
@@ -214,7 +214,7 @@ exports.resendVerifyLink = async (req, res) => {
 
     const mailDetails = {
       email: user.email,
-      subject: 'ACCOUNT VERIFICATION',
+      subject: 'EMAIL VERIFICATION',
       html
     };
 
@@ -361,9 +361,9 @@ exports.changePassword = async (req, res) => {
 exports.updateProfilePic = async (req, res) => {
   try {
     const { id } = req.user;
-    const file = req.file;    
+    const file = req.file;
 
-    const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);    
+    const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
     if (!user) {
       return res.status(404).json({
@@ -419,17 +419,13 @@ exports.updateProfilePic = async (req, res) => {
 exports.updateLocation = async (req, res) => {
   try {
     const { id } = req.user;
-    const { number, street, lga, state } = req.body;
-    let user = await artisanModel.findById(id);
+    const { lga } = req.body;
+    const user = await artisanModel.findById(id) || await employerModel.findById(id);
 
     if (!user) {
-      user = await employerModel.findById(id);
-
-      if (!user) {
-        return res.status(404).json({
-          message: 'User not found'
-        })
-      }
+      return res.status(404).json({
+        message: 'User not found'
+      })
     };
 
     const data = {
@@ -437,10 +433,7 @@ exports.updateLocation = async (req, res) => {
     };
 
     data.location = {
-      number,
-      street,
-      lga,
-      state
+      lga
     };
 
     let updatedLocation;

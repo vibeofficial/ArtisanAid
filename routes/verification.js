@@ -1,5 +1,5 @@
-const { initializeVerification } = require('../controllers/verification');
-const { authenticate } = require('../middlewares/authentication');
+const { initializeVerification, acceptVerification } = require('../controllers/verification');
+const { authenticate, authorize } = require('../middlewares/authentication');
 const { verificationValidation } = require('../middlewares/validator');
 
 const router = require('express').Router();
@@ -87,6 +87,45 @@ const uploads = require('../middlewares/multer');
  *                   example: "Error initializing verification"
  */
 router.post('/account/verification', authenticate, uploads.single('workCertificate'), verificationValidation, initializeVerification);
+
+
+/**
+ * @swagger
+ * /accept/verification:
+ *   get:
+ *     summary: Approve artisan's verification request
+ *     tags:
+ *       - Verification
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the verification document to approve
+ *     responses:
+ *       200:
+ *         description: Account has been verified successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Account has been verified successfully
+ *       404:
+ *         description: Verification or artisan not found
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: No verification initialized
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Internal server error
+ */
+router.get('/accept/verification', authorize, acceptVerification);
 
 
 module.exports = router;
