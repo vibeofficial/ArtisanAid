@@ -9,7 +9,7 @@ exports.bookArtisan = async (req, res) => {
   try {
     const { id } = req.user;
     const { artisanId } = req.params;
-    const { location, serviceTitle, serviceDescription } = req.body;
+    const { location, serviceTitle, serviceDescription, phoneNumber } = req.body;
 
     const employer = await employerModel.findById(id);
 
@@ -33,7 +33,7 @@ exports.bookArtisan = async (req, res) => {
       location,
       serviceTitle,
       serviceDescription,
-      date: new Date().toDateString()
+      phoneNumber
     });
 
     const html = verifyMail(link, artisan.fullname);
