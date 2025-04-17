@@ -324,10 +324,10 @@ router.get('/pending/artisans', authorize, getPendingArtisans);
 
 /**
  * @swagger
- * /v1/pending/artisans:
+ * /v1/approved/artisans:
  *   get:
- *     summary: Get all pending artisans
- *     description: Retrieves a list of all artisans with pending account verification status..
+ *     summary: Get all approved artisans
+ *     description: Retrieves a list of all artisans with approved account verification status..
  *     tags:
  *       - Admin
  *     security:
@@ -364,7 +364,7 @@ router.get('/pending/artisans', authorize, getPendingArtisans);
  *       '500':
  *         description: Error retrieving artisans.
  */
-router.get('/pending/artisans', authorize, getApprovedArtisans);
+router.get('/approved/artisans', authorize, getApprovedArtisans);
 
 
 /**
