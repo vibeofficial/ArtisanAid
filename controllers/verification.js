@@ -81,7 +81,7 @@ exports.acceptVerification = async (req, res) => {
     const mailDetails = {
       email: artisan.email,
       subject: 'ACCOUNT VERIFICATION',
-      HTML: acceptVerification()
+      html: acceptVerification()
     };
 
     await mail_sender(mailDetails);
