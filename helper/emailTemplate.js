@@ -152,7 +152,7 @@ exports.resetPassword = (link) => {
                     <a href=""><img src="${linkedin}" alt="social media icons" style="width:19px; margin-bottom:5px; margin-right: 5px; margin-left: 5px;" /></a>
                     <a href=""><img src="${fb}" alt="social media icons" style="width:20px; margin-bottom:5px;" /></a>
                     <p style="font-size:12px; color:#98A2B3;">
-                      &#169;${new Date().getFullYear()} ArtisanAid. All Rights Reserved.
+                      @${new Date().getFullYear()} ArtisanAid. All Rights Reserved.
                     </p>
                   </td>
                 </tr>
@@ -173,175 +173,8 @@ exports.resetPassword = (link) => {
 };
 
 
-// exports.acceptVerification = () => {
-//   return `
-//   <!DOCTYPE html>
-//   <html lang="en">
 
-//   <head>
-//     <meta charset="UTF-8">
-//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//     <title>Document</title>
-//     <link rel="preconnect" href="https://fonts.googleapis.com">
-//     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-//     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-//       rel="stylesheet">
-//     <style>
-//       * {
-//         margin: 0;
-//         padding: 0;
-//         box-sizing: border-box;
-//       }
-
-//       body {
-//         height: 100vh;
-//         width: 100%;
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
-//       }
-
-//       main {
-//         height: 90%;
-//         width: 30%;
-//         background: #C1DBEA;
-//         display: flex;
-//         flex-direction: column;
-//         align-items: center;
-//         font-family: Montserrat;
-//       }
-
-//       .secOne {
-//         width: 80%;
-//         height: 15%;
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
-//       }
-
-//       .secTwo {
-//         width: 80%;
-//         height: 61%;
-//         background: #fff;
-//         margin-bottom: 10px;
-//       }
-
-//       .secTwoFisrt {
-//         width: 100%;
-//         height: 25%;
-//         display: flex;
-//         align-items: center;
-//       }
-
-//       .secTwoSecond {
-//         width: 100%;
-//         height: 25%;
-//       }
-
-//       .secTwoThird {
-//         width: 100%;
-//         height: 25%;
-//         display: flex;
-//         position: relative;
-//         align-items: center;
-//         justify-content: center;
-//       }
-
-//       a {
-//         width: 100%;
-//         height: 100%;
-//         display: flex;
-//         position: relative;
-//         align-items: center;
-//         justify-content: center;
-//       }
-
-//       .secTwoFourth {
-//         width: 100%;
-//         height: 25%;
-//       }
-
-//       .secThree {
-//         width: 80%;
-//         height: 12%;
-//         display: flex;
-//         flex-direction: column;
-//         align-items: center;
-//       }
-
-//       .secThreeP {
-//         font-size: 12px;
-//       }
-
-//       .secThreeImg {
-//         display: flex;
-//         justify-content: center;
-//         margin: 5px;
-//         gap: 5px;
-//       }
-
-//       .secFour {
-//         width: 80%;
-//         height: 12%;
-//       }
-//     </style>
-//   </head>
-
-//   <body>
-//     <main>
-//       <section class="secOne">
-//         <h2 style="color: #fff;">Artisan<span style="color: #FFA500;">Aid.</span></h2>
-//       </section>
-//       <section class="secTwo">
-//         <div class="secTwoFisrt">
-//           <h2 style="font-size: 21px; text-align: center;">Artisan Account Verification Successful</h2>
-//         </div>
-//         <div class="secTwoSecond">
-//           <p style="font-size: 11px; text-align: center; color: #808080;">Great news! We've reviewed the documents you
-//             submitted, and your artisan account has been<br><br>successfully verified.
-//             Click on the button below to connect with employers now!!!</p>
-//         </div>
-//         <div class="secTwoThird">
-//           <a href="${landi}">
-//             <div class="btn1"
-//               style="height: 55%; width: 50%; background: #000435; position: absolute; border-radius: 5px; z-index: 1; top: 13px; left: 70px; display: flex; align-items: center; justify-content: center;">
-//               <p style="color: #fff;">Connect Now!!!</p>
-//             </div>
-//             <div class="btn1"
-//               style="height: 55%; width: 50%; background: #2F80ED; position: absolute; border-radius: 5px; bottom: 15px;">
-//             </div>
-//           </a>
-//         </div>
-//         <div class="secTwoFourth">
-//           <p style="color: #808080; font-size: 12px; text-align: center;">Start exploring opportunities and building your
-//             profile today!</p>
-//         </div>
-//       </section>
-//       <section class="secThree">
-//         <div class="secThreeP">
-//           <p style="font-size: 12px;">Connect with us #artisanaid</p>
-//         </div>
-
-//         <div class="secThreeImg">
-//           <img src="${twitter}" alt="" style="width: 7%;">
-//           <img src="${linkedin}" alt="" style="width: 7%;">
-//           <img src="${fb}" alt="" style="width: 7%;">
-//         </div>
-
-//         <div>
-//           <p style="font-size: 12px; color: #98A2B3;">©${new Date().getFullYear()} [ArtisanAid]. All Rights Reserved</p>
-//         </div>
-//       </section>
-//       <section class="secFour"></section>
-//     </main>
-//   </body>
-
-//   </html>
-//   `
-// };
-
-
-exports.acceptVerification = (landingPage, twitter, linkedin, fb) => {
+exports.acceptVerification = () => {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -349,142 +182,50 @@ exports.acceptVerification = (landingPage, twitter, linkedin, fb) => {
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Verification Email</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet">
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: Montserrat, sans-serif;
-        background: #f4f4f4;
-      }
-
-      main {
-        max-width: 600px;
-        width: 100%;
-        background: #C1DBEA;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 20px auto;
-      }
-
-      .secOne {
-        width: 90%;
-        padding: 20px 0;
-        text-align: center;
-      }
-
-      .secTwo {
-        width: 90%;
-        background: #fff;
-        margin-bottom: 10px;
-        padding: 20px 10px;
-        text-align: center;
-      }
-
-      .secTwo h2 {
-        font-size: 21px;
-        margin-bottom: 10px;
-      }
-
-      .secTwo p {
-        font-size: 11px;
-        color: #808080;
-        margin-bottom: 20px;
-        line-height: 1.5;
-      }
-
-      .btnContainer {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        height: 50px;
-        margin-bottom: 20px;
-      }
-
-      .btnBack {
-        height: 100%;
-        width: 50%;
-        background: #2F80ED;
-        border-radius: 5px;
-        position: absolute;
-        bottom: 0;
-      }
-
-      .btnFront {
-        height: 100%;
-        width: 50%;
-        background: #000435;
-        border-radius: 5px;
-        position: absolute;
-        top: 0;
-        z-index: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        text-decoration: none;
-        font-size: 14px;
-      }
-
-      .secThree {
-        width: 90%;
-        padding: 20px 0;
-        text-align: center;
-      }
-
-      .secThree p {
-        font-size: 12px;
-        color: #98A2B3;
-      }
-
-      .socialIcons img {
-        width: 24px;
-        margin: 5px;
-      }
-    </style>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   </head>
 
-  <body>
-    <main>
-      <section class="secOne">
-        <h2 style="color: #fff;">Artisan<span style="color: #FFA500;">Aid.</span></h2>
-      </section>
-      <section class="secTwo">
-        <h2>Artisan Account Verification Successful</h2>
-        <p>
-          Great news! We've reviewed the documents you submitted, and your artisan account has been<br><br>
-          successfully verified. Click on the button below to connect with employers now!!!
-        </p>
-        <div class="btnContainer">
-          <div class="btnBack"></div>
-          <a href="${landingPage}" class="btnFront">Connect Now!!!</a>
-        </div>
-        <p style="font-size: 12px;">Start exploring opportunities and building your profile today!</p>
-      </section>
-      <section class="secThree">
-        <p>Connect with us #artisanaid</p>
-        <div class="socialIcons">
-          <img src="${twitter}" alt="Twitter">
-          <img src="${linkedin}" alt="LinkedIn">
-          <img src="${fb}" alt="Facebook">
-        </div>
-        <p>©${new Date().getFullYear()} [ArtisanAid]. All Rights Reserved</p>
-      </section>
-    </main>
+  <body style="margin: 0; padding: 0; font-family: Montserrat, sans-serif; background-color: #f4f4f4; color: #000;">
+    <table align="center" width="100%" style="max-width: 400px; background-color: #ffffff; border-collapse: collapse;">
+      <!-- Header Section -->
+      <tr>
+        <td style="padding: 20px; text-align: center; background-color: #C1DBEA;">
+          <h2 style="margin: 0; color: #000;">Artisan<span style="color: #FFA500;">Aid</span></h2>
+        </td>
+      </tr>
+
+      <!-- Body Section -->
+      <tr>
+        <td style="padding: 20px; text-align: center;">
+          <h2 style="color: #000;">Artisan Account Verification Successful</h2>
+          <p style="font-size: 14px; line-height: 1.5; color: #808080;">
+            Great news! We've reviewed the documents you submitted, and your artisan account has been successfully verified.
+            <br /><br />
+            Click on the button below to connect with employers now!
+          </p>
+          <a href="${landingPage}" 
+             style="display: inline-block; background-color: #000435; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-top: 15px;">
+            Connect Now!!!
+          </a>
+        </td>
+      </tr>
+
+      <!-- Social Section -->
+      <tr>
+        <td style="padding: 20px; text-align: center; background-color: #f4f4f4;">
+          <p style="font-size: 14px; color: #98A2B3;">Connect with us #artisanaid</p>
+          <div>
+            <a href="" style="margin: 5px;"><img src="${twitter}" alt="Twitter" style="width: 24px;"></a>
+            <a href="" style="margin: 5px;"><img src="${linkedin}" alt="LinkedIn" style="width: 24px;"></a>
+            <a href="" style="margin: 5px;"><img src="${fb}" alt="Facebook" style="width: 24px;"></a>
+          </div>
+          <p style="font-size: 12px; color: #808080;">©${new Date().getFullYear()} ArtisanAid. All Rights Reserved.</p>
+        </td>
+      </tr>
+    </table>
   </body>
 
   </html>

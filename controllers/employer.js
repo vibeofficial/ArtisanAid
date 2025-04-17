@@ -96,7 +96,7 @@ exports.registerEmployer = async (req, res) => {
     };
 
     await mail_sender(mailDetails);
-    await employer.save();
+    // await employer.save();
 
     res.status(201).json({
       message: 'Account Registered Successfully',
