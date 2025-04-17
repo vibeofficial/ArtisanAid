@@ -119,7 +119,11 @@ exports.verifySubscription = async (req, res) => {
       artisan.subscriptionPlan = plan.planName;
 
       if (artisan.subscriptionPlan === 'PREMIUM PLAN') {
-        artisan.rating = 5
+        artisan.rating = 5;
+
+        const mailDetails = {
+          email
+        }
       } else if (artisan.subscriptionPlan === 'BASIC PLAN') {
         artisan.rating = 3
       };

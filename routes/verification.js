@@ -96,10 +96,8 @@ router.post('/account/verification/:id', authenticate, uploads.single('workCerti
  *     summary: Approve artisan's verification request
  *     tags:
  *       - Verification
- *     security:
- *       - bearerAuth: []
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: id
  *         schema:
  *           type: string
@@ -126,12 +124,15 @@ router.post('/account/verification/:id', authenticate, uploads.single('workCerti
  *               message: Internal server error
  */
 router.get('/accept/verification', authorize, acceptVerification);
+
+
 /**
  * @swagger
  * /v1/verification/reject/{id}:
  *   get:
  *     summary: Reject an artisan's verification request
- *     tags: [Verification]
+ *     tags:
+ *       - Verification
  *     description: This route allows an admin to reject an artisan's account verification. It updates their status and sends a rejection email.
  *     parameters:
  *       - in: path
@@ -140,8 +141,6 @@ router.get('/accept/verification', authorize, acceptVerification);
  *         description: The ID of the verification document
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Verification has been rejected and email sent
