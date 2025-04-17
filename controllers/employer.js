@@ -113,7 +113,7 @@ exports.registerEmployer = async (req, res) => {
 
 exports.getArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Verified', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -301,7 +301,7 @@ exports.getArtisansByLocalGovt = async (req, res) => {
       state: 'Lagos'
     };
 
-    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: 'Active' || 'Free' }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
