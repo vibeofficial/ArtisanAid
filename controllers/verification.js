@@ -39,9 +39,8 @@ exports.initializeVerification = async (req, res) => {
     });
 
     await verification.save();
-
     artisan.verificationId = verification._id;
-    artisan.accountVerification = verification.status;
+    artisan.verificationStatus = verification.status;
     await artisan.save();
 
     res.status(201).json({
@@ -76,7 +75,9 @@ exports.acceptVerification = async (req, res) => {
       })
     };
 
-    artisan.verificationStatus = 'Approved';
+    verification.status = 'Approved'
+    await verification.save();
+    artisan.verificationStatus = verification.status;
 
     const mailDetails = {
       email: artisan.email,
@@ -115,8 +116,10 @@ exports.rejectVerification = async (req, res) => {
       return res.status(404).json({
         message: 'Artisan not found'
       });
-    }
+    };
 
+    verification.status = 'Declined';
+    await verification.save();
     artisan.verificationStatus = 'Declined'; 
 
     const mailDetails = {
