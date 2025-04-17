@@ -153,14 +153,16 @@ exports.login = async (req, res) => {
 
     if (email) {
       user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
-      console.log(user);
       
+      if (!user) {
+        return res.status(404).json({ message: 'No account found' });
+      };
     } else if (phoneNumber) {
       user = await artisanModel.findOne({ phoneNumber }) || await employerModel.findOne({ phoneNumber }) || await adminModel.findOne({ phoneNumber });
-    }
-
-    if (!user) {
-      return res.status(404).json({ message: 'No account found' });
+      
+      if (!user) {
+        return res.status(404).json({ message: 'No account found' });
+      };
     };
 
     const correctPassword = await bcrypt.compare(password, user.password);
