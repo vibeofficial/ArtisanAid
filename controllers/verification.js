@@ -2,7 +2,7 @@ const verificationModel = require('../models/verification');
 const artisanModel = require('../models/artisan');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
-const { acceptVerification } = require('../helper/emailTemplate');
+const { acceptVerification, rejectVerification } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 
 
@@ -97,6 +97,7 @@ exports.acceptVerification = async (req, res) => {
   }
 };
 
+
 exports.rejectVerification = async (req, res) => {
   try {
     const { id } = req.params;
@@ -116,12 +117,12 @@ exports.rejectVerification = async (req, res) => {
       });
     }
 
-    artisan.verificationStatus = 'Rejected'; 
+    artisan.verificationStatus = 'Declined'; 
 
     const mailDetails = {
       email: artisan.email,
       subject: 'ACCOUNT VERIFICATION REJECTED',
-      HTML: rejectVerification() 
+      html: rejectVerification() 
     };
 
     await mail_sender(mailDetails);

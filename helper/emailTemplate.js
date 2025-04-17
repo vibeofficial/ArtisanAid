@@ -3,10 +3,10 @@ const fb = 'https://res.cloudinary.com/djhz8vda0/image/upload/v1744591727/fb_iu3
 const twitter = 'https://res.cloudinary.com/djhz8vda0/image/upload/v1744591727/twitter_zzeonb.png';
 const linkedin = 'https://res.cloudinary.com/djhz8vda0/image/upload/v1744591727/linkedin_lxgsxb.png';
 const landingPage = 'https://artisian-aid.vercel.app/'
+const loginPage = 'https://artisian-aid.vercel.app/login'
 
 
 exports.verifyMail = (link) => {
-
   return `
   <!DOCTYPE html>
     <html lang="en">
@@ -91,7 +91,6 @@ exports.verifyMail = (link) => {
 
 
 exports.resetPassword = (link) => {
-
   return `
   <!DOCTYPE html>
     <html lang="en">
@@ -173,7 +172,6 @@ exports.resetPassword = (link) => {
 };
 
 
-
 exports.acceptVerification = () => {
   return `
   <!DOCTYPE html>
@@ -182,7 +180,7 @@ exports.acceptVerification = () => {
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification Email</title>
+    <title>ACCOUNT VERIFICATION</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
@@ -209,6 +207,65 @@ exports.acceptVerification = () => {
           <a href="${landingPage}" 
              style="display: inline-block; background-color: #000435; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-top: 15px;">
             Connect Now!!!
+          </a>
+        </td>
+      </tr>
+
+      <!-- Social Section -->
+      <tr>
+        <td style="padding: 20px; text-align: center; background-color: #f4f4f4;">
+          <p style="font-size: 14px; color: #98A2B3;">Connect with us #artisanaid</p>
+          <div>
+            <a href="" style="margin: 5px;"><img src="${twitter}" alt="Twitter" style="width: 24px;"></a>
+            <a href="" style="margin: 5px;"><img src="${linkedin}" alt="LinkedIn" style="width: 24px;"></a>
+            <a href="" style="margin: 5px;"><img src="${fb}" alt="Facebook" style="width: 24px;"></a>
+          </div>
+          <p style="font-size: 12px; color: #808080;">©${new Date().getFullYear()} ArtisanAid. All Rights Reserved.</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+
+  </html>
+  `;
+};
+
+
+exports.rejectVerification = () => {
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACCOUNT VERIFICATION</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  </head>
+
+  <body style="margin: 0; padding: 0; font-family: Montserrat, sans-serif; background-color: #f4f4f4; color: #000;">
+    <table align="center" width="100%" style="max-width: 400px; background-color: #ffffff; border-collapse: collapse;">
+      <!-- Header Section -->
+      <tr>
+        <td style="padding: 20px; text-align: center; background-color: #C1DBEA;">
+          <h2 style="margin: 0; color: #000;">Artisan<span style="color: #FFA500;">Aid</span></h2>
+        </td>
+      </tr>
+
+      <!-- Body Section -->
+      <tr>
+        <td style="padding: 20px; text-align: center;">
+          <h2 style="color: #000;">Artisan Account Verification Declined</h2>
+          <p style="font-size: 14px; line-height: 1.5; color: #808080;">
+            Thank you for submitting your documents for verification. After careful review, we were unable to verify your artisan account at this time.
+            <br /><br />
+            Please log in to your account to update or re-upload your documents.
+          </p>
+          <a href="${loginPage}" 
+             style="display: inline-block; background-color: #000435; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-top: 15px;">
+            Log In
           </a>
         </td>
       </tr>

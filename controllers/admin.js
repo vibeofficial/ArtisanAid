@@ -271,7 +271,7 @@ exports.getEmployers = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await employerModel.findById(id) || await artisanModel.findById(id) || await adminModel.findById(id).populate('jobPostId', 'jobImage');
+    const user = await employerModel.findById(id) || await artisanModel.findById(id).populate('jobPostId', 'jobImage').populate('verificationId', 'workCertificate') || await adminModel.findById(id);
 
     if (!user) {
       return res.status(404).json({
