@@ -153,6 +153,8 @@ exports.login = async (req, res) => {
 
     if (email) {
       user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
+      console.log(user);
+      
     } else if (phoneNumber) {
       user = await artisanModel.findOne({ phoneNumber }) || await employerModel.findOne({ phoneNumber }) || await adminModel.findOne({ phoneNumber });
     }
