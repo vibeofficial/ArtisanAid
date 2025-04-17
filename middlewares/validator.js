@@ -148,17 +148,8 @@ exports.resendVerifyLinkValidation = async (req, res, next) => {
 
 exports.updateLocationValidation = async (req, res, next) => {
   const schema = joi.object({
-    number: joi.string().required().messages({
-      'string.empty': 'Number is required'
-    }),
-    street: joi.string().required().messages({
-      'string.empty': 'Street is required'
-    }),
     lga: joi.string().required().messages({
       'string.empty': 'LGA is required'
-    }),
-    state: joi.string().required().messages({
-      'string.empty': 'State is required'
     })
   });
 
@@ -400,11 +391,6 @@ exports.lgaValidation = (req, res, next) => {
       "any.required": "LGA is required",
       "string.empty": "LGA cannot be empty",
       "string.min": "LGA must be at least 2 characters"
-    }),
-    state: joi.string().min(2).required().messages({
-      "any.required": "State is required",
-      "string.empty": "State cannot be empty",
-      "string.min": "State must be at least 2 characters"
     })
   });
 

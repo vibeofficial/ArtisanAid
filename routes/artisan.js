@@ -485,14 +485,12 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
 
 /**
  * @swagger
- * /v1/update/address:
+ * /v1/update/location:
  *   put:
  *     summary: Update user address
  *     description: Allows a user to update their location details, including Local Government Area (LGA) and state.
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -504,10 +502,6 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *                 type: string
  *                 example: 'Ikeja'
  *                 description: The Local Government Area (LGA) of the user.
- *               state:
- *                 type: string
- *                 example: 'Lagos'
- *                 description: The state of the user.
  *     responses:
  *       '200':
  *         description: Location updated successfully.
@@ -550,7 +544,7 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *                   type: string
  *                   example: 'Error updating address'
  */
-router.put('/update/address', updateLocationValidation, authenticate, updateLocation);
+router.put('/update/location', updateLocationValidation, authenticate, updateLocation);
 
 
 /**

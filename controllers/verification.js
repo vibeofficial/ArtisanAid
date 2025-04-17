@@ -2,6 +2,8 @@ const verificationModel = require('../models/verification');
 const artisanModel = require('../models/artisan');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
+const { acceptVerification } = require('../helper/emailTemplate');
+const { mail_sender } = require('../middlewares/nodemailer');
 
 
 exports.initializeVerification = async (req, res) => {
@@ -57,8 +59,36 @@ exports.initializeVerification = async (req, res) => {
 
 exports.acceptVerification = async (req, res) => {
   try {
-    const {id} = req.user;
+    const {id} = req.params;
+    const verification = await verificationModel.findById(id);
 
+    if (!verification) {
+      return res.status(404).json({
+        message: 'No verification initialized'
+      })
+    };
+
+    const artisan = await artisanModel.findById(verification.artisanId);
+
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Artisan not found'
+      })
+    };
+
+    artisan.verificationStatus = 'Approved';
+
+    const mailDetails = {
+      email: artisan.email,
+      subject: 'ACCOUNT VERIFICATION',
+      HTML: acceptVerification()
+    };
+
+    await mail_sender(mailDetails);
+    await artisan.save();
+    res.status(200).json({
+      message: 'Account has been verified successfully'
+    })
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

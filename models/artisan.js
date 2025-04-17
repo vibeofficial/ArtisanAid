@@ -46,10 +46,8 @@ const artisanSchema = new mongoose.Schema({
     image_url: { type: String }
   },
   location: {
-    number: { type: String, trim: true },
-    street: { type: String, trim: true },
     lga: { type: String, trim: true },
-    state: { type: String, trim: true }
+    state: { type: String, default: 'Lagos',trim: true }
   },
   verificationStatus: {
     type: String,

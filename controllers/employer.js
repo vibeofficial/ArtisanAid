@@ -91,7 +91,7 @@ exports.registerEmployer = async (req, res) => {
 
     const mailDetails = {
       email: employer.email,
-      subject: 'ACCOUNT VERIFICATION',
+      subject: 'EMAIL VERIFICATION',
       html
     };
 
@@ -174,7 +174,7 @@ exports.login = async (req, res) => {
 
       const mailDetails = {
         email: user.email,
-        subject: 'ACCOUNT VERIFICATION',
+        subject: 'EMAIL VERIFICATION',
         html
       };
 
@@ -294,8 +294,13 @@ exports.getArtisansByCategory = async (req, res) => {
 
 exports.getArtisansByLocalGovt = async (req, res) => {
   try {
-    const { lga } = req.query;
-    const location = { lga, state }
+    const { lga } = req.body;
+
+    const location = {
+      lga,
+      state: 'Lagos'
+    };
+
     const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: 'Active' || 'Free' }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
@@ -319,8 +324,6 @@ exports.updateCoverPhoto = async (req, res) => {
     const { id } = req.user;
     const file = req.file;
     const user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
-    console.log(user);
-    
 
     if (!user) {
       return res.status(404).json({
