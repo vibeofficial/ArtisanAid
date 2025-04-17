@@ -96,7 +96,7 @@ exports.registerEmployer = async (req, res) => {
     };
 
     await mail_sender(mailDetails);
-    // await employer.save();
+    await employer.save();
 
     res.status(201).json({
       message: 'Account Registered Successfully',
@@ -217,7 +217,7 @@ exports.logout = async (req, res) => {
       return res.status(400).json({
         message: 'User is not logged in'
       });
-    }
+    };
 
     let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
