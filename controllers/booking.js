@@ -1,7 +1,7 @@
 const bookingModel = require('../models/booking');
 const employerModel = require('../models/employer');
 const artisanModel = require('../models/artisan');
-const { verifyMail } = require('../helper/emailTemplate');
+const { verifyMail, acceptJobOffer, rejectJobOffer } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 
 
@@ -149,6 +149,21 @@ exports.acceptJob = async (req, res) => {
       })
     };
 
+    const employer = await employerModel.findById(booking.employerId);
+
+    if (!employer) {
+      return res.status(404).json({
+        message: 'Employer not found'
+      })
+    };
+
+    const mailDetails = {
+      email: employer.email,
+      subject: 'JOB ACCEPT',
+      html: acceptJobOffer(artisan.fullname)
+    };
+
+    await mail_sender(mailDetails);
     booking.status = 'Confirmed';
     await booking.save();
 
@@ -196,7 +211,7 @@ exports.rejectJob = async (req, res) => {
     const mailDetails = {
       email: employer.email,
       subject: 'JOB REJECTION',
-      html: reason
+      html: rejectJobOffer(artisan.fullname)
     };
 
     await mail_sender(mailDetails);
