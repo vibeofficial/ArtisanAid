@@ -25,7 +25,7 @@ exports.authenticate = async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, jwtSecret);
     const { id } = decodedToken;
-    let user = await artisanModel.findById(id) || await employerModel.findById(id);
+    let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
   if (user.isLoggedIn !== decodedToken.isLoggedIn) {
     return res.status(401).json({
@@ -71,21 +71,21 @@ exports.authorize = async (req, res, next) => {
 
     const decodedToken = jwt.verify(token, jwtSecret);
     const { id } = decodedToken;
-    const admin = await adminModel.findById(id);
+    let user = await adminModel.findById(id) || await artisanModel.findById(id) || await employerModel.findById(id);
 
-    if (!admin) {
+    if (!user) {
       return res.status(404).json({
         message: 'Authentication failed: User not found'
       })
     };
 
-    if (admin.isLoggedIn !== decodedToken.isLoggedIn) {
+    if (user.isLoggedIn !== decodedToken.isLoggedIn) {
       return res.status(401).json({
         message: 'Authentication failed: Account is not logged in'
       })
     };
 
-    if (admin.role !== 'Admin') {
+    if (user.role !== 'Admin') {
       return res.status(401).json({
         message: 'Authorization failed: Contact admin'
       })
