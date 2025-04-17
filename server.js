@@ -1,12 +1,10 @@
 require('dotenv').config();
 require('./configs/database')
-require('./cronJobs/subscriptionChecker'); 
-
 
 const express = require('express');
 const PORT = process.env.PORT
 const cors = require('cors');
-
+const cron = require('node-cron');
 const app = express();
 
 
@@ -26,7 +24,7 @@ app.use(cors());
 
 
 const swaggerJsdoc = require("swagger-jsdoc");
-const swagger_UI = require("swagger-ui-express")
+const swagger_UI = require("swagger-ui-express");
 
 const options = {
   definition: {
@@ -48,12 +46,12 @@ const options = {
         BearerAuth: {
           type: "http",
           scheme: "bearer",
-           bearerFormat: "JWT"
+          bearerFormat: "JWT"
         }
       }
-    }, 
+    },
     security: [{ BearerAuth: [] }]
-    
+
   },
   apis: ["./routes/*.js"] // Ensure this points to the correct path
 };
@@ -71,6 +69,19 @@ app.use('/v1', verificationRouter);
 app.use('/v1', bookingRouter);
 app.use('/v1', jobPostRouter);
 app.use('/v1', reportRouter);
+
+
+const { subscriptionChecker } = require('./app');
+
+cron.schedule('0 0 * * *', async () => {
+  try {
+    console.log('Running subscriptionChecker task...');
+    await subscriptionChecker();
+    console.log('subscriptionChecker task completed successfully');
+  } catch (error) {
+    console.error('Error executing subscriptionChecker:', error.message);
+  }
+});
 
 
 app.listen(PORT, () => {
