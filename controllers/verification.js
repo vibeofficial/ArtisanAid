@@ -96,3 +96,44 @@ exports.acceptVerification = async (req, res) => {
     })
   }
 };
+
+exports.rejectVerification = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const verification = await verificationModel.findById(id);
+
+    if (!verification) {
+      return res.status(404).json({
+        message: 'No verification initialized'
+      });
+    }
+
+    const artisan = await artisanModel.findById(verification.artisanId);
+
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Artisan not found'
+      });
+    }
+
+    artisan.verificationStatus = 'Rejected'; 
+
+    const mailDetails = {
+      email: artisan.email,
+      subject: 'ACCOUNT VERIFICATION REJECTED',
+      HTML: rejectVerification() 
+    };
+
+    await mail_sender(mailDetails);
+    await artisan.save();
+
+    res.status(200).json({
+      message: 'Account verification has been rejected'
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
