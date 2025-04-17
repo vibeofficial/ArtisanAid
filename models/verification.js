@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const verificationSchema = new mongoose.Schema({
   artisanId: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: 'users'
+    ref: 'artisans'
   },
   artisanName: {
     type: String,
