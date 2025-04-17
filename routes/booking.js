@@ -24,6 +24,7 @@ const router = require('express').Router();
  *               - artisanId
  *               - location
  *               - serviceDescription
+ *               - phoneNumber
  *             properties:
  *               artisanId:
  *                 type: string
@@ -36,6 +37,10 @@ const router = require('express').Router();
  *               serviceDescription:
  *                 type: string
  *                 description: Description of the service required
+ *                 example: "Need plumbing services for kitchen sink"
+ *               phoneNumber:
+ *                 type: string
+ *                 description: Phone number if the employer
  *                 example: "Need plumbing services for kitchen sink"
  *     responses:
  *       201:
