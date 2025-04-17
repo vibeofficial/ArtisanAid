@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken');
 exports.createJobPost = async (req, res) => {
   try {
     const { id } = req.user;
-    const { description } = req.body;
     const artisan = await artisanModel.findById(id);
 
     if (!artisan) {
@@ -35,12 +34,10 @@ exports.createJobPost = async (req, res) => {
       jobImage: {
         public_id: jobPostResult.public_id,
         image_url: jobPostResult.secure_url
-      },
-      description
+      }
     });
 
     await jobPost.save();
-
     artisan.jobPostId = jobPost._id;
     await artisan.save();
     res.status(201).json({
