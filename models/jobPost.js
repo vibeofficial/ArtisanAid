@@ -8,11 +8,6 @@ const jobPostSchema = new mongoose.Schema({
   jobImage: {
     public_id: { type: String, require: true },
     image_url: { type: String, require: true }
-  },
-  description: {
-    type: String,
-    require: true,
-    trim: true
   }
 });
 

@@ -12,8 +12,6 @@ const upload = require('../middlewares/multer');
  *     summary: Create a job post
  *     tags:
  *       - Job Post
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
