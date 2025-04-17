@@ -41,7 +41,7 @@ const router = require('express').Router();
  *               phoneNumber:
  *                 type: string
  *                 description: Phone number if the employer
- *                 example: "Need plumbing services for kitchen sink"
+ *                 example: "09085637287"
  *     responses:
  *       201:
  *         description: Artisan booked successfully
