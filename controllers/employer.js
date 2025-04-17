@@ -96,7 +96,7 @@ exports.registerEmployer = async (req, res) => {
     };
 
     await mail_sender(mailDetails);
-    await employer.save();
+    // await employer.save();
 
     res.status(201).json({
       message: 'Account Registered Successfully',
@@ -113,7 +113,7 @@ exports.registerEmployer = async (req, res) => {
 
 exports.getArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Verified', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
@@ -196,7 +196,7 @@ exports.login = async (req, res) => {
 
     return res.status(200).json({
       message: 'Login successful',
-      role: user.role,
+      data: user,
       token
     });
 
@@ -301,7 +301,7 @@ exports.getArtisansByLocalGovt = async (req, res) => {
       state: 'Lagos'
     };
 
-    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: 'Active' || 'Free' }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     if (artisans.length === 0) {
       return res.status(404).json({
