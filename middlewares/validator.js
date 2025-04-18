@@ -364,27 +364,6 @@ exports.changePasswordValidation = (req, res, next) => {
 };
 
 
-exports.categoryValidation = (req, res, next) => {
-  const schema = joi.object({
-    category: joi.string().min(3).required().messages({
-      "any.required": "Category is required",
-      "string.empty": "Category cannot be empty",
-      "string.min": "Category must be at least 3 characters long"
-    })
-  });
-
-  const { error } = schema.validate(req.body);
-
-  if (error) {
-    return res.status(400).json({
-      message: "Validation Error",
-      errors: error.message
-    });
-  }
-
-  next();
-};
-
 exports.lgaValidation = (req, res, next) => {
   const schema = joi.object({
     lga: joi.string().min(2).required().messages({
