@@ -147,44 +147,8 @@ exports.resendVerifyLinkValidation = async (req, res, next) => {
     });
   }
   next();
-}
-
-exports.updateLocationValidation = async (req, res, next) => {
-  const schema = joi.object({
-    lga: joi.string().required().messages({
-      'string.empty': 'LGA is required'
-    })
-  });
-
-  const { error } = schema.validate(req.body, { abortEarly: true });
-
-  if (error) {
-    return res.status(400).json({
-      message: error.message // Returning the first validation error message
-    });
-  }
-  next();
 };
 
-
-exports.updateBioValidation = (req, res, next) => {
-  const schema = joi.object({
-    bio: joi.string().required().messages({
-      'string.empty': 'Bio is required',
-      'any.required': 'Bio field is required'
-    })
-  });
-
-  const { error } = schema.validate(req.body, { abortEarly: true });
-
-  if (error) {
-    return res.status(400).json({
-      message: error.message
-    });
-  }
-
-  next();
-};
 
 exports.bookArtisanValidation = (req, res, next) => {
   const schema = joi.object({
@@ -379,26 +343,6 @@ exports.lgaValidation = (req, res, next) => {
 
   const { error } = schema.validate(req.query);
 
-  if (error) {
-    return res.status(400).json({
-      message: "Validation Error",
-      errors: error.message
-    });
-  }
-
-  next();
-};
-
-exports.updateSocialLinkValidation = (req, res, next) => {
-  const schema = joi.object({
-    socialLink: joi.string().uri().required().messages({
-      "any.required": "Social link is required",
-      "string.empty": "Social link cannot be empty",
-      "string.uri": "Social link must be a valid URL"
-    })
-  });
-
-  const { error } = schema.validate(req.body);
   if (error) {
     return res.status(400).json({
       message: "Validation Error",

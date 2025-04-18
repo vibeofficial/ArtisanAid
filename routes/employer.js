@@ -1,6 +1,6 @@
 const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employer');
 const { authenticate } = require('../middlewares/authentication');
-const { registerEmployerValidation, loginValidation, categoryValidation, lgaValidation, updateSocialLinkValidation } = require('../middlewares/validator');
+const { registerEmployerValidation, loginValidation, lgaValidation } = require('../middlewares/validator');
 
 const router = require('express').Router();
 const uploads = require('../middlewares/multer');
@@ -468,62 +468,6 @@ router.post('/artisans/lga', lgaValidation, getArtisansByLocalGovt);
  *                   example: 'Error updating cover'
  */
 router.put('/update/cover', authenticate, uploads.single('coverPhoto'), updateCoverPhoto);
-
-
-/**
- * @swagger
- * /v1/update/social:
- *   put:
- *     summary: Update artisan social media link
- *     description: Allows an authenticated artisan to update their social media link.
- *     tags:
- *       - General
- *     security:
- *       - Bearer: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               socialLink:
- *                 type: string
- *                 example: "https://linkedin.com/in/artisan-profile"
- *                 description: The social media link of the artisan.
- *     responses:
- *       '200':
- *         description: Social link updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Social link updated successfully"
- *       '404':
- *         description: Account not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Account not found"
- *       '500':
- *         description: Error updating social link.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Error updating social link"
- */
-router.put('/update/social', authenticate, updateSocialLinkValidation, updateSocialLink);
 
 
 module.exports = router;
