@@ -261,8 +261,8 @@ exports.getRecommendedArtisans = async (req, res) => {
 
 exports.getArtisansByCategory = async (req, res) => {
   try {
-    const { category } = req.body;
-    const artisans = await artisanModel.find({ category, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const { nameOfCategory } = req.body;
+    const artisans = await artisanModel.find({ category: nameOfCategory, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
     res.status(200).json({
       message: "All artisans in this category",
