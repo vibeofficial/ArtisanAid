@@ -12,8 +12,6 @@ const router = require('express').Router();
  *     description: Authenticated artisans can initialize a subscription payment using a selected plan ID.
  *     tags:
  *       - Subscription
- *     security:
- *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
@@ -73,8 +71,6 @@ router.get('/initialize/payment/:planId', authenticate, initializeSubscription);
  *     description: Verifies the status of a subscription payment using the transaction reference.
  *     tags:
  *       - Subscription
- *     security:
- *       - Bearer: []
  *     parameters:
  *       - in: query
  *         name: reference
