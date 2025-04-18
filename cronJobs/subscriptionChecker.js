@@ -47,7 +47,7 @@ cron.schedule('0 0 * * *', async () => {
       { upsert: true }
     );
 
-    // 🔍 Find and update expired subscriptions
+    // Find and update expired subscriptions
     const expiredArtisans = await Artisan.find({
       subscriptionEndDate: { $lt: now },
       subscription: { $ne: 'Expired' }
