@@ -147,13 +147,13 @@ exports.login = async (req, res) => {
 
     if (email) {
       user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'No account found' });
       };
     } else if (phoneNumber) {
       user = await artisanModel.findOne({ phoneNumber }) || await employerModel.findOne({ phoneNumber }) || await adminModel.findOne({ phoneNumber });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'No account found' });
       };
@@ -208,21 +208,20 @@ exports.login = async (req, res) => {
 
 
 exports.logout = async (req, res) => {
-  try {
+  try {    
     const { id } = req.user;
+    let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);    
 
-    if (!id) {
+    if (!user) {
       return res.status(400).json({
-        message: 'User is not logged in'
+        message: 'Account not found'
       });
     };
 
-    let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: 'User not found'
-      });
+    if (user.isLoggedIn !== true) {
+      return res.status(400).json({
+        message: 'Account is already logged out'
+      })
     };
 
     user.isLoggedIn = false;
@@ -289,11 +288,11 @@ exports.getArtisansByLocalGovt = async (req, res) => {
 
     const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
-      return res.status(404).json({
-        message: "All artisans in this lga",
-        total: artisans.length,
-        data: artisans
-      });
+    return res.status(404).json({
+      message: "All artisans in this lga",
+      total: artisans.length,
+      data: artisans
+    });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({

@@ -238,7 +238,7 @@ router.post('/login', loginValidation, login);
  *       '500':
  *         description: Error logging user out
  */
-router.get('/logout', logout);
+router.get('/logout', authenticate, logout);
 
 
 /**
