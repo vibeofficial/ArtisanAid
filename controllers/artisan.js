@@ -416,10 +416,10 @@ exports.updateProfilePic = async (req, res) => {
 };
 
 
-exports.updateLocation = async (req, res) => {
+exports.updateProfile = async (req, res) => {
   try {
     const { id } = req.user;
-    const { lga } = req.body;
+    const { lga, bio, socialMediaLink } = req.body;
     const user = await artisanModel.findById(id) || await employerModel.findById(id);
 
     if (!user) {
@@ -429,13 +429,12 @@ exports.updateLocation = async (req, res) => {
     };
 
     const data = {
-      location: user.location
+      location: user.location,
+      bio,
+      socialMediaLink
     };
 
-    data.location = {
-      lga
-    };
-
+    data.location.lga = lga;
     let updatedLocation;
 
     if (user.role === 'Employer') {
@@ -445,7 +444,7 @@ exports.updateLocation = async (req, res) => {
     }
 
     res.status(200).json({
-      message: 'Location updated successfully'
+      message: 'Profile updated successfully'
     })
   } catch (error) {
     console.log(error);
@@ -458,40 +457,6 @@ exports.updateLocation = async (req, res) => {
 
     res.status(500).json({
       message: 'Error updating address'
-    })
-  }
-};
-
-
-exports.updateBio = async (req, res) => {
-  try {
-    const { id } = req.user;
-    const { bio } = req.body;
-    const artisan = await artisanModel.findById(id);
-
-    if (!artisan) {
-      return res.status(404).json({
-        message: 'Account not found'
-      })
-    };
-
-    const data = {
-      bio: artisan.bio
-    };
-
-    data.bio = {
-      bio
-    };
-
-    const updatedBio = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
-
-    res.status(200).json({
-      message: 'Bio updated successfully'
-    })
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: 'Error updating bio'
     })
   }
 };

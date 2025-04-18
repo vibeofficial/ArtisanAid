@@ -358,37 +358,3 @@ exports.updateCoverPhoto = async (req, res) => {
     })
   }
 };
-
-
-exports.updateSocialLink = async (req, res) => {
-  try {
-    const { id } = req.user;
-    const { socialLink } = req.body;
-    const artisan = await artisanModel.findById(id);
-
-    if (!artisan) {
-      return res.status(404).json({
-        message: 'Account not found'
-      })
-    };
-
-    const data = {
-      socialMediaLink: artisan.socialMediaLink
-    };
-
-    data.socialMediaLink = {
-      socialLink
-    };
-
-    const updatedSocialLink = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
-
-    res.status(200).json({
-      message: 'Social link updated successfully'
-    })
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: error.message
-    })
-  }
-};

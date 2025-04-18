@@ -47,7 +47,7 @@ const artisanSchema = new mongoose.Schema({
   },
   location: {
     lga: { type: String, trim: true },
-    state: { type: String, default: 'Lagos',trim: true }
+    state: { type: String, default: 'Lagos' }
   },
   verificationStatus: {
     type: String,
