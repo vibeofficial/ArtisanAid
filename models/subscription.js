@@ -39,11 +39,6 @@ const subscriptionSchema = new mongoose.Schema({
     enum: ['Pending', 'Successful', 'Failed'],
     default: 'Pending'
   },
-  subscriptionType: {
-    type: String,
-    enum: ['Initial', 'Renewal', 'Upgrade'],
-    default: 'Initial'
-  },
   subscriptionDate: {
     type: String,
     require: true,

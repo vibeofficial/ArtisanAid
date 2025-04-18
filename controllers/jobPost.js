@@ -63,12 +63,6 @@ exports.getAllJobPost = async (req, res) => {
   try {
     const jobPost = await jobPostModel.find().populate('artisanId', 'fullname businessName profilePic category accountVerification isRecommended rating');
 
-    if (jobPost.length === 0) {
-      return res.status(404).json({
-        message: 'No artisan found'
-      })
-    };
-
     res.status(200).json({
       message: 'All artisans',
       data: jobPost

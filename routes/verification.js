@@ -126,7 +126,7 @@ router.get('/accept/verification/:id', authorize, acceptVerification);
 
 /**
  * @swagger
- * /v1/verification/reject/{id}:
+ * /v1/reject/verification/{id}:
  *   get:
  *     summary: Reject an artisan's verification request
  *     tags:

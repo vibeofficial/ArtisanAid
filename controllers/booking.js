@@ -1,7 +1,7 @@
 const bookingModel = require('../models/booking');
 const employerModel = require('../models/employer');
 const artisanModel = require('../models/artisan');
-const { verifyMail } = require('../helper/emailTemplate');
+const { verifyMail, acceptJobOffer, rejectJobOffer } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 
 
@@ -9,7 +9,7 @@ exports.bookArtisan = async (req, res) => {
   try {
     const { id } = req.user;
     const { artisanId } = req.params;
-    const { location, serviceTitle, serviceDescription } = req.body;
+    const { location, serviceTitle, serviceDescription, phoneNumber } = req.body;
 
     const employer = await employerModel.findById(id);
 
@@ -33,7 +33,7 @@ exports.bookArtisan = async (req, res) => {
       location,
       serviceTitle,
       serviceDescription,
-      date: new Date().toDateString()
+      phoneNumber
     });
 
     const html = verifyMail(link, artisan.fullname);
@@ -63,12 +63,6 @@ exports.getPendingBookings = async (req, res) => {
   try {
     const bookings = await bookingModel.find({ status: 'Pending' }).populate('employerId', 'fullname');
 
-    if (bookings.length === 0) {
-      return res.status(404).json({
-        message: 'No booking yet'
-      })
-    };
-
     res.status(200).json({
       message: 'All Pending bookings',
       data: bookings
@@ -86,12 +80,6 @@ exports.getConfirmedBookings = async (req, res) => {
   try {
     const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId', 'fullname phoneNumber');
 
-    if (bookings.length === 0) {
-      return res.status(404).json({
-        message: 'No booking yet'
-      })
-    };
-
     res.status(200).json({
       message: 'All Pending bookings',
       data: bookings
@@ -108,12 +96,6 @@ exports.getConfirmedBookings = async (req, res) => {
 exports.getRejectedBookings = async (req, res) => {
   try {
     const bookings = await bookingModel.find({ status: 'Rejected' }).populate('employerId', 'fullname');
-
-    if (bookings.length === 0) {
-      return res.status(404).json({
-        message: 'No booking yet'
-      })
-    };
 
     res.status(200).json({
       message: 'All Pending bookings',
@@ -149,6 +131,21 @@ exports.acceptJob = async (req, res) => {
       })
     };
 
+    const employer = await employerModel.findById(booking.employerId);
+
+    if (!employer) {
+      return res.status(404).json({
+        message: 'Employer not found'
+      })
+    };
+
+    const mailDetails = {
+      email: employer.email,
+      subject: 'JOB ACCEPT',
+      html: acceptJobOffer(artisan.fullname)
+    };
+
+    await mail_sender(mailDetails);
     booking.status = 'Confirmed';
     await booking.save();
 
@@ -196,7 +193,7 @@ exports.rejectJob = async (req, res) => {
     const mailDetails = {
       email: employer.email,
       subject: 'JOB REJECTION',
-      html: reason
+      html: rejectJobOffer(artisan.fullname)
     };
 
     await mail_sender(mailDetails);

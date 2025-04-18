@@ -2,9 +2,10 @@ const subscriptionModel = require('../models/subscription');
 const artisanModel = require('../models/artisan');
 const planModel = require('../models/plan');
 const generator = require('otp-generator');
-const ref = generator.generate(15, { lowerCaseAlphabets: true, upperCaseAlphabets: true, specialChars: false });
 const koraSecretKey = process.env.KORAPAY_SECRET_KEY
 const axios = require('axios');
+const { premiumSubscription, basicSubscription } = require('../helper/emailTemplate');
+const { mail_sender } = require('../middlewares/nodemailer');
 
 
 exports.initializeSubscription = async (req, res) => {
@@ -12,6 +13,7 @@ exports.initializeSubscription = async (req, res) => {
     const { id } = req.user;
     const { planId } = req.params;
     const artisan = await artisanModel.findById(id);
+    const ref = generator.generate(15, { lowerCaseAlphabets: true, upperCaseAlphabets: true, specialChars: false });
 
     if (!artisan) {
       return res.status(404).json({
@@ -32,7 +34,7 @@ exports.initializeSubscription = async (req, res) => {
       currency: 'NGN',
       reference: ref,
       customer: { email: artisan.email, name: artisan.fullname },
-      redirect_url: ''
+      redirect_url: 'https://artisian-aid.vercel.app/artisandashboard?'
     };
 
     const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentDetails, {
@@ -99,8 +101,6 @@ exports.verifySubscription = async (req, res) => {
       })
     };
 
-    const month = parseInt(plan.duration.split(' ')[0]);
-
     const response = await axios.get(`https://api.korapay.com/merchant/api/v1/charges/${reference}`, {
       headers: {
         Authorization: `Bearer ${koraSecretKey}`
@@ -112,7 +112,7 @@ exports.verifySubscription = async (req, res) => {
     if (data.status && data.data.status === 'success') {
       subscription.status = 'Successful';
       subscription.subscriptionDate = new Date().toLocaleString();
-      subscription.subscriptionEndDate = Date.now() + ((30.44 * 24 * 60 * 60 * 1000) * month);
+      subscription.expiresIn = Date.now() + (30.44 * 24 * 60 * 60 * 1000);
       await subscription.save();
 
       artisan.subscription = 'Active';
@@ -122,10 +122,22 @@ exports.verifySubscription = async (req, res) => {
         artisan.rating = 5;
 
         const mailDetails = {
-          email
-        }
+          email: artisan.email,
+          subject: 'SUBSCRIPTION ACTIVATED',
+          html: premiumSubscription()
+        };
+
+        await mail_sender(mailDetails);
       } else if (artisan.subscriptionPlan === 'BASIC PLAN') {
-        artisan.rating = 3
+        artisan.rating = 3;
+
+        const mailDetails = {
+          email: artisan.email,
+          subject: 'SUBSCRIPTION ACTIVATED',
+          html: basicSubscription()
+        };
+
+        await mail_sender(mailDetails);
       };
 
       await artisan.save();
