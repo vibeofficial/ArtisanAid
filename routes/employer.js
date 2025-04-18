@@ -230,8 +230,6 @@ router.post('/login', loginValidation, login);
  *     summary: Log out a user
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     responses:
  *       '200':
  *         description: User logged out successfully
