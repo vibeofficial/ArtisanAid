@@ -290,7 +290,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
 
 /**
  * @swagger
- * /v1/artisans/category:
+ * /v1/artisans/:category:
  *   get:
  *     summary: Get all users in a specific category
  *     description: Retrieves all users artisan the specified category and approved account verificatoon status.
@@ -335,7 +335,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
  *         description: Error retrieving users in the category.
  */
 
-router.get('/artisans/category', categoryValidation, getArtisansByCategory);
+router.get('/artisans/:category', getArtisansByCategory);
 
 
 /**
