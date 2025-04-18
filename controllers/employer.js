@@ -143,11 +143,11 @@ exports.login = async (req, res) => {
       return res.status(400).json({
         message: 'Please provide an email or phone number'
       });
-    }
+    };
 
     if (!password) {
       return res.status(400).json({ message: 'Password is required' });
-    }
+    };
 
     let user;
 
