@@ -521,7 +521,7 @@ exports.rejectJobOffer = (name) => {
 };
 
 
-exports.subscriptionExpire = (name) => {
+exports.subscriptionExpire = () => {
   return `
   <!DOCTYPE html>
   <html lang="en">
@@ -547,14 +547,14 @@ exports.subscriptionExpire = (name) => {
       <!-- Body Section -->
       <tr>
         <td style="padding: 20px; text-align: center;">
-          <h2 style="color: #000;">Update on Your Artisan Subscription</h2>
+          <h2 style="color: #000;">Your Subscription Has Expired - Don't Miss Out!</h2>
           <p style="font-size: 14px; line-height: 1.5; color: #808080;">
-           We wanted to inform you that the artisan you recently booked, ${name}, has unfortunately been rejected and will not be available for your project at this time.<br><br>
-           We understand how important it is to find the right talent for your needs, and we're here to help you connect with other qualified artisans who can bring your project to life.
+          We hope you’ve enjoyed all the benefits of being part of the Artisan aid community! We want to notify you that your subscription has expired.<br><br>
+          To continue enjoying uninterrupted access to our platform—connecting you with top employers —please renew your subscription before it expires by clicking on the link below.
           </p>
-          <a href="${artisans}" 
+          <a href="${loginPage}" 
              style="display: inline-block; background-color: #000435; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; margin-top: 15px;">
-            Explore more artisans
+            Login to Subscribe
           </a>
         </td>
       </tr>
