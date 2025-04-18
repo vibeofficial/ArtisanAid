@@ -253,7 +253,7 @@ exports.contactUsMessageValidation = async (req, resizeBy, next) => {
 
   if (error) {
     return res.status(400).json({
-      message: error.message // Returning the first validation error message
+      message: error.message
     });
   }
   next();
