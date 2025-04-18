@@ -247,7 +247,7 @@ exports.forgotPassword = async (req, res) => {
     };
 
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://${req.get('host')}/v1/reset/password/${token}`;//hosted url
+    const link = `${req.protocol}://artisian-aid.vercel.app/verify/${token}`;
     const html = resetPassword(link);
 
     const mailDetails = {
