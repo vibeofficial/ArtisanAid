@@ -151,8 +151,6 @@ router.get('/all/plan', authenticate, getAllPlans);
  *     summary: Get a specific subscription plan
  *     tags:
  *       - Plans
- *     security:
- *       - Bearer: []
  *     parameters:
  *       - in: path
  *         name: planId
