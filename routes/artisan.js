@@ -339,8 +339,6 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
  *     description: Allows a user to change their password by providing the current password, new password, and confirming the new password.
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
