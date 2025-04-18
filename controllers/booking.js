@@ -63,12 +63,6 @@ exports.getPendingBookings = async (req, res) => {
   try {
     const bookings = await bookingModel.find({ status: 'Pending' }).populate('employerId', 'fullname');
 
-    if (bookings.length === 0) {
-      return res.status(404).json({
-        message: 'No booking yet'
-      })
-    };
-
     res.status(200).json({
       message: 'All Pending bookings',
       data: bookings
@@ -86,12 +80,6 @@ exports.getConfirmedBookings = async (req, res) => {
   try {
     const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId', 'fullname phoneNumber');
 
-    if (bookings.length === 0) {
-      return res.status(404).json({
-        message: 'No booking yet'
-      })
-    };
-
     res.status(200).json({
       message: 'All Pending bookings',
       data: bookings
@@ -108,12 +96,6 @@ exports.getConfirmedBookings = async (req, res) => {
 exports.getRejectedBookings = async (req, res) => {
   try {
     const bookings = await bookingModel.find({ status: 'Rejected' }).populate('employerId', 'fullname');
-
-    if (bookings.length === 0) {
-      return res.status(404).json({
-        message: 'No booking yet'
-      })
-    };
 
     res.status(200).json({
       message: 'All Pending bookings',

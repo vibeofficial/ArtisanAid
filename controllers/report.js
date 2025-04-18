@@ -63,15 +63,7 @@ exports.reportArtisan = async (req, res) => {
 
 exports.getAllReports = async (req, res) => {
   try {
-    const reports = await reportModel.find()
-    .populate('artisanId', 'fullname email isReported verificationStatus')
-    .populate('employerId', 'fullname');
-
-    if (reports.length === 0) {
-      return res.status(404).json({
-        message: 'No report'
-      })
-    };
+    const reports = await reportModel.find().populate('artisanId', 'fullname email isReported verificationStatus').populate('employerId', 'fullname');
 
     res.status(200).json({
       message: 'All reports',

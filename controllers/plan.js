@@ -38,12 +38,6 @@ exports.getAllPlans = async (req, res) => {
   try {
     const plans = await planModel.find();
 
-    if (plans.length === 0) {
-      return res.status(404).json({
-        message: 'No plan created'
-      })
-    };
-
     res.status(200).json({
       message: 'All subscription plans',
       data: plans

@@ -115,12 +115,6 @@ exports.getArtisans = async (req, res) => {
   try {
     const artisans = await artisanModel.find({ verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No verified artisans found'
-      });
-    };
-
     return res.status(200).json({
       message: 'Verified artisans retrieved successfully',
       total: artisans.length,
@@ -251,12 +245,6 @@ exports.getRecommendedArtisans = async (req, res) => {
   try {
     const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No recommended artisan found'
-      });
-    }
-
     return res.status(200).json({
       message: 'Recommended artisans retrieved successfully',
       total: artisans.length,
@@ -275,12 +263,6 @@ exports.getArtisansByCategory = async (req, res) => {
   try {
     const { category } = req.body;
     const artisans = await artisanModel.find({ category, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
-
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: "No artisan found in this category",
-      });
-    }
 
     res.status(200).json({
       message: "All artisans in this category",
@@ -307,13 +289,11 @@ exports.getArtisansByLocalGovt = async (req, res) => {
 
     const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
 
-    if (artisans.length === 0) {
       return res.status(404).json({
         message: "All artisans in this lga",
         total: artisans.length,
         data: artisans
       });
-    };
   } catch (error) {
     console.error(error.message);
     res.status(500).json({

@@ -121,12 +121,6 @@ exports.getAdmins = async (req, res) => {
   try {
     const admins = await adminModel.find({ isVerified: true });
 
-    if (admins.length === 0) {
-      return res.status(404).json({
-        message: 'No admin found'
-      })
-    };
-
     res.status(200).json({
       message: 'All admins',
       total: admins.length,
@@ -152,12 +146,6 @@ exports.getUnVerifiedArtisans = async (req, res) => {
   try {
     const artisans = await artisanModel.find({ verificationStatus: 'Unverified' });
 
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No unerified artisans found'
-      });
-    };
-
     return res.status(200).json({
       message: 'Unverified artisans retrieved successfully',
       total: artisans.length,
@@ -175,12 +163,6 @@ exports.getUnVerifiedArtisans = async (req, res) => {
 exports.getPendingArtisans = async (req, res) => {
   try {
     const artisans = await artisanModel.find({ verificationStatus: 'Pending' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
-
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No pending artisan found'
-      });
-    };
 
     return res.status(200).json({
       message: 'Pending artisans retrieved successfully',
@@ -200,12 +182,6 @@ exports.getApprovedArtisans = async (req, res) => {
   try {
     const artisans = await artisanModel.find({ verificationStatus: 'Approved' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
 
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No approved artisan found'
-      });
-    };
-
     return res.status(200).json({
       message: 'Approved artisans retrieved successfully',
       total: artisans.length,
@@ -224,12 +200,6 @@ exports.getDeclinedArtisans = async (req, res) => {
   try {
     const artisans = await artisanModel.find({ verificationStatus: 'Declined' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
 
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No declined artisans found'
-      });
-    };
-
     return res.status(200).json({
       message: 'Declined artisans retrieved successfully',
       total: artisans.length,
@@ -247,12 +217,6 @@ exports.getDeclinedArtisans = async (req, res) => {
 exports.getEmployers = async (req, res) => {
   try {
     const employers = await employerModel.find({ isVerified: true });
-
-    if (employers.length === 0) {
-      return res.status(404).json({
-        message: 'No verified employers found'
-      });
-    }
 
     return res.status(200).json({
       message: 'Verified employers retrieved successfully',
@@ -295,12 +259,6 @@ exports.getUser = async (req, res) => {
 exports.getReportedArtisan = async (req, res) => {
   try {
     const artisans = await artisanModel.find({ isReported: true });
-
-    if (artisans.length === 0) {
-      return res.status(404).json({
-        message: 'No artisan reported'
-      })
-    };
 
     res.status(200).json({
       message: 'Reported artisans below',
