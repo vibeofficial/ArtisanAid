@@ -39,11 +39,15 @@ exports.subscriptionChecker = async (req, res) => {
               html: subscriptionExpire()
             };
 
+            artisan.subscription = 'Expired';
+            artisan.rating = 0;
+            artisan.isSubscribed = false;
+            await artisan.save();
             await mail_sender(mailDetails);
             console.log('Subscription checks completed and email sent successfully');
           }
         }
-      }else {
+      } else {
         console.log('Subscription checks completed but no mail sent');
       }
     }
