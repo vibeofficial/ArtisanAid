@@ -19,6 +19,10 @@ const verificationSchema = new mongoose.Schema({
     require: true,
     trim: true
   },
+  certificateTitle: {
+    type: String,
+    require: true
+  },
   guarantorPhoneNumber: {
     type: String,
     require: true,
