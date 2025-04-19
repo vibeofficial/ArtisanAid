@@ -280,11 +280,11 @@ exports.changePasswordValidation = (req, res, next) => {
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
     }),
-    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
+    newPassword: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
     }),
-    confirmPassword: joi.string().valid(joi.ref("password")).required().messages({
+    confirmPassword: joi.string().valid(joi.ref("newPassword")).required().messages({
       "any.required": "Confirm password is required",
       "any.only": "Passwords do not match"
     })
