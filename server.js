@@ -73,7 +73,7 @@ app.use('/v1', reportRouter);
 
 const { subscriptionChecker } = require('./app');
 
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('*/20 * * * * *', async () => {
   try {
     console.log('Running subscriptionChecker task...');
     await subscriptionChecker();
