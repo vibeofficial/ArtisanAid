@@ -334,7 +334,7 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
 /**
  * @swagger
  * /v1/change/password:
- *   put:
+ *   post:
  *     summary: Change user password
  *     description: Allows a user to change their password by providing the current password, new password, and confirming the new password.
  *     tags:
@@ -400,7 +400,7 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', changePasswordValidation, authenticate, changePassword);
+router.post('/change/password', changePasswordValidation, authenticate, changePassword);
 
 
 
