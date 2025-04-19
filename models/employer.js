@@ -36,6 +36,10 @@ const employerSchema = new mongoose.Schema({
     type: String,
     default: 'Employer'
   },
+  isLoggedIn: {
+    type: Boolean,
+    default: false
+  },
   isVerified: {
     type: Boolean,
     default: false
