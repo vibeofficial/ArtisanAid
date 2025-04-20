@@ -410,7 +410,7 @@ exports.updateProfilePic = async (req, res) => {
     };
 
     res.status(500).json({
-      message: 'Error updating profile picture'
+      message: error.message
     })
   }
 };
