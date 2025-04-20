@@ -458,12 +458,12 @@ exports.updateProfile = async (req, res) => {
 
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(400).json({
-        message: 'Session expired, please login to continue'
+        message: error.message
       })
     };
 
     res.status(500).json({
-      message: 'Error updating address'
+      message: error.message
     })
   }
 };
