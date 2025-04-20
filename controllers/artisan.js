@@ -84,6 +84,9 @@ exports.registerArtisan = async (req, res) => {
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
     const profilePicResult = await cloudinary.uploader.upload(profile);
 
+    const jobPost = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const jobPostPicResult = await cloudinary.uploader.upload(jobPost);
+
     const cover = 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
     const coverPhotoResult = await cloudinary.uploader.upload(cover);
 
@@ -105,6 +108,10 @@ exports.registerArtisan = async (req, res) => {
       coverPhoto: {
         public_id: coverPhotoResult.public_id,
         image_url: coverPhotoResult.secure_url
+      },
+      jobPost: {
+        public_id: jobPostPicResult.public_id,
+        image_url: jobPostPicResult.secure_url
       }
     });
 
