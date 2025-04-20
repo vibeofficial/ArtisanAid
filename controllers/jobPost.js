@@ -38,7 +38,12 @@ exports.createJobPost = async (req, res) => {
     });
 
     await jobPost.save();
-    artisan.jobPostId = jobPost._id;
+
+    artisan.jobPost = {
+      public_id: jobPost.jobImage.public_id,
+      image_url: jobPost.jobImage.image_url
+    };
+
     await artisan.save();
     res.status(201).json({
       message: 'Job Post created successfully'
@@ -61,7 +66,7 @@ exports.createJobPost = async (req, res) => {
 
 exports.getAllJobPost = async (req, res) => {
   try {
-    const jobPost = await jobPostModel.find().populate('artisanId', 'fullname businessName profilePic category accountVerification isRecommended rating');
+    const jobPost = await jobPostModel.find().populate('artisanId');
 
     res.status(200).json({
       message: 'All artisans',
