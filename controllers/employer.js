@@ -113,7 +113,7 @@ exports.registerEmployer = async (req, res) => {
 
 exports.getArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     return res.status(200).json({
       message: 'Verified artisans retrieved successfully',
@@ -208,9 +208,9 @@ exports.login = async (req, res) => {
 
 
 exports.logout = async (req, res) => {
-  try {    
+  try {
     const { id } = req.user;
-    let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);    
+    let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
     if (!user) {
       return res.status(400).json({
@@ -242,7 +242,7 @@ exports.logout = async (req, res) => {
 
 exports.getRecommendedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     return res.status(200).json({
       message: 'Recommended artisans retrieved successfully',
@@ -261,7 +261,7 @@ exports.getRecommendedArtisans = async (req, res) => {
 exports.getArtisansByCategory = async (req, res) => {
   try {
     const { nameOfCategory } = req.body;
-    const artisans = await artisanModel.find({ category: nameOfCategory, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ category: nameOfCategory, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     res.status(200).json({
       message: "All artisans in this category",
@@ -286,7 +286,7 @@ exports.getArtisansByLocalGovt = async (req, res) => {
       state: 'Lagos'
     };
 
-    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     return res.status(404).json({
       message: "All artisans in this lga",
