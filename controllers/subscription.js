@@ -20,6 +20,12 @@ exports.initializeSubscription = async (req, res) => {
         message: 'Artisan not found'
       })
     };
+    
+    if (artisan.isSubscribed === true) {
+      return res.status(400).json({
+        message: 'You have an active subscription'
+      })
+    };
 
     const plan = await planModel.findById(planId);
 
