@@ -1,4 +1,4 @@
-const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, updateSocialLink, getArtisans } = require('../controllers/employer');
+const { registerEmployer, login, logout, getRecommendedArtisans, getArtisansByCategory, getArtisansByLocalGovt, updateCoverPhoto, getArtisans } = require('../controllers/employer');
 const { authenticate } = require('../middlewares/authentication');
 const { registerEmployerValidation, loginValidation, lgaValidation } = require('../middlewares/validator');
 
