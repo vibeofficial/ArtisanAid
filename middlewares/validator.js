@@ -16,10 +16,7 @@ exports.registerAdminValidation = (req, res, next) => {
       'string.email': 'Please provide a valid email address',
     }),
     password: joi.string()
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/
-)
-      
-      .required()
+      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).required()
       .messages({
         'string.empty': 'Password is required',
         'string.pattern.base':
@@ -408,7 +405,6 @@ exports.updateSocialLinkValidation = (req, res, next) => {
 
   next();
 };
-
 
 exports.verificationValidation =async (req, res, next) => {
 
