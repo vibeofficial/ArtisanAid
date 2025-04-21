@@ -36,12 +36,12 @@ exports.bookArtisan = async (req, res) => {
       phoneNumber
     });
 
-    c5
+    // c5
 
     const mailDetails = {
       email: artisan.email,
-      subject: 'JOB BOOKING',
-      html
+      subject: 'JOB BOOKING'
+      // html
     };
 
     await mail_sender(mailDetails);
