@@ -288,7 +288,7 @@ router.get('/recommended/artisans', getRecommendedArtisans);
 
 /**
  * @swagger
- * /v1/artisan/category/:nameOfCategory:
+ * /v1/artisan/category/{nameOfCategory}:
  *   get:
  *     summary: Get all users in a specific category
  *     description: Retrieves all users artisan the specified category and approved account verificatoon status.

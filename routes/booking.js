@@ -7,14 +7,14 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /v1/book/artisan:
+ * /v1/book/artisan/{artisanId}:
  *   post:
  *     summary: Book an artisan
  *     tags:
  *       - Booking
  *     parameters:
- *       - artisanId
  *         in: path
+ *         name: artisanId
  *         required: true
  *         description: Id of the artisan
  *         schema:
@@ -26,15 +26,10 @@ const router = require('express').Router();
  *           schema:
  *             type: object
  *             required:
- *               - artisanId
  *               - location
  *               - serviceDescription
  *               - phoneNumber
  *             properties:
- *               artisanId:
- *                 type: string
- *                 description: ID of the artisan to be booked
- *                 example: "65b7d1e8e6c1234567f91ab2"
  *               location:
  *                 type: string
  *                 description: Location where the service is needed
