@@ -12,8 +12,13 @@ const router = require('express').Router();
  *     summary: Book an artisan
  *     tags:
  *       - Booking
- *     security:
- *       - bearerAuth: []
+ *     parameters:
+ *       - artisanId
+ *         in: path
+ *         required: true
+ *         description: Id of the artisan
+ *         schema:
+ *         type: string
  *     requestBody:
  *       required: true
  *       content:
