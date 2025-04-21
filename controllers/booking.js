@@ -1,7 +1,7 @@
 const bookingModel = require('../models/booking');
 const employerModel = require('../models/employer');
 const artisanModel = require('../models/artisan');
-const { verifyMail, acceptJobOffer, rejectJobOffer } = require('../helper/emailTemplate');
+const { acceptJobOffer, rejectJobOffer } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 
 
