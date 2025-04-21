@@ -18,7 +18,7 @@ const router = require('express').Router();
  *         required: true
  *         schema:
  *           type: string
- *         description: Id of the artisan
+ *         description: ID of the artisan to be booked
  *     requestBody:
  *       required: true
  *       content:
@@ -26,25 +26,26 @@ const router = require('express').Router();
  *           schema:
  *             type: object
  *             required:
- *               -serviceTitle
+ *               - serviceTitle
  *               - location
  *               - serviceDescription
  *               - phoneNumber
  *             properties:
- *              serviceTitle:
- *                type: string
- *                description: type of service the personnel is rendering
+ *               serviceTitle:
+ *                 type: string
+ *                 description: Type of service the artisan is rendering
+ *                 example: "Plumbing"
  *               location:
  *                 type: string
  *                 description: Location where the service is needed
  *                 example: "Lagos, Nigeria"
  *               serviceDescription:
  *                 type: string
- *                 description: Description of the service required
+ *                 description: Detailed description of the service required
  *                 example: "Need plumbing services for kitchen sink"
  *               phoneNumber:
  *                 type: string
- *                 description: Phone number if the employer
+ *                 description: Phone number of the employer
  *                 example: "09085637287"
  *     responses:
  *       201:
@@ -57,6 +58,19 @@ const router = require('express').Router();
  *                 message:
  *                   type: string
  *                   example: Artisan booked successfully
+ *                 data:
+ *                   type: object
+ *                   description: The booking details
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Phone number must be between 10 and 15 digits
  *       404:
  *         description: Employer or Artisan not found
  *         content:
@@ -68,7 +82,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Artisan not found
  *       500:
- *         description: Error booking an artisan
+ *         description: Server error
  *         content:
  *           application/json:
  *             schema:
@@ -76,7 +90,7 @@ const router = require('express').Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Error booking an artisan
+ *                   example: Internal Server Error
  */
 router.post('/book/artisan/:artisanId', bookArtisanValidation, authenticate, bookArtisan);
 

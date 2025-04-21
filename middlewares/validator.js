@@ -151,7 +151,10 @@ exports.bookArtisanValidation = (req, res, next) => {
       'string.empty': 'Location is required',
       'string.min': 'Location should be at least 3 characters long'
     }),
-
+    serviceTitle: joi.string().trim().required().messages({
+      'string.empty': 'Service title is required',
+      'any.required': 'Service title is required'
+    }),
     serviceDescription: joi.string().min(3).required().messages({
       'string.empty': 'Service description is required',
       'string.min': 'Service description should be at least 3 characters long'
