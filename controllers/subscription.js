@@ -40,7 +40,7 @@ exports.initializeSubscription = async (req, res) => {
       currency: 'NGN',
       reference: ref,
       customer: { email: artisan.email, name: artisan.fullname },
-      redirect_url: 'https://artisian-aid.vercel.app/artisandashboard?'
+      redirect_url: 'https://artisian-aid.vercel.app/subscriptionverified'
     };
 
     const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize', paymentDetails, {
