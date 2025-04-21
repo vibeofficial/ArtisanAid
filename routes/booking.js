@@ -13,12 +13,12 @@ const router = require('express').Router();
  *     tags:
  *       - Booking
  *     parameters:
- *         in: path
+ *       - in: path
  *         name: artisanId
  *         required: true
- *         description: Id of the artisan
  *         schema:
- *         type: string
+ *           type: string
+ *         description: Id of the artisan
  *     requestBody:
  *       required: true
  *       content:
