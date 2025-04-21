@@ -260,7 +260,7 @@ exports.getRecommendedArtisans = async (req, res) => {
 
 exports.getArtisansByCategory = async (req, res) => {
   try {
-    const { nameOfCategory } = req.body;
+    const { nameOfCategory } = req.params;
     const artisans = await artisanModel.find({ category: nameOfCategory, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     res.status(200).json({
