@@ -12,7 +12,7 @@ exports.createJobPost = async (req, res) => {
 
     if (!artisan) {
       return res.status(404).json({
-        message: 'Acoount not found'
+        message: 'Account not found'
       })
     };
 
