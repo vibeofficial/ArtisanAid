@@ -117,6 +117,17 @@ exports.updateJobPost = async (req, res) => {
       };
 
       const updatedJobPost = await jobPostModel.findByIdAndUpdate(jobPost._id, data, { new: true });
+      
+      if (updatedJobPost) {
+        await cloudinary.uploader.destroy(artisan.jobPost.public_id);
+        const jobPostResult = await cloudinary.uploader.upload(data.jobImage.image_url);
+        artisan.jobPost = {
+          public_id: jobPostResult.public_id,
+          image_url: jobPostResult.secure_url
+        }
+        await artisan.save()
+      };
+
       res.status(200).json({
         message: 'Job post updated successfully'
       })
