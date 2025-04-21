@@ -36,7 +36,7 @@ exports.bookArtisan = async (req, res) => {
       phoneNumber
     });
 
-    const html = verifyMail(link, artisan.fullname);
+    c5
 
     const mailDetails = {
       email: artisan.email,
