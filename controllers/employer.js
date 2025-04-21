@@ -113,7 +113,7 @@ exports.registerEmployer = async (req, res) => {
 
 exports.getArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     return res.status(200).json({
       message: 'Verified artisans retrieved successfully',
@@ -147,13 +147,13 @@ exports.login = async (req, res) => {
 
     if (email) {
       user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'No account found' });
       };
     } else if (phoneNumber) {
       user = await artisanModel.findOne({ phoneNumber }) || await employerModel.findOne({ phoneNumber }) || await adminModel.findOne({ phoneNumber });
-      
+
       if (!user) {
         return res.status(404).json({ message: 'No account found' });
       };
@@ -210,19 +210,18 @@ exports.login = async (req, res) => {
 exports.logout = async (req, res) => {
   try {
     const { id } = req.user;
-
-    if (!id) {
-      return res.status(400).json({
-        message: 'User is not logged in'
-      });
-    };
-
     let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
 
     if (!user) {
-      return res.status(404).json({
-        message: 'User not found'
+      return res.status(400).json({
+        message: 'Account not found'
       });
+    };
+
+    if (user.isLoggedIn !== true) {
+      return res.status(400).json({
+        message: 'Account is already logged out'
+      })
     };
 
     user.isLoggedIn = false;
@@ -243,7 +242,7 @@ exports.logout = async (req, res) => {
 
 exports.getRecommendedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ isRecommended: true, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     return res.status(200).json({
       message: 'Recommended artisans retrieved successfully',
@@ -262,7 +261,7 @@ exports.getRecommendedArtisans = async (req, res) => {
 exports.getArtisansByCategory = async (req, res) => {
   try {
     const { nameOfCategory } = req.body;
-    const artisans = await artisanModel.find({ category: nameOfCategory, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ category: nameOfCategory, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
     res.status(200).json({
       message: "All artisans in this category",
@@ -287,13 +286,13 @@ exports.getArtisansByLocalGovt = async (req, res) => {
       state: 'Lagos'
     };
 
-    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } }).populate('jobPostId', 'jobImage');
+    const artisans = await artisanModel.find({ location, verificationStatus: 'Approved', subscription: { $in: ['Active', 'Free'] } });
 
-      return res.status(404).json({
-        message: "All artisans in this lga",
-        total: artisans.length,
-        data: artisans
-      });
+    return res.status(404).json({
+      message: "All artisans in this lga",
+      total: artisans.length,
+      data: artisans
+    });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({
@@ -353,40 +352,6 @@ exports.updateCoverPhoto = async (req, res) => {
       })
     };
 
-    res.status(500).json({
-      message: error.message
-    })
-  }
-};
-
-
-exports.updateSocialLink = async (req, res) => {
-  try {
-    const { id } = req.user;
-    const { socialLink } = req.body;
-    const artisan = await artisanModel.findById(id);
-
-    if (!artisan) {
-      return res.status(404).json({
-        message: 'Account not found'
-      })
-    };
-
-    const data = {
-      socialMediaLink: artisan.socialMediaLink
-    };
-
-    data.socialMediaLink = {
-      socialLink
-    };
-
-    const updatedSocialLink = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
-
-    res.status(200).json({
-      message: 'Social link updated successfully'
-    })
-  } catch (error) {
-    console.log(error.message);
     res.status(500).json({
       message: error.message
     })

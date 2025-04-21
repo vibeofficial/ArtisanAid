@@ -84,6 +84,9 @@ exports.registerArtisan = async (req, res) => {
     const profile = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
     const profilePicResult = await cloudinary.uploader.upload(profile);
 
+    const jobPost = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+    const jobPostPicResult = await cloudinary.uploader.upload(jobPost);
+
     const cover = 'http://www.listercarterhomes.com/wp-content/uploads/2013/11/dummy-image-square.jpg';
     const coverPhotoResult = await cloudinary.uploader.upload(cover);
 
@@ -105,11 +108,17 @@ exports.registerArtisan = async (req, res) => {
       coverPhoto: {
         public_id: coverPhotoResult.public_id,
         image_url: coverPhotoResult.secure_url
+      },
+      jobPost: {
+        public_id: jobPostPicResult.public_id,
+        image_url: jobPostPicResult.secure_url
       }
     });
 
     const token = jwt.sign({ id: artisan._id }, jwtSecret, { expiresIn: '5mins' });
     const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
+    console.log(link);
+    
     const html = verifyMail(link);
 
     const mailDetails = {
@@ -247,7 +256,7 @@ exports.forgotPassword = async (req, res) => {
     };
 
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://artisian-aid.vercel.app/verify/${token}`;
+    const link = `${req.protocol}://artisian-aid.vercel.app/resetpassword/${token}`;
     const html = resetPassword(link);
 
     const mailDetails = {
@@ -410,16 +419,16 @@ exports.updateProfilePic = async (req, res) => {
     };
 
     res.status(500).json({
-      message: 'Error updating profile picture'
+      message: error.message
     })
   }
 };
 
 
-exports.updateLocation = async (req, res) => {
+exports.updateProfile = async (req, res) => {
   try {
     const { id } = req.user;
-    const { lga } = req.body;
+    const { lga, bio, socialMediaLink } = req.body;
     const user = await artisanModel.findById(id) || await employerModel.findById(id);
 
     if (!user) {
@@ -429,13 +438,12 @@ exports.updateLocation = async (req, res) => {
     };
 
     const data = {
-      location: user.location
+      location: user.location,
+      bio,
+      socialMediaLink
     };
 
-    data.location = {
-      lga
-    };
-
+    data.location.lga = lga;
     let updatedLocation;
 
     if (user.role === 'Employer') {
@@ -445,53 +453,19 @@ exports.updateLocation = async (req, res) => {
     }
 
     res.status(200).json({
-      message: 'Location updated successfully'
+      message: 'Profile updated successfully'
     })
   } catch (error) {
     console.log(error);
 
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(400).json({
-        message: 'Session expired, please login to continue'
+        message: error.message
       })
     };
 
     res.status(500).json({
-      message: 'Error updating address'
-    })
-  }
-};
-
-
-exports.updateBio = async (req, res) => {
-  try {
-    const { id } = req.user;
-    const { bio } = req.body;
-    const artisan = await artisanModel.findById(id);
-
-    if (!artisan) {
-      return res.status(404).json({
-        message: 'Account not found'
-      })
-    };
-
-    const data = {
-      bio: artisan.bio
-    };
-
-    data.bio = {
-      bio
-    };
-
-    const updatedBio = await artisanModel.findByIdAndUpdate(artisan._id, data, { new: true });
-
-    res.status(200).json({
-      message: 'Bio updated successfully'
-    })
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: 'Error updating bio'
+      message: error.message
     })
   }
 };

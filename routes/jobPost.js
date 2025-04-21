@@ -1,4 +1,4 @@
-const { createJobPost, getAllJobPost } = require('../controllers/jobPost');
+const { createJobPost, getAllJobPost, updateJobPost, deleteJobPost } = require('../controllers/jobPost');
 const { authenticate, checkSubscription } = require('../middlewares/authentication');
 
 const router = require('express').Router();
@@ -145,6 +145,112 @@ router.post('/upload/job', authenticate, upload.single('jobImage'), createJobPos
  *                   example: Session expired, please login to continue
  */
 router.get('/job/post', getAllJobPost);
+
+
+/**
+ * @swagger
+ * /v1/upload/job/{jobPostId}:
+ *   put:
+ *     summary: Update a job post image for the authenticated artisan
+ *     tags:
+ *       - Job Post
+ *     parameters:
+ *       - name: jobPostId
+ *         in: path
+ *         required: true
+ *         description: ID of the job post to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               jobImage:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Job post updated successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Job post updated successfully
+ *       400:
+ *         description: Session expired or invalid token
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Session expired, please login to continue
+ *       404:
+ *         description: Job post or artisan not found
+ *         content:
+ *           application/json:
+ *             examples:
+ *               AccountNotFound:
+ *                 value:
+ *                   message: Account not found
+ *               JobPostNotFound:
+ *                 value:
+ *                   message: No job post found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Internal server error
+ */
+router.put('/upload/job/:jobPostId', authenticate, updateJobPost);
+
+
+/**
+ * @swagger
+ * /v1/delete/job/{jobPostId}:
+ *   delete:
+ *     summary: Delete a job post created by the authenticated artisan
+ *     tags:
+ *       - Job Post
+ *     parameters:
+ *       - name: jobPostId
+ *         in: path
+ *         required: true
+ *         description: ID of the job post to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Job post deleted successfully
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Job post deleted successfully
+ *       400:
+ *         description: Session expired or invalid token
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Session expired, please login to continue
+ *       404:
+ *         description: Job post or artisan not found
+ *         content:
+ *           application/json:
+ *             examples:
+ *               AccountNotFound:
+ *                 value:
+ *                   message: Account not found
+ *               JobPostNotFound:
+ *                 value:
+ *                   message: No job post found
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Internal server error
+ */
+router.delete('/delete/job/:jobPostId', authenticate, deleteJobPost);
 
 
 module.exports = router;

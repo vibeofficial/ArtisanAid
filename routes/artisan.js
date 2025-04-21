@@ -1,5 +1,5 @@
-const { registerAdminValidation, resendVerifyLinkValidation, forgotPasswordValidation, resetPasswordValidation, changePasswordValidation, updateLocationValidation, updateBioValidation, registerArtisanValidation } = require('../middlewares/validator');
-const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, updateLocation, resendVerifyLink, updateBio } = require('../controllers/artisan');
+const { resendVerifyLinkValidation, forgotPasswordValidation, resetPasswordValidation, changePasswordValidation, registerArtisanValidation } = require('../middlewares/validator');
+const { registerArtisan, verifyAccount, forgotPassword, resetPassword, changePassword, updateProfilePic, resendVerifyLink, updateProfile } = require('../controllers/artisan');
 const { authenticate } = require('../middlewares/authentication');
 
 const router = require('express').Router();
@@ -334,13 +334,11 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
 /**
  * @swagger
  * /v1/change/password:
- *   put:
+ *   post:
  *     summary: Change user password
  *     description: Allows a user to change their password by providing the current password, new password, and confirming the new password.
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
@@ -402,14 +400,14 @@ router.post('/reset/password/:token', resetPasswordValidation, resetPassword);
  *                   type: string
  *                   example: 'Error changing password'
  */
-router.put('/change/password', changePasswordValidation, authenticate, changePassword);
+router.post('/change/password', changePasswordValidation, authenticate, changePassword);
 
 
 
 
 /**
  * @swagger
- * /v1/update/profile:
+ * /v1/update/profilepic:
  *   put:
  *     summary: Update user profile and profile picture
  *     description: Allows a user to update their profile details, including uploading a new profile picture.
@@ -480,15 +478,15 @@ router.put('/change/password', changePasswordValidation, authenticate, changePas
  *                   type: string
  *                   example: 'Error updating profile'
  */
-router.put('/update/profile', authenticate, uploads.single('profilePic'), updateProfilePic);
+router.put('/update/profilepic', authenticate, uploads.single('profilePic'), updateProfilePic);
 
 
 /**
  * @swagger
- * /v1/update/location:
+ * /v1/update/profile:
  *   put:
- *     summary: Update user address
- *     description: Allows a user to update their location details, including Local Government Area (LGA) and state.
+ *     summary: Update user profile
+ *     description: Allows an authenticated Artisan or Employer to update their profile (bio, social link, and LGA).
  *     tags:
  *       - General
  *     requestBody:
@@ -500,77 +498,16 @@ router.put('/update/profile', authenticate, uploads.single('profilePic'), update
  *             properties:
  *               lga:
  *                 type: string
- *                 example: 'Ikeja'
- *                 description: The Local Government Area (LGA) of the user.
- *     responses:
- *       '200':
- *         description: Location updated successfully.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Location updated successfully'
- *       '400':
- *         description: Invalid session or session expired.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Session expired, please login to continue'
- *       '404':
- *         description: Account not found.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Account not found'
- *       '500':
- *         description: Error updating address.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Error updating address'
- */
-router.put('/update/location', updateLocationValidation, authenticate, updateLocation);
-
-
-/**
- * @swagger
- * /v1/update/bio:
- *   put:
- *     summary: Update user bio
- *     description: Allows an authenticated user to update their bio information.
- *     tags:
- *       - General
- *     security:
- *       - Bearer: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
+ *                 example: "Ikeja"
  *               bio:
  *                 type: string
- *                 example: "Passionate about craftsmanship and dedicated to excellent service."
- *                 description: A short bio describing the user.
+ *                 example: "Experienced artisan specializing in home renovation and electrical work."
+ *               socialMediaLink:
+ *                 type: string
+ *                 example: "https://linkedin.com/in/artisanpro"
  *     responses:
- *       '200':
- *         description: Bio updated successfully.
+ *       200:
+ *         description: Profile updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -578,9 +515,24 @@ router.put('/update/location', updateLocationValidation, authenticate, updateLoc
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Bio updated successfully"
- *       '400':
- *         description: Invalid session or session expired.
+ *                   example: Profile updated successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "605c72ef2f1b2c0015b2b5d1"
+ *                     bio:
+ *                       type: string
+ *                     socialMediaLink:
+ *                       type: string
+ *                     location:
+ *                       type: object
+ *                       properties:
+ *                         lga:
+ *                           type: string
+ *       400:
+ *         description: Session expired or invalid token
  *         content:
  *           application/json:
  *             schema:
@@ -588,9 +540,9 @@ router.put('/update/location', updateLocationValidation, authenticate, updateLoc
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Session expired, please login to continue"
- *       '404':
- *         description: Account not found.
+ *                   example: Session expired, please login to continue
+ *       404:
+ *         description: User not found
  *         content:
  *           application/json:
  *             schema:
@@ -598,9 +550,9 @@ router.put('/update/location', updateLocationValidation, authenticate, updateLoc
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Account not found"
- *       '500':
- *         description: Error updating bio.
+ *                   example: User not found
+ *       500:
+ *         description: Error updating profile
  *         content:
  *           application/json:
  *             schema:
@@ -608,9 +560,9 @@ router.put('/update/location', updateLocationValidation, authenticate, updateLoc
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Error updating bio"
+ *                   example: Error updating profile
  */
-router.put('/update/bio', updateBioValidation, authenticate, updateBio);
+router.put('/update/profile', authenticate, updateProfile);
 
 
 module.exports = router;

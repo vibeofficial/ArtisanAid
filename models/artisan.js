@@ -47,7 +47,7 @@ const artisanSchema = new mongoose.Schema({
   },
   location: {
     lga: { type: String, trim: true },
-    state: { type: String, default: 'Lagos',trim: true }
+    state: { type: String, default: 'Lagos' }
   },
   verificationStatus: {
     type: String,
@@ -104,9 +104,9 @@ const artisanSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  jobPostId: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'jobPosts'
+  jobPost: {
+    public_id: { type: String, require: true },
+    image_url: { type: String, require: true }
   },
   verificationId: {
     type: mongoose.SchemaTypes.ObjectId,

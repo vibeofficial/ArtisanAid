@@ -21,6 +21,12 @@ exports.initializeSubscription = async (req, res) => {
       })
     };
 
+    if (artisan.isSubscribed === true) {
+      return res.status(400).json({
+        message: 'You have an active subscription'
+      })
+    };
+
     const plan = await planModel.findById(planId);
 
     if (!plan) {
@@ -116,6 +122,7 @@ exports.verifySubscription = async (req, res) => {
       await subscription.save();
 
       artisan.subscription = 'Active';
+      artisan.isSubscribed = true;
       artisan.subscriptionPlan = plan.planName;
 
       if (artisan.subscriptionPlan === 'PREMIUM PLAN') {

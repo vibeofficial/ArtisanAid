@@ -16,11 +16,11 @@ exports.registerAdminValidation = (req, res, next) => {
       'string.email': 'Please provide a valid email address',
     }),
     password: joi.string()
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).required()
+      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/)
+      .required()
       .messages({
         'string.empty': 'Password is required',
-        'string.pattern.base':
-          'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, a number, and a special character',
+        'string.pattern.base': 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, a number, and a special character (@$!%_*#?&)',
       }),
     confirmPassword: joi.string().required().valid(joi.ref('password')).messages({
       'any.only': 'Passwords do not match',
@@ -65,12 +65,11 @@ exports.registerArtisanValidation = async (req, res, next) => {
       'string.min': 'Category must be at least 5 characters long.',
       'string.pattern.base': 'Category must contain only letters'
     }),
-    password: joi.string().required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/
-).messages({
+    password: joi.string().required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).messages({
       'string.empty': 'Password is required.',
-      'string.pattern.base': 'Password must be at least 9 characters long, include one uppercase letter, one lowercase letter, and one special character(!@#$%).'
+      'string.pattern.base': 'Password must be at least 9 characters long, include one uppercase letter, one lowercase letter, and one special character (@$!%_*#?&).'
     }),
-    confirmPassword: joi.string().required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).messages({
+    confirmPassword: joi.string().required().valid(joi.ref('password')).messages({
       'string.empty': 'Confirmation password is required.',
       'string.pattern.base': 'Confirmation password must meet the same requirements as the password.'
     }),
@@ -104,11 +103,10 @@ exports.registerEmployerValidation = (req, res, next) => {
       "any.required": "Phone number is required",
       "string.pattern.base": "Phone number must be 11 digits"
     }),
-    //    address,
-    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).required().messages({
+    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
-      "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
+      "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character (@$!%_*#?&)."
     }),
     confirmPassword: joi.string().valid(joi.ref("password")).required().messages({
       "any.required": "Confirm password is required",
@@ -144,44 +142,8 @@ exports.resendVerifyLinkValidation = async (req, res, next) => {
     });
   }
   next();
-}
-
-exports.updateLocationValidation = async (req, res, next) => {
-  const schema = joi.object({
-    lga: joi.string().required().messages({
-      'string.empty': 'LGA is required'
-    })
-  });
-
-  const { error } = schema.validate(req.body, { abortEarly: true });
-
-  if (error) {
-    return res.status(400).json({
-      message: error.message // Returning the first validation error message
-    });
-  }
-  next();
 };
 
-
-exports.updateBioValidation = (req, res, next) => {
-  const schema = joi.object({
-    bio: joi.string().required().messages({
-      'string.empty': 'Bio is required',
-      'any.required': 'Bio field is required'
-    })
-  });
-
-  const { error } = schema.validate(req.body, { abortEarly: true });
-
-  if (error) {
-    return res.status(400).json({
-      message: error.message
-    });
-  }
-
-  next();
-};
 
 exports.bookArtisanValidation = (req, res, next) => {
   const schema = joi.object({
@@ -193,27 +155,6 @@ exports.bookArtisanValidation = (req, res, next) => {
     serviceDescription: joi.string().min(3).required().messages({
       'string.empty': 'Service description is required',
       'string.min': 'Service description should be at least 3 characters long'
-    })
-  });
-
-  const { error } = schema.validate(req.body, { abortEarly: true });
-
-  if (error) {
-    return res.status(400).json({
-      message: error.message
-    });
-  }
-
-  next();
-};
-
-
-exports.rejectJobBookingValidation = (req, res, next) => {
-  const schema = joi.object({
-    reason: joi.string().min(3).required().messages({
-      'string.empty': 'Rejection reason is required',
-      'string.min': 'Rejection reason must be at least 3 characters',
-      'any.required': 'Rejection reason is required'
     })
   });
 
@@ -250,7 +191,7 @@ exports.contactUsMessageValidation = async (req, resizeBy, next) => {
 
   if (error) {
     return res.status(400).json({
-      message: error.message // Returning the first validation error message
+      message: error.message
     });
   }
   next();
@@ -267,7 +208,7 @@ exports.loginValidation = (req, res, next) => {
       "any.required": "Phone number is required",
       "string.pattern.base": "Phone number must be 11 digits"
     }),
-    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).required().messages({
+    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Input your password"
     })
@@ -308,10 +249,10 @@ exports.forgotPasswordValidation = (req, res, next) => {
 
 exports.resetPasswordValidation = (req, res, next) => {
   const schema = joi.object({
-    newPassword: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).required().messages({
+    newPassword: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
-      "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
+      "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character (@$!%_*#?&)."
     }),
     confirmPassword: joi.string().valid(joi.ref("password")).required().messages({
       "any.required": "Confirm password is required",
@@ -335,16 +276,13 @@ exports.resetPasswordValidation = (req, res, next) => {
 
 exports.changePasswordValidation = (req, res, next) => {
   const schema = joi.object({
-    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).required().messages({
+    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
-      "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
-      
     }),
-    newPassword: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&])[A-Za-z\d!@#$%^&]{8,}$/).required().messages({
+    newPassword: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
       "string.empty": "Password cannot be empty",
-      "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character"
     }),
     confirmPassword: joi.string().valid(joi.ref("newPassword")).required().messages({
       "any.required": "Confirm password is required",
@@ -386,27 +324,8 @@ exports.lgaValidation = (req, res, next) => {
   next();
 };
 
-exports.updateSocialLinkValidation = (req, res, next) => {
-  const schema = joi.object({
-    socialLink: joi.string().uri().required().messages({
-      "any.required": "Social link is required",
-      "string.empty": "Social link cannot be empty",
-      "string.uri": "Social link must be a valid URL"
-    })
-  });
 
-  const { error } = schema.validate(req.body);
-  if (error) {
-    return res.status(400).json({
-      message: "Validation Error",
-      errors: error.message
-    });
-  }
-
-  next();
-};
-
-exports.verificationValidation =async (req, res, next) => {
+exports.verificationValidation = async (req, res, next) => {
 
   console.log(req)
   const schema = joi.object({
@@ -498,12 +417,12 @@ exports.updatePlanValidation = (req, res, next) => {
 exports.reportArtisanValidation = (req, res, next) => {
   const schema = joi.object({
     reason: joi.string().min(10).max(1000).required().messages({
-        'string.base': 'Reason must be a text',
-        'string.empty': 'Reason is required',
-        'string.min': 'Reason must be at least 10 characters long',
-        'string.max': 'Reason cannot exceed 1000 characters',
-        'any.required': 'Reason is required'
-      })
+      'string.base': 'Reason must be a text',
+      'string.empty': 'Reason is required',
+      'string.min': 'Reason must be at least 10 characters long',
+      'string.max': 'Reason cannot exceed 1000 characters',
+      'any.required': 'Reason is required'
+    })
   });
 
   const { error } = schema.validate(req.body);

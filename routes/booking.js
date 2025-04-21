@@ -1,6 +1,6 @@
 const { bookArtisan, acceptJob, rejectJob, getPendingBookings, getConfirmedBookings, getRejectedBookings } = require('../controllers/booking');
 const { authenticate } = require('../middlewares/authentication');
-const { rejectJobBookingValidation, bookArtisanValidation } = require('../middlewares/validator');
+const { bookArtisanValidation } = require('../middlewares/validator');
 
 const router = require('express').Router();
 
@@ -186,7 +186,7 @@ router.get('/accept/job/:bookingId', authenticate, acceptJob);
  *                   type: string
  *                   example: Error rejecting job offer
  */
-router.get('/reject/job/:bookingId', rejectJobBookingValidation, authenticate, rejectJob);
+router.get('/reject/job/:bookingId', authenticate, rejectJob);
 
 
 /**

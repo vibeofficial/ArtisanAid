@@ -36,12 +36,12 @@ exports.bookArtisan = async (req, res) => {
       phoneNumber
     });
 
-    const html = verifyMail(link, artisan.fullname);
+    // c5
 
     const mailDetails = {
       email: artisan.email,
-      subject: 'JOB BOOKING',
-      html
+      subject: 'JOB BOOKING'
+      // html
     };
 
     await mail_sender(mailDetails);
@@ -61,7 +61,7 @@ exports.bookArtisan = async (req, res) => {
 
 exports.getPendingBookings = async (req, res) => {
   try {
-    const bookings = await bookingModel.find({ status: 'Pending' }).populate('employerId', 'fullname');
+    const bookings = await bookingModel.find({ status: 'Pending' }).populate('employerId');
 
     res.status(200).json({
       message: 'All Pending bookings',
@@ -78,7 +78,7 @@ exports.getPendingBookings = async (req, res) => {
 
 exports.getConfirmedBookings = async (req, res) => {
   try {
-    const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId', 'fullname phoneNumber');
+    const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId');
 
     res.status(200).json({
       message: 'All Pending bookings',
@@ -95,7 +95,7 @@ exports.getConfirmedBookings = async (req, res) => {
 
 exports.getRejectedBookings = async (req, res) => {
   try {
-    const bookings = await bookingModel.find({ status: 'Rejected' }).populate('employerId', 'fullname');
+    const bookings = await bookingModel.find({ status: 'Rejected' }).populate('employerId');
 
     res.status(200).json({
       message: 'All Pending bookings',

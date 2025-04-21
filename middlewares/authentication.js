@@ -23,9 +23,15 @@ exports.authenticate = async (req, res, next) => {
       })
     };
 
-    const decodedToken = jwt.verify(token, jwtSecret);
+    const decodedToken = jwt.verify(token, jwtSecret);    
     const { id } = decodedToken;
-    let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);
+    let user = await artisanModel.findById(id) || await employerModel.findById(id) || await adminModel.findById(id);    
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    };
 
   if (user.isLoggedIn !== decodedToken.isLoggedIn) {
     return res.status(401).json({
