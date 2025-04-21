@@ -67,7 +67,7 @@ exports.registerArtisanValidation = async (req, res, next) => {
     }),
     password: joi.string().required().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).messages({
       'string.empty': 'Password is required.',
-      'string.pattern.base': 'Password must be at least 9 characters long, include one uppercase letter, one lowercase letter, and one special character (@$!%_*#?&).'
+      'string.pattern.base': 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, and one special character (@$!%_*#?&).'
     }),
     confirmPassword: joi.string().required().valid(joi.ref('password')).messages({
       'string.empty': 'Confirmation password is required.',
