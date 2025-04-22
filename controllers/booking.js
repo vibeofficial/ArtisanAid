@@ -104,6 +104,11 @@ exports.getConfirmedBookings = async (req, res) => {
     }
 
     const bookings = await bookingModel.find({ status: 'Confirmed', artisanId: artisan._id }).populate('employerId');
+
+    res.status(200).json({
+      message: 'All Confirmed bookings',
+      data: bookings
+    })
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -125,6 +130,11 @@ exports.getRejectedBookings = async (req, res) => {
     }
 
     const bookings = await bookingModel.find({ status: 'Rejected', artisanId: artisan._id }).populate('employerId');
+
+    res.status(200).json({
+      message: 'All Rejected bookings',
+      data: bookings
+    })
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
