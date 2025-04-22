@@ -3,7 +3,7 @@ const joi = require('joi');
 
 exports.registerAdminValidation = (req, res, next) => {
   const schema = joi.object({
-    fullname: joi.string().min(3).required().messages({
+    fullname: joi.string().min(3).trim().required().messages({
       'string.empty': 'Full name is required',
       'string.min': 'Full name must be at least 3 characters long',
     }),
@@ -11,7 +11,7 @@ exports.registerAdminValidation = (req, res, next) => {
       'string.empty': 'Phone number is required',
       'string.pattern.base': 'Phone number must be 11 digits',
     }),
-    email: joi.string().email().required().messages({
+    email: joi.string().email().trim().required().messages({
       'string.empty': 'Email is required',
       'string.email': 'Please provide a valid email address',
     }),
@@ -145,7 +145,7 @@ exports.resendVerifyLinkValidation = async (req, res, next) => {
 
 exports.bookArtisanValidation = (req, res, next) => {
   const schema = joi.object({
-    location: joi.string().min(3).required().messages({
+    location: joi.string().min(3).trim().required().messages({
       'string.empty': 'Location is required',
       'string.min': 'Location should be at least 3 characters long'
     }),
@@ -153,7 +153,7 @@ exports.bookArtisanValidation = (req, res, next) => {
       'string.empty': 'Service title is required',
       'any.required': 'Service title is required'
     }),
-    serviceDescription: joi.string().min(3).required().messages({
+    serviceDescription: joi.string().trim().min(3).required().messages({
       'string.empty': 'Service description is required',
       'string.min': 'Service description should be at least 3 characters long'
     }),
@@ -205,7 +205,7 @@ exports.contactUsMessageValidation = async (req, resizeBy, next) => {
 
 exports.loginValidation = (req, res, next) => {
   const schema = joi.object({
-    email: joi.string().email().optional().messages({
+    email: joi.string().email().trim().optional().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
@@ -310,7 +310,7 @@ exports.changePasswordValidation = (req, res, next) => {
 
 exports.lgaValidation = (req, res, next) => {
   const schema = joi.object({
-    lga: joi.string().min(2).required().messages({
+    lga: joi.string().min(2).trim().required().messages({
       "any.required": "LGA is required",
       "string.empty": "LGA cannot be empty",
       "string.min": "LGA must be at least 2 characters"
@@ -340,14 +340,14 @@ exports.verificationValidation = async (req, res, next) => {
       'any.required': 'Guarantor name is required'
     }),
     guarantorPhoneNumber: joi.string()
-      .pattern(/^[0-9]{10,15}$/)
+      .pattern(/^[0-9]{10,15}$/).trim()
       .required()
       .messages({
         'string.pattern.base': 'Phone number must be between 10 and 15 digits',
         'string.empty': 'Guarantor phone number is required',
         'any.required': 'Guarantor phone number is required'
       }),
-    workCertificate: joi.string().optional()
+    workCertificate: joi.string().trim().required()
   });
   console.log(req.body)
   const { error } = await schema.validate(req.body, { abortEarly: true });
@@ -373,7 +373,7 @@ exports.createPlanValidation = (req, res, next) => {
       'number.positive': 'Amount must be greater than 0',
       'any.required': 'Amount is required'
     }),
-    description: joi.string().required().messages({
+    description: joi.string().required().trim().messages({
       'string.empty': 'Description cannot be empty',
       'any.required': 'Description is required'
     })
@@ -393,7 +393,7 @@ exports.createPlanValidation = (req, res, next) => {
 
 exports.updatePlanValidation = (req, res, next) => {
   const schema = joi.object({
-    planName: joi.string().required().messages({
+    planName: joi.string().required().trim().messages({
       'string.empty': 'Plan name cannot be empty',
       'any.required': 'Plan name is required'
     }),
@@ -402,7 +402,7 @@ exports.updatePlanValidation = (req, res, next) => {
       'number.positive': 'Amount must be greater than 0',
       'any.required': 'Amount is required'
     }),
-    description: joi.string().required().messages({
+    description: joi.string().required().trim().messages({
       'string.empty': 'Description cannot be empty',
       'any.required': 'Description is required'
     })
@@ -421,7 +421,7 @@ exports.updatePlanValidation = (req, res, next) => {
 
 exports.reportArtisanValidation = (req, res, next) => {
   const schema = joi.object({
-    reason: joi.string().min(10).max(1000).required().messages({
+    reason: joi.string().min(10).max(1000).required().trim().messages({
       'string.base': 'Reason must be a text',
       'string.empty': 'Reason is required',
       'string.min': 'Reason must be at least 10 characters long',
