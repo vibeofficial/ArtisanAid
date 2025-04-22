@@ -1,6 +1,7 @@
 const employerModel = require('../models/employer');
 const artisanModel = require('../models/artisan');
 const adminModel = require('../models/admin');
+const jobPostModel = require('../models/jobPost');
 const bcrypt = require('bcrypt');
 const cloudinary = require('../configs/cloudinary');
 const fs = require('fs');
@@ -165,6 +166,14 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid Credentials' });
     };
 
+    const jobPost = await jobPostModel.findOne({artisanId: user._id});
+
+    if (!jobPost) {
+      return res.status(404).json({
+        message: 'Job post not found'
+      })
+    }
+
     if (user.isVerified !== true) {
       const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5m' });
       const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
@@ -195,6 +204,7 @@ exports.login = async (req, res) => {
     return res.status(200).json({
       message: 'Login successful',
       data: user,
+      jobPostImage: jobPost,
       token
     });
 

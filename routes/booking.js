@@ -239,7 +239,7 @@ router.get('/reject/job/:bookingId', authenticate, rejectJob);
  *             example:
  *               message: Something went wrong
  */
-router.get('/pending/job', getPendingBookings);
+router.get('/pending/job', authenticate, getPendingBookings);
 
 
 /**
@@ -279,7 +279,7 @@ router.get('/pending/job', getPendingBookings);
  *             example:
  *               message: An unexpected error occurred
  */
-router.get('/confimed/job', getConfirmedBookings);
+router.get('/confimed/job', authenticate, getConfirmedBookings);
 
 
 /**
@@ -318,7 +318,7 @@ router.get('/confimed/job', getConfirmedBookings);
  *             example:
  *               message: Error message from the server
  */
-router.get('/rejected/job', getRejectedBookings);
+router.get('/rejected/job', authenticate, getRejectedBookings);
 
 
 module.exports = router;

@@ -68,7 +68,16 @@ exports.bookArtisan = async (req, res) => {
 
 exports.getPendingBookings = async (req, res) => {
   try {
-    const bookings = await bookingModel.find({ status: 'Pending' }).populate('employerId');
+    const { id } = req.user;
+    const artisan = await artisanModel.findById(id);
+
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    }
+
+    const bookings = await bookingModel.find({ status: 'Pending', artisanId: artisan._id }).populate('employerId');
 
     res.status(200).json({
       message: 'All Pending bookings',
@@ -85,12 +94,16 @@ exports.getPendingBookings = async (req, res) => {
 
 exports.getConfirmedBookings = async (req, res) => {
   try {
-    const bookings = await bookingModel.find({ status: 'Confirmed' }).populate('employerId');
+    const { id } = req.user;
+    const artisan = await artisanModel.findById(id);
 
-    res.status(200).json({
-      message: 'All Pending bookings',
-      data: bookings
-    })
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    }
+
+    const bookings = await bookingModel.find({ status: 'Confirmed', artisanId: artisan._id }).populate('employerId');
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -102,12 +115,16 @@ exports.getConfirmedBookings = async (req, res) => {
 
 exports.getRejectedBookings = async (req, res) => {
   try {
-    const bookings = await bookingModel.find({ status: 'Rejected' }).populate('employerId');
+    const { id } = req.user;
+    const artisan = await artisanModel.findById(id);
 
-    res.status(200).json({
-      message: 'All Pending bookings',
-      data: bookings
-    })
+    if (!artisan) {
+      return res.status(404).json({
+        message: 'Account not found'
+      })
+    }
+
+    const bookings = await bookingModel.find({ status: 'Rejected', artisanId: artisan._id }).populate('employerId');
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
