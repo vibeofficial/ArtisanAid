@@ -46,7 +46,8 @@ exports.createJobPost = async (req, res) => {
 
     await artisan.save();
     res.status(201).json({
-      message: 'Job Post created successfully'
+      message: 'Job Post created successfully',
+      data: jobPost
     })
   } catch (error) {
     console.log(error);
@@ -129,7 +130,7 @@ exports.updateJobPost = async (req, res) => {
       };
 
       res.status(200).json({
-        message: 'Job post updated successfully'
+        message: 'Job post updated successfully',
       })
     }
   } catch (error) {
