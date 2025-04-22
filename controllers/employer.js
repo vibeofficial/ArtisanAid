@@ -194,19 +194,13 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user._id, role: user.role, isLoggedIn: user.isLoggedIn }, jwtSecret, { expiresIn: '1d' });
     await user.save();
     
-    if (user.role === 'Artisan') {
-      const jobPost = await jobPostModel.findOne({artisanId: user._id});
-  
-      if (!jobPost) {
-        return res.status(404).json({
-          message: 'Job post not found'
-        })
-      };
+    const jobPost = await jobPostModel.findOne({artisanId: user._id});
 
+    if (user.role === 'Artisan') {
       res.status(200).json({
         message: 'Login successful',
         data: user,
-        jobPostImage: jobPost || user.jobPost,
+        jobPostImage: jobPost,
         token
       }); 
     } else {
