@@ -209,7 +209,7 @@ exports.loginValidation = (req, res, next) => {
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
-    phoneNumber: joi.string().trim().pattern(/^\d{11}$/).required().messages({
+    phoneNumber: joi.string().trim().pattern(/^\d{11}$/).optional().messages({
       'string.empty': 'Phone number is required',
       'string.pattern.base': 'Phone number must be 11 digits',
     }),
