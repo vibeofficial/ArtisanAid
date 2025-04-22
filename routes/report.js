@@ -6,15 +6,13 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /v1/report/artisan:
+ * /v1/report/artisan/{artisanId}:
  *   post:
  *     summary: Report an artisan
  *     tags:
  *       - Report Artisan
- *     security:
- *       - Bearer: []
  *     parameters:
- *       - name: ArtisanId
+ *       - name: artisanId
  *         in: path
  *         description: The ID of the user whose account will be restricted.
  *         required: true
