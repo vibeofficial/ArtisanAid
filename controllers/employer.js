@@ -166,14 +166,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid Credentials' });
     };
 
-    const jobPost = await jobPostModel.findOne({artisanId: user._id});
-
-    if (!jobPost) {
-      return res.status(404).json({
-        message: 'Job post not found'
-      })
-    }
-
+    
     if (user.isVerified !== true) {
       const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5m' });
       const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
@@ -196,18 +189,33 @@ exports.login = async (req, res) => {
         message: 'Your account is restricted. Contact: artisanaid.team@gmail.com to resolve'
       });
     }
-
+    
     user.isLoggedIn = true;
     const token = jwt.sign({ id: user._id, role: user.role, isLoggedIn: user.isLoggedIn }, jwtSecret, { expiresIn: '1d' });
     await user.save();
+    
+    if (user.role === 'Artisan') {
+      const jobPost = await jobPostModel.findOne({artisanId: user._id});
+  
+      if (!jobPost) {
+        return res.status(404).json({
+          message: 'Job post not found'
+        })
+      };
 
-    return res.status(200).json({
-      message: 'Login successful',
-      data: user,
-      jobPostImage: jobPost,
-      token
-    });
-
+      res.status(200).json({
+        message: 'Login successful',
+        data: user,
+        jobPostImage: jobPost,
+        token
+      }); 
+    } else {
+      return res.status(200).json({
+        message: 'Login successful',
+        data: user,
+        token
+      }); 
+    }
   } catch (error) {
     console.error('Login Error:', error.message);
     return res.status(500).json({
