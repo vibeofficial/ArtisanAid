@@ -205,7 +205,7 @@ exports.contactUsMessageValidation = async (req, resizeBy, next) => {
 
 exports.loginValidation = (req, res, next) => {
   const schema = joi.object({
-    email: joi.string().email().optional().messages({
+    email: joi.string().email().trim().optional().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
