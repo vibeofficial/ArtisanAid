@@ -233,7 +233,7 @@ exports.resendVerifyLink = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error sending mail'
+      message: error.message
     });
   }
 };
@@ -272,7 +272,7 @@ exports.forgotPassword = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({
-      message: 'Error processing password reset'
+      message: error.messsage
     });
   }
 };
@@ -308,7 +308,7 @@ exports.resetPassword = async (req, res) => {
     });
   } catch (error) {
     console.error(error.message);
-    return res.status(500).json({ message: 'Error resetting password' });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -359,7 +359,7 @@ exports.changePassword = async (req, res) => {
     };
 
     res.status(500).json({
-      message: 'Error changing password'
+      message: error.message
     });
   }
 };
