@@ -6,7 +6,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /v1/report/artisan:
+ * /v1/report/artisan/{artisanId}:
  *   post:
  *     summary: Report an artisan
  *     tags:

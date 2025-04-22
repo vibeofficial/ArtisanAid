@@ -159,11 +159,9 @@ exports.bookArtisanValidation = (req, res, next) => {
       'string.empty': 'Service description is required',
       'string.min': 'Service description should be at least 3 characters long'
     }),
-    phoneNumber: joi.string().min(11).max(11).required().pattern(/^[0-9]+$/).messages({
-      'string.empty': 'Phone number is required.',
-      'string.pattern.base': 'Phone number must contain only numbers.',
-      'string.min': 'Phone number must be exactly 11 digits.',
-      'string.max': 'Phone number must be exactly 11 digits.'
+    phoneNumber: joi.string().trim().pattern(/^\d{11,11}$/).required().messages({
+      "any.required": "Phone number is required",
+      "string.pattern.base": "Phone number must be 11 digits"
     }),
   });
 
