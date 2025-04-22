@@ -206,7 +206,7 @@ exports.login = async (req, res) => {
       res.status(200).json({
         message: 'Login successful',
         data: user,
-        jobPostImage: jobPost,
+        jobPostImage: jobPost || user.jobPost,
         token
       }); 
     } else {
