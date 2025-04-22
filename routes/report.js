@@ -25,9 +25,6 @@ const router = require('express').Router();
  *           schema:
  *             type: object
  *             properties:
- *               artisanId:
- *                 type: string
- *                 description: ID of the artisan being reported
  *               reason:
  *                 type: string
  *                 description: Reason for reporting the artisan
