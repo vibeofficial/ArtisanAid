@@ -7,7 +7,7 @@ exports.registerAdminValidation = (req, res, next) => {
       'string.empty': 'Full name is required',
       'string.min': 'Full name must be at least 3 characters long',
     }),
-    phoneNumber: joi.string().pattern(/^[0-9]{11}$/).required().messages({
+    phoneNumber: joi.string().trim().pattern(/^\d{11}$/).required().messages({
       'string.empty': 'Phone number is required',
       'string.pattern.base': 'Phone number must be 11 digits',
     }),
@@ -54,11 +54,9 @@ exports.registerArtisanValidation = async (req, res, next) => {
     businessName: joi.string().min(3).trim().required().messages({
       'string.min': 'Business name must be at least 3 characters long.'
     }),
-    phoneNumber: joi.string().min(11).max(11).required().pattern(/^[0-9]+$/).messages({
-      'string.empty': 'Phone number is required.',
-      'string.pattern.base': 'Phone number must contain only numbers.',
-      'string.min': 'Phone number must be exactly 11 digits.',
-      'string.max': 'Phone number must be exactly 11 digits.'
+    phoneNumber: joi.string().trim().pattern(/^\d{11}$/).required().messages({
+      'string.empty': 'Phone number is required',
+      'string.pattern.base': 'Phone number must be 11 digits',
     }),
     category: joi.string().min(3).trim().required().pattern(/^[A-Za-z]/).messages({
       'string.empty': 'Category is required.',
@@ -99,9 +97,9 @@ exports.registerEmployerValidation = (req, res, next) => {
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
-    phoneNumber: joi.string().trim().pattern(/^\d{11,11}$/).required().messages({
-      "any.required": "Phone number is required",
-      "string.pattern.base": "Phone number must be 11 digits"
+    phoneNumber: joi.string().trim().pattern(/^\d{11}$/).required().messages({
+      'string.empty': 'Phone number is required',
+      'string.pattern.base': 'Phone number must be 11 digits',
     }),
     password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",
@@ -159,9 +157,9 @@ exports.bookArtisanValidation = (req, res, next) => {
       'string.empty': 'Service description is required',
       'string.min': 'Service description should be at least 3 characters long'
     }),
-    phoneNumber: joi.string().trim().pattern(/^\d{11,11}$/).required().messages({
-      "any.required": "Phone number is required",
-      "string.pattern.base": "Phone number must be 11 digits"
+    phoneNumber: joi.string().trim().pattern(/^\d{11}$/).required().messages({
+      'string.empty': 'Phone number is required',
+      'string.pattern.base': 'Phone number must be 11 digits',
     }),
   });
 
@@ -211,9 +209,9 @@ exports.loginValidation = (req, res, next) => {
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     }),
-    phoneNumber: joi.string().pattern(/^\d{11,11}$/).optional().messages({
-      "any.required": "Phone number is required",
-      "string.pattern.base": "Phone number must be 11 digits"
+    phoneNumber: joi.string().trim().pattern(/^\d{11}$/).optional().messages({
+      'string.empty': 'Phone number is required',
+      'string.pattern.base': 'Phone number must be 11 digits',
     }),
     password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
       "any.required": "Password is required",

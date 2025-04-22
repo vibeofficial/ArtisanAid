@@ -1,7 +1,7 @@
 const bookingModel = require('../models/booking');
 const employerModel = require('../models/employer');
 const artisanModel = require('../models/artisan');
-const { acceptJobOffer, rejectJobOffer } = require('../helper/emailTemplate');
+const { acceptJobOffer, rejectJobOffer, artisanBookingMail, employerBookingMail } = require('../helper/emailTemplate');
 const { mail_sender } = require('../middlewares/nodemailer');
 
 
@@ -20,6 +20,8 @@ exports.bookArtisan = async (req, res) => {
     };
 
     const artisan = await artisanModel.findById(artisanId);
+    console.log(artisan);
+
 
     if (!artisan) {
       return res.status(404).json({
@@ -36,15 +38,20 @@ exports.bookArtisan = async (req, res) => {
       phoneNumber
     });
 
-    // c5
-
-    const mailDetails = {
+    const artisanMailDetails = {
       email: artisan.email,
-      subject: 'JOB BOOKING'
-      // html
+      subject: 'JOB BOOKING',
+      html: artisanBookingMail(artisan.category)
     };
 
-    await mail_sender(mailDetails);
+    const employerMailDetails = {
+      email: employer.email,
+      subject: 'JOB BOOKING',
+      html: employerBookingMail(artisan.fullname, artisan.category)
+    };
+
+    await mail_sender(artisanMailDetails);
+    await mail_sender(employerMailDetails);
     await booking.save();
 
     res.status(201).json({

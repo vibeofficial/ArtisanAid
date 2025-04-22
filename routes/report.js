@@ -11,10 +11,8 @@ const router = require('express').Router();
  *     summary: Report an artisan
  *     tags:
  *       - Report Artisan
- *     security:
- *       - Bearer: []
  *     parameters:
- *       - name: ArtisanId
+ *       - name: artisanId
  *         in: path
  *         description: The ID of the user whose account will be restricted.
  *         required: true
@@ -27,9 +25,6 @@ const router = require('express').Router();
  *           schema:
  *             type: object
  *             properties:
- *               artisanId:
- *                 type: string
- *                 description: ID of the artisan being reported
  *               reason:
  *                 type: string
  *                 description: Reason for reporting the artisan
