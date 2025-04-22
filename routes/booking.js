@@ -58,9 +58,6 @@ const router = require('express').Router();
  *                 message:
  *                   type: string
  *                   example: Artisan booked successfully
- *                 data:
- *                   type: object
- *                   description: The booking details
  *       400:
  *         description: Validation error
  *         content:
@@ -72,7 +69,7 @@ const router = require('express').Router();
  *                   type: string
  *                   example: Phone number must be between 10 and 15 digits
  *       404:
- *         description: Employer or Artisan not found
+ *         description: Artisan not found
  *         content:
  *           application/json:
  *             schema:
