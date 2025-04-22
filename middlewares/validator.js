@@ -347,7 +347,7 @@ exports.verificationValidation = async (req, res, next) => {
         'string.empty': 'Guarantor phone number is required',
         'any.required': 'Guarantor phone number is required'
       }),
-    workCertificate: joi.string().trim().required()
+    workCertificate: joi.string().optional()
   });
   console.log(req.body)
   const { error } = await schema.validate(req.body, { abortEarly: true });
