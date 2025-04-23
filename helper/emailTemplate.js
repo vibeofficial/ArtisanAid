@@ -131,13 +131,13 @@ exports.resetPassword = (link) => {
                 <tr>
                   <td class="content-box" style="background-color:#ffffff; border-radius:8px 8px 0 0; padding:20px 25px 15px; text-align:center; box-shadow:0 0 5px rgba(0, 0, 0, 0.1);">
                     <h2 style="font-size:25px; line-height: 1; color:#000435; margin-bottom:9px;">
-                      Reset Password
+                      RESET YOUR PASSWORD
                     </h2>
                     <p style="font-size:13px; color:#808080; line-height:1.5; margin-bottom:16px;">
                       We received a request to reset your account password. Click on the button below to create a new password:
                     </p>
                     <a href="${link}" style="display:inline-block; background-color:#000435; color:#ffffff; text-decoration:none; padding:10px 20px; border-radius:5px; font-weight:bold; font-size:14px;">
-                      Confirm Email
+                      Reset Password
                     </a>
                   </td>
                 </tr>
