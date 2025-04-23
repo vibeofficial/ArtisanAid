@@ -162,7 +162,7 @@ exports.getUnVerifiedArtisans = async (req, res) => {
 
 exports.getPendingArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Pending' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
+    const artisans = await artisanModel.find({ verificationStatus: 'Pending' }).populate('verificationId');
 
     return res.status(200).json({
       message: 'Pending artisans retrieved successfully',
@@ -180,7 +180,7 @@ exports.getPendingArtisans = async (req, res) => {
 
 exports.getApprovedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Approved' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
+    const artisans = await artisanModel.find({ verificationStatus: 'Approved' }).populate('verificationId');
 
     return res.status(200).json({
       message: 'Approved artisans retrieved successfully',
@@ -198,7 +198,7 @@ exports.getApprovedArtisans = async (req, res) => {
 
 exports.getDeclinedArtisans = async (req, res) => {
   try {
-    const artisans = await artisanModel.find({ verificationStatus: 'Declined' }).populate('verificationId', 'workCertificate guarantorName guarantorPhoneNumber');
+    const artisans = await artisanModel.find({ verificationStatus: 'Declined' }).populate('verificationId');
 
     return res.status(200).json({
       message: 'Declined artisans retrieved successfully',
