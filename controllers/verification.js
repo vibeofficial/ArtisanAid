@@ -39,6 +39,7 @@ exports.initializeVerification = async (req, res) => {
     });
 
     await verification.save();
+    
     artisan.verificationId = verification._id;
     artisan.verificationStatus = verification.status;
     await artisan.save();
