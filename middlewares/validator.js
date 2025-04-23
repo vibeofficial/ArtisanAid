@@ -256,7 +256,7 @@ exports.resetPasswordValidation = (req, res, next) => {
       "string.empty": "Password cannot be empty",
       "string.pattern.base": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character (@$!%_*#?&)."
     }),
-    confirmPassword: joi.string().valid(joi.ref("password")).required().messages({
+    confirmPassword: joi.string().valid(joi.ref("newPassword")).required().messages({
       "any.required": "Confirm password is required",
       "any.only": "Passwords do not match"
     })
