@@ -216,7 +216,7 @@ exports.resendVerifyLink = async (req, res) => {
     };
 
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://artisian-aid.vercel.app/verifyemail/${token}`;
+    const link = `https://artisian-aid.vercel.app/verifyemail/${token}`;
     const html = verifyMail(link);
 
     const mailDetails = {
@@ -254,7 +254,7 @@ exports.forgotPassword = async (req, res) => {
     };
 
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
-    const link = `${req.protocol}://artisian-aid.vercel.app/resetpassword/${token}`;
+    const link = `https://artisian-aid.vercel.app/resetpassword/${token}`;
     const html = resetPassword(link);
 
     const mailDetails = {
