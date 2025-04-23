@@ -278,6 +278,41 @@ exports.forgotPassword = async (req, res) => {
 };
 
 
+exports.resendForgotLink = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      })
+    };
+
+    const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '5mins' });
+    const link = `https://artisian-aid.vercel.app/resetpassword/${token}`;
+    const html = resetPassword(link);
+
+    const mailDetails = {
+      email: user.email,
+      subject: 'EMAIL VERIFICATION',
+      html
+    };
+
+    await mail_sender(mailDetails);
+
+    res.status(201).json({
+      message: 'Link has been sent to email address'
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({
+      message: error.message
+    });
+  }
+};
+
+
 exports.resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
