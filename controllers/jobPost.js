@@ -118,7 +118,7 @@ exports.updateJobPost = async (req, res) => {
       };
 
       const updatedJobPost = await jobPostModel.findByIdAndUpdate(jobPost._id, data, { new: true });
-      
+
       if (updatedJobPost) {
         await cloudinary.uploader.destroy(artisan.jobPost.public_id);
         const jobPostResult = await cloudinary.uploader.upload(data.jobImage.image_url);
@@ -173,6 +173,15 @@ exports.deleteJobPost = async (req, res) => {
 
     if (deletedJobPost) {
       await cloudinary.uploader.destroy(jobPost.jobImage.public_id);
+      const jobPost = 'https://dentico.co.za/wp-content/uploads/2016/08/dummy-prod-1.jpg';
+      const jobPostPicResult = await cloudinary.uploader.upload(jobPost);
+
+      artisan.jobPost = {
+        public_id: jobPostPicResult.public_id,
+        image_url: jobPostPicResult.secure_url
+      };
+
+      await artisan.save()
     };
 
     res.status(200).json({
