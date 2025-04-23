@@ -429,3 +429,4 @@ exports.reportArtisanValidation = (req, res, next) => {
 
   next();
 };
+
