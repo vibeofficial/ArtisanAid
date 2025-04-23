@@ -15,10 +15,7 @@ exports.registerAdminValidation = (req, res, next) => {
       'string.empty': 'Email is required',
       'string.email': 'Please provide a valid email address',
     }),
-    password: joi.string()
-      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/)
-      .required()
-      .messages({
+    password: joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%_*#?&])[A-Za-z\d@$!%_*#?&]{8,}$/).required().messages({
         'string.empty': 'Password is required',
         'string.pattern.base': 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, a number, and a special character (@$!%_*#?&)',
       }),
@@ -234,7 +231,7 @@ exports.loginValidation = (req, res, next) => {
 
 exports.forgotPasswordValidation = (req, res, next) => {
   const schema = joi.object({
-    email: joi.string().email().required().messages({
+    email: joi.string().trim().email().required().messages({
       "string.email": "Invalid email format",
       "any.required": "Email is required"
     })
@@ -331,27 +328,22 @@ exports.lgaValidation = (req, res, next) => {
 
 
 exports.verificationValidation = async (req, res, next) => {
-
-  console.log(req)
   const schema = joi.object({
-    guarantorName: joi.string().min(3).required().messages({
+    guarantorName: joi.string().trim().min(3).required().messages({
       'string.empty': 'Guarantor name is required',
       'string.min': 'Guarantor name must be at least 3 characters long',
       'any.required': 'Guarantor name is required'
     }),
-    guarantorPhoneNumber: joi.string()
-      .pattern(/^[0-9]{10,15}$/).trim()
-      .required()
-      .messages({
+    guarantorPhoneNumber: joi.string().pattern(/^[0-9]{10,15}$/).trim().required().messages({
         'string.pattern.base': 'Phone number must be between 10 and 15 digits',
         'string.empty': 'Guarantor phone number is required',
         'any.required': 'Guarantor phone number is required'
       }),
     workCertificate: joi.string().optional()
   });
-  console.log(req.body)
+  
   const { error } = await schema.validate(req.body, { abortEarly: true });
-  console.log(req.body)
+  
   if (error) {
     return res.status(400).json({
       message: error.message
@@ -364,7 +356,7 @@ exports.verificationValidation = async (req, res, next) => {
 
 exports.createPlanValidation = (req, res, next) => {
   const schema = joi.object({
-    planName: joi.string().required().messages({
+    planName: joi.string().trim().required().messages({
       'string.empty': 'Plan name cannot be empty',
       'any.required': 'Plan name is required'
     }),

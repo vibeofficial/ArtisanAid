@@ -82,7 +82,7 @@ exports.acceptVerification = async (req, res) => {
 
     const mailDetails = {
       email: artisan.email,
-      subject: 'ACCOUNT VERIFICATION',
+      subject: 'ACCOUNT VERIFICATION APPROVED',
       html: acceptVerification()
     };
 
@@ -120,17 +120,18 @@ exports.rejectVerification = async (req, res) => {
     };
 
     verification.status = 'Declined';
+    artisan.verificationStatus = 'Declined';
+    await verificationModel.findByIdAndDelete(verification._id);
     await verification.save();
-    artisan.verificationStatus = 'Declined'; 
+    await artisan.save();
 
     const mailDetails = {
       email: artisan.email,
-      subject: 'ACCOUNT VERIFICATION REJECTED',
+      subject: 'ACCOUNT VERIFICATION DECLINED',
       html: rejectVerification() 
     };
 
     await mail_sender(mailDetails);
-    await artisan.save();
 
     res.status(200).json({
       message: 'Account verification has been rejected'
