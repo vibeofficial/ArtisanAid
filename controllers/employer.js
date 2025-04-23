@@ -133,27 +133,16 @@ exports.getArtisans = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, phoneNumber, password } = req.body;
-
-    if (!email && !phoneNumber) {
-      return res.status(400).json({
-        message: 'Please provide an email or phone number'
-      });
-    };
-
-    if (!password) {
-      return res.status(400).json({ message: 'Password is required' });
-    };
-
     let user;
 
     if (email) {
-      user = await artisanModel.findOne({ email: email?.toLowerCase() }) || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
+      user = await artisanModel.findOne({ email: email?.toLowerCase() }).populate('verificationId') || await employerModel.findOne({ email: email?.toLowerCase() }) || await adminModel.findOne({ email: email?.toLowerCase() });
 
       if (!user) {
         return res.status(404).json({ message: 'No account found' });
       };
     } else if (phoneNumber) {
-      user = await artisanModel.findOne({ phoneNumber }) || await employerModel.findOne({ phoneNumber }) || await adminModel.findOne({ phoneNumber });
+      user = await artisanModel.findOne({ phoneNumber }).populate('verificationId') || await employerModel.findOne({ phoneNumber }) || await adminModel.findOne({ phoneNumber });
 
       if (!user) {
         return res.status(404).json({ message: 'No account found' });
