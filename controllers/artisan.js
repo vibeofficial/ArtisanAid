@@ -271,6 +271,13 @@ exports.forgotPassword = async (req, res) => {
 
   } catch (error) {
     console.error(error.message);
+
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, enter your email to resend link'
+      })
+    }
+
     return res.status(500).json({
       message: error.messsage
     });
