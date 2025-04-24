@@ -162,8 +162,6 @@ router.get('/verify/account/:token', verifyAccount);
  *     description: Resends the account verification link to the provided email address if the user exists.
  *     tags:
  *       - General
- *     security:
- *       - Bearer: []
  *     requestBody:
  *       required: true
  *       content:
