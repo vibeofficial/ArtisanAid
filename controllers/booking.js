@@ -11,17 +11,21 @@ exports.bookArtisan = async (req, res) => {
     const { artisanId } = req.params;
     const { location, serviceTitle, serviceDescription, phoneNumber } = req.body;
 
-    const employer = await employerModel.findById(id);
+    const user = await employerModel.findById(id) || await artisanModel.findById(id);
 
-    if (!employer) {
+    if (!user) {
       return res.status(404).json({
-        message: 'Employer not found'
+        message: "Account not found, please create an employer's account"
+      })
+    };
+
+    if (user.role === 'Artisan') {
+      return res.status(400).json({
+        message: 'You cannot book another artisan with an artisan account'
       })
     };
 
     const artisan = await artisanModel.findById(artisanId);
-    console.log(artisan);
-
 
     if (!artisan) {
       return res.status(404).json({
@@ -31,7 +35,7 @@ exports.bookArtisan = async (req, res) => {
 
     const booking = new bookingModel({
       artisanId: artisan._id,
-      employerId: employer._id,
+      employerId: user._id,
       location,
       serviceTitle,
       serviceDescription,
@@ -45,7 +49,7 @@ exports.bookArtisan = async (req, res) => {
     };
 
     const employerMailDetails = {
-      email: employer.email,
+      email: user.email,
       subject: 'JOB BOOKING',
       html: employerBookingMail(artisan.fullname, artisan.category)
     };
