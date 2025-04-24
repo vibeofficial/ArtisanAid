@@ -121,7 +121,6 @@ exports.rejectVerification = async (req, res) => {
 
     verification.status = 'Declined';
     artisan.verificationStatus = 'Declined';
-    await verificationModel.findByIdAndDelete(verification._id);
     await verification.save();
     await artisan.save();
 
