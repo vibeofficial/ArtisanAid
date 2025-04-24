@@ -127,7 +127,8 @@ exports.verifySubscription = async (req, res) => {
 
       if (artisan.subscriptionPlan === 'PREMIUM PLAN') {
         artisan.rating = 5;
-
+        artisan.isRecommended = true;
+        
         const mailDetails = {
           email: artisan.email,
           subject: 'SUBSCRIPTION ACTIVATED',
@@ -137,6 +138,7 @@ exports.verifySubscription = async (req, res) => {
         await mail_sender(mailDetails);
       } else if (artisan.subscriptionPlan === 'BASIC PLAN') {
         artisan.rating = 3;
+        artisan.isRecommended = false;
 
         const mailDetails = {
           email: artisan.email,
